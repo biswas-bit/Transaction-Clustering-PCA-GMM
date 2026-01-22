@@ -107,3 +107,10 @@ A neglible portion of the dataset (**0.27%**) was found to have missing values i
 1. **Daily Cycle:** Transactions peak between **12:00 and 15:00**, suggesting a business-heavy operating window.
 2. **weekly Cycle:** A significant drop-off is observed on **saturday and Wednesday**, indicating a specific operational constraint in the data source (likely a closed warehouse).
 3. **Monthly Momentum:** there is a clear upward trend moving into **sept-Nov** then little decrement in the **dec**. 
+
+### 5.Handling Data Redundancy
+An audit for duplicate records was conducted to ensure the statistical integrity of the clusters.
+
+- **Discovery:** Approximately **5268** records were identified as exact duplicates across all feature dimensions.
+- **Action:** Duplicate rows were removed using the `drop_duplicates()` method.
+- **Impact on Modeling:** This step prevents the Gaussian Mixture Model from "over-learning" specific transactional signatures and ensures that the membership probabilities are based on unique economic events rather than logging errors.
