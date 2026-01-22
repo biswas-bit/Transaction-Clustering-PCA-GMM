@@ -127,6 +127,14 @@ An audit for duplicate records was conducted to ensure the statistical integrity
 - **Time vs. Value:** Peak average transaction values occur during mid-day hours, suggesting business procurement cycles.
 - **Quantity vs. Price:** An expected inverse relationship exists; however, certain high-value/high-quantity outliers represent a distinct "Wholesale" segment.
 
+### 6.2 Bivariate Observations: Linear Alignment
+The scatter plots reveal distinct linear "striping" and diagonal alignments.
+
+- **Vertical Strips:** Caused by the discrete nature of the `Hours` and `Months` features.
+- **Diagonal Trends:** Reflect the deterministic relationship between `Quantity` and `TotalValue`.
+- **Insight for GMM:** The high density along these lines suggests that while the data is constrained to specific values, the *thickness* (frequency) of these lines will allow the Gaussian Mixture Model to define "Soft" probability zones.
+---
+
 ### 6.2 Correlation Analysis
 - A high correlation ($r > 0.8$) exists between `Quantity` and `TotalValue`. 
 - **Strategic Decision:** Both are retained for now, as `TotalValue` captures the weight of `UnitPrice` which `Quantity` alone does not.
