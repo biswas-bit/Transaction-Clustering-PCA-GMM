@@ -123,10 +123,10 @@ An audit for duplicate records was conducted to ensure the statistical integrity
 - **Quantity & Value:** Both features are heavily right-skewed. The majority of transactions are small retail purchases, while the "tail" represents large-scale wholesale orders.
 - **Temporal Peaks:** Transactions are most frequent between 10:00 and 15:00.
 
-### 3.1 Bivariate Relationships
+### 6.1 Bivariate Relationships
 - **Time vs. Value:** Peak average transaction values occur during mid-day hours, suggesting business procurement cycles.
 - **Quantity vs. Price:** An expected inverse relationship exists; however, certain high-value/high-quantity outliers represent a distinct "Wholesale" segment.
 
-### 3.2 Correlation Analysis
+### 6.2 Correlation Analysis
 - A high correlation ($r > 0.8$) exists between `Quantity` and `TotalValue`. 
 - **Strategic Decision:** Both are retained for now, as `TotalValue` captures the weight of `UnitPrice` which `Quantity` alone does not.
