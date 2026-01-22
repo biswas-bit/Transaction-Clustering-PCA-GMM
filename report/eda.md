@@ -98,3 +98,10 @@ A neglible portion of the dataset (**0.27%**) was found to have missing values i
 - **Action:** Missing values were replaced with the mode : ' "WHITE HANGING HEART T-LIGHT HOLDER" '.
 - **Justification:** Given the extremly low percentage of the missingness, this imputation maintains the dataset's integrity without introducing significant bias into the transactional clusters.
 - **Alternative Considered:** Deletion was rejected to preserve the associated 'UnitPrice' amd 'Quantity' data, which are vital for the soft Clustering (GMM) probability calculations.
+
+
+## 4.Date Time Analysis
+### Findings:
+1. **Daily Cycle:** Transactions peak between **12:00 and 15:00**, suggesting a business-heavy operating window.
+2. **weekly Cycle:** A significant drop-off is observed on **saturday and Wednesday**, indicating a specific operational constraint in the data source (likely a closed warehouse).
+3. **Monthly Momentum:** there is a clear upward trend moving into **sept-Nov** then little decrement in the **dec**. 
