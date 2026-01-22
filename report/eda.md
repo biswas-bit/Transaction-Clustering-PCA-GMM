@@ -1,6 +1,7 @@
 # Exploratory Data Analysis (EDA)
 
-## 1. Quantity Analysis
+## 1. Numerica Data Analysis
+### 1.1 Quantity Analysis
 Tracks the volume of items per transaction.
 
 - **Central Tendency:**  
@@ -18,7 +19,7 @@ Tracks the volume of items per transaction.
 
 ---
 
-## 2. Temporal Range (InvoiceDate)
+### 1.2 Temporal Range (InvoiceDate)
 Analyzes the time span of the transactions.
 
 - **Start Date:** `2010-12-01 08:26:00`  
@@ -28,7 +29,7 @@ Analyzes the time span of the transactions.
 
 ---
 
-## 3. Unit Price Distribution
+### 1.3 Unit Price Distribution
 Pricing metrics for products in the catalog.
 
 - **Pricing Tiers:**  
@@ -42,9 +43,50 @@ Pricing metrics for products in the catalog.
 
 ---
 
-## 4. Customer Coverage
+### 1.4. Customer Coverage
 Insight into customer data quality.
 
 - **Active Customers:** **406,829** records with valid `CustomerID`.  
 - **Missing Data:** Approximately **135,080 rows** (~25%) lack `CustomerID`.  
 - Observation: Missing data may impact **customer-level analysis** and **segmentation**.
+
+---
+
+## 2. Categorical Feature Analysis
+
+This section explores the non-numeric metadata of the transactional dataset. Initial observation reveals high cardinality in product identifiers and a heavy geographical bias toward the domestic market.
+
+### 2.1 Feature Summary Table
+The table below summarizes the distribution of the primary categorical variables across **541,909** records.
+
+| Feature | Unique Count | Top Value | Frequency | Business Insight |
+| :--- | :--- | :--- | :--- | :--- |
+| **InvoiceNo** | 25,900 | `573585` | 1,114 | High frequency in single invoices suggests bulk/B2B purchasing. |
+| **StockCode** | 4,070 | `85123A` | 2,313 | Inventory is diverse, but sales are concentrated in top SKUs. |
+| **Description** | 4,223 | `WHITE HANGING HEART...` | 2,369 | This "Anchor Product" serves as a primary entry point for customers. |
+| **Country** | 38 | `United Kingdom` | 495,478 | **91.4% Market Share** is domestic; international is a growth niche. |
+
+---
+
+### 2.2 Key Data Insights
+
+#### A. The "Wholesaler" Signature
+The presence of **Invoice 573585**, which contains **1,114 unique entries**, indicates that the dataset includes wholesale or B2B (Business-to-Business) entities. 
+* **Model Impact:** These outliers can skew K-Means centroids. They are treated as a distinct "Wholesaler" segment to avoid diluting the "Retail Shopper" personas.
+
+#### B. High Cardinality & Dimensionality
+With over **4,000 unique product descriptions**, using standard encoding techniques (like One-Hot Encoding) would lead to the *Curse of Dimensionality*, expanding the dataset into 4,000+ sparse columns.
+* **Modeling Strategy:** Instead of encoding product names, we engineered features such as **"Variety of Products Bought"** and **"Average Items per Transaction"** to capture behavior without overwhelming the model.
+
+
+
+#### C. Geographical Concentration
+The vast majority of transactions occur in the **United Kingdom (91.4%)**.
+* **Strategic Action:** For marketing purposes, the "Country" feature is collapsed into a binary category: **Domestic (UK)** vs. **International**. This simplifies the model while retaining the most important geographical distinction.
+
+
+
+---
+
+### 2.3 Implications for Modeling
+The categorical analysis confirms that the data is not "isotropic" (uniform). The high frequency of specific items and the dominance of the UK market suggest that a **Centroid-based approach (K-Means)** will be effective at slicing the main "Retail Cloud," while **DBSCAN** may be useful specifically for isolating the massive B2B invoices as outliers.
