@@ -65,6 +65,7 @@ The table below summarizes the distribution of the primary categorical variables
 | **StockCode** | 4,070 | `85123A` | 2,313 | Inventory is diverse, but sales are concentrated in top SKUs. |
 | **Description** | 4,223 | `WHITE HANGING HEART...` | 2,369 | This "Anchor Product" serves as a primary entry point for customers. |
 | **Country** | 38 | `United Kingdom` | 495,478 | **91.4% Market Share** is domestic; international is a growth niche. |
+Here InvoiceNO and Stockcode is removed cause they are just identifier's for transactions they don't make any sense for model.
 
 ---
 
