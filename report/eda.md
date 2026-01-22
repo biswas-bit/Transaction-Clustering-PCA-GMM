@@ -130,3 +130,10 @@ An audit for duplicate records was conducted to ensure the statistical integrity
 ### 6.2 Correlation Analysis
 - A high correlation ($r > 0.8$) exists between `Quantity` and `TotalValue`. 
 - **Strategic Decision:** Both are retained for now, as `TotalValue` captures the weight of `UnitPrice` which `Quantity` alone does not.
+---
+## 7.Ouliers Removal :IQR Method
+Following the boxplot analysis, the dataset was pruned of statistical anomalies using the Interquartile Range (IQR) technique.
+
+- **Target Features:** `Quantity`, `UnitPrice`, and `TotalValue`.
+- **Methodology:** Records falling outside the $[Q1 - 1.5 \times IQR, Q3 + 1.5 \times IQR]$ range were excluded.
+- **Result:** This process eliminated extreme "Whale" transactions, resulting in a more homogenous dataset that allows the **Gaussian Mixture Model** to focus on meaningful behavioral density rather than extreme variance.
