@@ -108,7 +108,7 @@ A neglible portion of the dataset (**0.27%**) was found to have missing values i
 2. **weekly Cycle:** A significant drop-off is observed on **saturday and Wednesday**, indicating a specific operational constraint in the data source (likely a closed warehouse).
 3. **Monthly Momentum:** there is a clear upward trend moving into **sept-Nov** then little decrement in the **dec**. 
 
-### 5.Handling Data Redundancy
+## 5.Handling Data Redundancy
 An audit for duplicate records was conducted to ensure the statistical integrity of the clusters.
 
 - **Discovery:** Approximately **5268** records were identified as exact duplicates across all feature dimensions.
