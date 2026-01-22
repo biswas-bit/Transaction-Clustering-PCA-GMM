@@ -90,3 +90,11 @@ The vast majority of transactions occur in the **United Kingdom (91.4%)**.
 
 ### 2.3 Implications for Modeling
 The categorical analysis confirms that the data is not "isotropic" (uniform). The high frequency of specific items and the dominance of the UK market suggest that a **Centroid-based approach (K-Means)** will be effective at slicing the main "Retail Cloud," while **DBSCAN** may be useful specifically for isolating the massive B2B invoices as outliers.
+
+## 3.Handaling MIssing Values
+A neglible portion of the dataset (**0.27%**) was found to have missing values in the "description" column.
+
+### Strategy: Mode Imputation
+- **Action:** Missing values were replaced with the mode : ' "WHITE HANGING HEART T-LIGHT HOLDER" '.
+- **Justification:** Given the extremly low percentage of the missingness, this imputation maintains the dataset's integrity without introducing significant bias into the transactional clusters.
+- **Alternative Considered:** Deletion was rejected to preserve the associated 'UnitPrice' amd 'Quantity' data, which are vital for the soft Clustering (GMM) probability calculations.
