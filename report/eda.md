@@ -145,3 +145,13 @@ Following the boxplot analysis, the dataset was pruned of statistical anomalies 
 - **Target Features:** `Quantity`, `UnitPrice`, and `TotalValue`.
 - **Methodology:** Records falling outside the $[Q1 - 1.5 \times IQR, Q3 + 1.5 \times IQR]$ range were excluded.
 - **Result:** This process eliminated extreme "Whale" transactions, resulting in a more homogenous dataset that allows the **Gaussian Mixture Model** to focus on meaningful behavioral density rather than extreme variance.
+---
+## 8.Treatment of Categorical Metadata
+
+A distinction was made between **Predictive Features** and **Descriptive Metadata**:
+
+- **Predictive Features:** `Quantity`, `UnitPrice`, and temporal features were standardized. These form the basis of the GMM probability density.
+- **Descriptive Metadata:** `Description` and `Country` were excluded from the clustering math. 
+- **Rationale:** - **Description:** High cardinality (~4,000 unique values) would lead to sparse data and the "Curse of Dimensionality," degrading GMM performance.
+    - **Country:** Extreme class imbalance (UK dominance) would bias the clusters toward geography rather than purchasing behavior.
+- **Post-Clustering Plan:** These columns will be used to profile the "Personas" identified by the model.
