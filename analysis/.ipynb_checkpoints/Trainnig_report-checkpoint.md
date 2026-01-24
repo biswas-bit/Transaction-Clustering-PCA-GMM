@@ -21,3 +21,13 @@ The model was evaluated on internal cluster validity metrics:
   2. **Davies-Boulin Index:** 1.5293 (indicates moderate seperation between clusters centers).
   3. **Calinski-Harabasz index:** 290,208 (High value confirming strong, dense patterns in the data).
 ---
+# 4. Clusters Persona Profiles(The Labels)
+The followig behaviors were derived from the Cluster Centroids:
+| Cluster Label | Avg Quantity | Avg Price | Behavioral Description |
+|--------------|--------------|-----------|--------------------------|
+| Premium Retail | 2.46 | $3.13 | High-value, low-volume gift / luxury buyers |
+| Standard Retail | 3.38 | $2.75 | Everyday consumers making small, frequent purchases |
+| Growth Retail | 4.79 | $2.73 | Regular shoppers with higher basket depth |
+| Wholesale | 13.83 | $1.20 | B2B / bulk buyers benefiting from low unit prices |
+
+---
