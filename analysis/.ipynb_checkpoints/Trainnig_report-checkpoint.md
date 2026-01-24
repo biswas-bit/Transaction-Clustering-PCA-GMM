@@ -8,3 +8,10 @@
   2. **Dropped Features:** TotalValue (redundancy/leakage), Description (metadata), CustomerID (identity).
   3. **Outlier Strategy:** IQR Method (1.5x) applied to financial metrics to ensure Gaussian stability.
   4. **Scaling:** StandardScaler applied to all numerical features to equalize feature influence.
+---
+
+# 2.Model Architecture & Selection
+   1. **Algorithm:** Gaussian Mixture Model(GMM)
+   2. **Coviariance Type:** Ful
+   3. **Hyperparameter Tuning:** K=4 was selected based on the Baysian information Criterion(BIC) "Elbow" point.
+---
