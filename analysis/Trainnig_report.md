@@ -15,3 +15,9 @@
    2. **Coviariance Type:** Ful
    3. **Hyperparameter Tuning:** K=4 was selected based on the Baysian information Criterion(BIC) "Elbow" point.
 ---
+# 3.Quantitative Evaluation
+The model was evaluated on internal cluster validity metrics:
+  1. **silhouette Score:** 0.1578 (Reflects expected "soft" boundaries and natral behaviour overlap).
+  2. **Davies-Boulin Index:** 1.5293 (indicates moderate seperation between clusters centers).
+  3. **Calinski-Harabasz index:** 290,208 (High value confirming strong, dense patterns in the data).
+---
