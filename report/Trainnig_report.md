@@ -31,3 +31,8 @@ The followig behaviors were derived from the Cluster Centroids:
 | Wholesale | 13.83 | $1.20 | B2B / bulk buyers benefiting from low unit prices |
 
 ---
+
+# 5. Production & Export Status
+   1. **Persistence:** Model and Scaler serialized via joblib.
+   2. **Deployment Readiness:** The model is ready for an inference pipeline where it can assign "Membership Probabilities" to new transactions.
+   3. **Risk Note:** Low Silhouette score implies that "Borderline" customers (e.g., someone buying 9 items) will have high uncertainty between Cluster 2 and 3.
