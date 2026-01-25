@@ -1,3 +1,33 @@
+# --- Python / Environment ---
 venv/
 .env
-datasets/
+__pycache__/
+*.py[cod]
+*$py.class
+.ipynb_checkpoints/
+
+# --- ML Data & Artifacts ---
+# Ignore raw datasets but keep the directory structure
+datasets/*.csv
+datasets/*.xlsx
+datasets/*.json
+
+# Keep the models folder but ignore large/temp model weights if needed
+# (Only ignore if you are using Git LFS for the .pkl files)
+# models/*.pkl
+
+# --- Django Specific ---
+db.sqlite3
+db.sqlite3-journal
+media/
+static_root/
+staticfiles/
+
+# --- OS / IDE ---
+.DS_Store
+.vscode/
+.idea/
+
+# --- Logs & Deployment ---
+*.log
+Procfile
