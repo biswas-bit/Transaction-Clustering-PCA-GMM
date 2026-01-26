@@ -1,0 +1,533 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MallX Analytics | Dashboard</title>
+    <link rel="stylesheet" href="{% static 'css/style.css'%}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <h1>MallX Analytics</h1>
+            </div>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li class="active">
+                        <a href="#">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-store"></i>
+                            <span>Stores</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Sales</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-users"></i>
+                            <span>Customers</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-boxes"></i>
+                            <span>Inventory</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" id="transactionTab">
+                            <i class="fas fa-cash-register"></i>
+                            <span>Transaction Entry</span>
+                            <span class="new-badge">New</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="calendar-widget">
+                <h3><i class="fas fa-calendar-alt"></i> Today</h3>
+                <div class="date-display">
+                    <div class="day">26</div>
+                    <div class="month-year">
+                        <div class="month">January</div>
+                        <div class="year">2024</div>
+                    </div>
+                </div>
+                <div class="weekday">Monday</div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="username">Admin User</span>
+                        <span class="role">Mall Manager</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="navbar">
+                <div class="navbar-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="page-title">
+                        <h2>Analytics Overview</h2>
+                        <p class="date-range">Dec 25, 2023 - Jan 26, 2024</p>
+                    </div>
+                </div>
+                
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" placeholder="Search stores, reports, analytics...">
+                </div>
+                
+                <div class="navbar-right">
+                    <div class="date-selector">
+                        <i class="fas fa-calendar"></i>
+                        <select id="dateRange">
+                            <option>Last 7 days</option>
+                            <option selected>Last 30 days</option>
+                            <option>Last quarter</option>
+                            <option>Last year</option>
+                            <option>Custom range</option>
+                        </select>
+                    </div>
+                    
+                    <button class="notification-btn" id="notificationBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    
+                    <div class="profile-dropdown">
+                        <div class="profile-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="dropdown-content">
+                            <a href="#"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="#"><i class="fas fa-cog"></i> Account Settings</a>
+                            <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- KPI Cards -->
+                <section class="kpi-section">
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <i class="fas fa-wallet"></i>
+                            <h3>Total Sales</h3>
+                        </div>
+                        <div class="kpi-value" id="totalSales">₹ 12,84,560</div>
+                        <div class="kpi-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>12.5%</span>
+                            <span class="change-label">vs last month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <i class="fas fa-users"></i>
+                            <h3>Total Visitors</h3>
+                        </div>
+                        <div class="kpi-value" id="totalVisitors">45,820</div>
+                        <div class="kpi-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>8.3%</span>
+                            <span class="change-label">vs last month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <i class="fas fa-percentage"></i>
+                            <h3>Conversion Rate</h3>
+                        </div>
+                        <div class="kpi-value" id="conversionRate">4.8%</div>
+                        <div class="kpi-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            <span>1.2%</span>
+                            <span class="change-label">vs last month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Profit Margin</h3>
+                        </div>
+                        <div class="kpi-value" id="profitMargin">24.6%</div>
+                        <div class="kpi-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>3.1%</span>
+                            <span class="change-label">vs last month</span>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Transaction Entry Section -->
+                <section class="transaction-entry-section">
+                    <div class="section-header">
+                        <h3><i class="fas fa-cash-register"></i> Transaction Data Entry</h3>
+                        <p class="section-subtitle">Enter sales transactions. Time data is auto-captured for ML features.</p>
+                    </div>
+                    
+                    <div class="transaction-entry-grid">
+                        <!-- Transaction Entry Form -->
+                        <div class="transaction-form-card">
+                            <div class="card-header">
+                                <h4>New Transaction</h4>
+                                <div class="current-time" id="currentTime">
+                                    <i class="fas fa-clock"></i> <span id="timeDisplay">Loading...</span>
+                                </div>
+                            </div>
+                            
+                            <form id="transactionForm" class="transaction-form">
+                                <div class="form-group">
+                                    <label for="productName">
+                                        <i class="fas fa-tag"></i> Product Name
+                                    </label>
+                                    <input 
+                                        type="text" 
+                                        id="productName" 
+                                        placeholder="e.g., Premium Headphones, T-shirt, Coffee"
+                                        required
+                                    >
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="quantity">
+                                            <i class="fas fa-boxes"></i> Quantity
+                                        </label>
+                                        <input 
+                                            type="number" 
+                                            id="quantity" 
+                                            min="1" 
+                                            max="1000" 
+                                            value="1"
+                                            required
+                                        >
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="unitPrice">
+                                            <i class="fas fa-rupee-sign"></i> Unit Price (₹)
+                                        </label>
+                                        <input 
+                                            type="number" 
+                                            id="unitPrice" 
+                                            min="1" 
+                                            max="1000000" 
+                                            step="0.01"
+                                            placeholder="0.00"
+                                            required
+                                        >
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="category">
+                                        <i class="fas fa-store"></i> Store Category
+                                    </label>
+                                    <select id="category" required>
+                                        <option value="">Select Category</option>
+                                        <option value="electronics">Electronics</option>
+                                        <option value="fashion">Fashion & Apparel</option>
+                                        <option value="food">Food & Beverage</option>
+                                        <option value="home">Home & Living</option>
+                                        <option value="beauty">Beauty & Cosmetics</option>
+                                        <option value="sports">Sports & Fitness</option>
+                                        <option value="entertainment">Entertainment</option>
+                                        <option value="books">Books & Stationery</option>
+                                        <option value="other">Other</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div class="auto-data-info">
+                                        <h5><i class="fas fa-robot"></i> Auto-Captured ML Features</h5>
+                                        <div class="features-list">
+                                            <div class="feature">
+                                                <span class="feature-name">Hour:</span>
+                                                <span class="feature-value" id="autoHour">--</span>
+                                            </div>
+                                            <div class="feature">
+                                                <span class="feature-name">Day of Week:</span>
+                                                <span class="feature-value" id="autoDay">--</span>
+                                            </div>
+                                            <div class="feature">
+                                                <span class="feature-name">Month:</span>
+                                                <span class="feature-value" id="autoMonth">--</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group total-preview">
+                                    <label>Total Value:</label>
+                                    <div class="total-amount" id="totalPreview">₹ 0.00</div>
+                                </div>
+                                
+                                <button type="submit" class="submit-btn">
+                                    <i class="fas fa-plus-circle"></i> Add Transaction
+                                </button>
+                                
+                                <button type="button" class="quick-add-btn" id="quickAddBtn">
+                                    <i class="fas fa-bolt"></i> Quick Add Sample
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <!-- Live Transactions Table -->
+                        <div class="transactions-table-card">
+                            <div class="card-header">
+                                <h4>Live Transactions</h4>
+                                <div class="transactions-count">
+                                    <span class="count-badge" id="transactionCount">0</span> transactions
+                                </div>
+                            </div>
+                            
+                            <div class="table-container">
+                                <table class="live-transactions-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Time</th>
+                                            <th>Product</th>
+                                            <th>Category</th>
+                                            <th>Qty</th>
+                                            <th>Unit Price</th>
+                                            <th>Total Value</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="liveTransactionsTable">
+                                        <!-- Transactions will be populated here -->
+                                        <tr class="empty-row">
+                                            <td colspan="6" class="empty-message">
+                                                <i class="fas fa-shopping-cart"></i>
+                                                <p>No transactions yet. Add your first transaction!</p>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            
+                            <div class="table-footer">
+                                <div class="summary-stats">
+                                    <div class="stat">
+                                        <span class="stat-label">Today's Total:</span>
+                                        <span class="stat-value" id="todayTotal">₹ 0</span>
+                                    </div>
+                                    <div class="stat">
+                                        <span class="stat-label">Avg. Transaction:</span>
+                                        <span class="stat-value" id="avgTransaction">₹ 0</span>
+                                    </div>
+                                </div>
+                                <button class="clear-btn" id="clearTransactionsBtn">
+                                    <i class="fas fa-trash"></i> Clear All
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Charts Row 1 -->
+                <section class="charts-row-1">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Weekly Sales Trend</h3>
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <span class="legend-color current-week"></span>
+                                    <span>Current Week</span>
+                                </div>
+                                <div class="legend-item">
+                                    <span class="legend-color last-week"></span>
+                                    <span>Last Week</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="salesChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Category Contribution</h3>
+                            <div class="chart-legend">
+                                <div class="legend-item">
+                                    <i class="fas fa-sync-alt refresh-icon" id="refreshCategories"></i>
+                                    <span>Live Updates</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="sourceChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Charts Row 2 -->
+                <section class="charts-row-2">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Hourly Transaction Volume</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="visitorsChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3>Sales Heatmap (Hour vs Day)</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="heatmapChart"></canvas>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Recent Transactions Panel -->
+                <section class="transactions-section">
+                    <div class="transactions-card">
+                        <div class="card-header">
+                            <h3>Recent Transactions</h3>
+                            <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+                        </div>
+                        <div class="transactions-container">
+                            <table class="transactions-table">
+                                <thead>
+                                    <tr>
+                                        <th>Customer</th>
+                                        <th>Store</th>
+                                        <th>Amount</th>
+                                        <th>Time</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="transactionsTable">
+                                    <!-- Transactions will be populated by JavaScript -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Notification Panel (Hidden by default) -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">
+            <h3>Notifications</h3>
+            <button class="close-notifications" id="closeNotifications">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-list">
+            <div class="notification-item unread">
+                <div class="notification-icon">
+                    <i class="fas fa-exclamation-circle"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>High footfall alert</h4>
+                    <p>Food court area experiencing 40% higher traffic than usual.</p>
+                    <span class="notification-time">10 min ago</span>
+                </div>
+            </div>
+            <div class="notification-item unread">
+                <div class="notification-icon">
+                    <i class="fas fa-shopping-bag"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Record sales at Electronics Store</h4>
+                    <p>ElectroHub reported ₹2.5L sales in the last 4 hours.</p>
+                    <span class="notification-time">1 hour ago</span>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Maintenance scheduled</h4>
+                    <p>West wing escalator maintenance scheduled for tonight at 11 PM.</p>
+                    <span class="notification-time">3 hours ago</span>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Monthly report ready</h4>
+                    <p>December 2023 performance report is now available.</p>
+                    <span class="notification-time">1 day ago</span>
+                </div>
+            </div>
+        </div>
+        <div class="notification-footer">
+            <a href="#" class="mark-all-read">Mark all as read</a>
+        </div>
+    </div>
+    
+    <!-- Transaction Success Toast -->
+    <div class="toast" id="successToast">
+        <div class="toast-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="toast-content">
+            <h4>Transaction Added!</h4>
+            <p>Successfully added to database and analytics.</p>
+        </div>
+        <button class="toast-close">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+    
+    <script src="{% static 'javascripts/scripts.js' %}"></script>
+</body>
+</html>
