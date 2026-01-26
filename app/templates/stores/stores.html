@@ -1,0 +1,579 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MallX Analytics | Store Management</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/store.css'%}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <h1>MallX Analytics</h1>
+            </div>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li>
+                        <a href="index.html">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="stores.html">
+                            <i class="fas fa-store"></i>
+                            <span>Stores</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Sales</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-users"></i>
+                            <span>Customers</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-boxes"></i>
+                            <span>Inventory</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="calendar-widget">
+                <h3><i class="fas fa-calendar-alt"></i> Stores Status</h3>
+                <div class="store-status-summary">
+                    <div class="status-item open">
+                        <i class="fas fa-door-open"></i>
+                        <div class="status-details">
+                            <span class="status-count">42</span>
+                            <span class="status-label">Open</span>
+                        </div>
+                    </div>
+                    <div class="status-item closed">
+                        <i class="fas fa-door-closed"></i>
+                        <div class="status-details">
+                            <span class="status-count">8</span>
+                            <span class="status-label">Closed</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="username">Admin User</span>
+                        <span class="role">Mall Manager</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="navbar">
+                <div class="navbar-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="page-title">
+                        <h2>Store Management</h2>
+                        <p class="date-range">Manage stores, leases, and performance analytics</p>
+                    </div>
+                </div>
+                
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="storeSearch" placeholder="Search stores by name, category, or location...">
+                </div>
+                
+                <div class="navbar-right">
+                    <button class="action-btn" id="addStoreBtn">
+                        <i class="fas fa-plus-circle"></i> Add New Store
+                    </button>
+                    
+                    <div class="view-toggle">
+                        <button class="view-btn active" data-view="grid">
+                            <i class="fas fa-th-large"></i>
+                        </button>
+                        <button class="view-btn" data-view="list">
+                            <i class="fas fa-list"></i>
+                        </button>
+                    </div>
+                    
+                    <button class="notification-btn" id="notificationBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">5</span>
+                    </button>
+                    
+                    <div class="profile-dropdown">
+                        <div class="profile-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="dropdown-content">
+                            <a href="#"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="#"><i class="fas fa-cog"></i> Account Settings</a>
+                            <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Store Management Content -->
+            <div class="stores-content">
+                <!-- Store KPIs -->
+                <section class="store-kpis">
+                    <div class="store-kpi-card">
+                        <div class="store-kpi-header">
+                            <i class="fas fa-store"></i>
+                            <div>
+                                <h3>Total Stores</h3>
+                                <p class="store-kpi-subtitle">Across all categories</p>
+                            </div>
+                        </div>
+                        <div class="store-kpi-value">50</div>
+                        <div class="store-kpi-change">
+                            <span class="change-positive">+2 stores</span>
+                            <span class="change-label">this month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="store-kpi-card">
+                        <div class="store-kpi-header">
+                            <i class="fas fa-wallet"></i>
+                            <div>
+                                <h3>Average Revenue</h3>
+                                <p class="store-kpi-subtitle">Per store (monthly)</p>
+                            </div>
+                        </div>
+                        <div class="store-kpi-value">₹ 8.2L</div>
+                        <div class="store-kpi-change">
+                            <span class="change-positive">+12%</span>
+                            <span class="change-label">vs last month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="store-kpi-card">
+                        <div class="store-kpi-header">
+                            <i class="fas fa-users"></i>
+                            <div>
+                                <h3>Occupancy Rate</h3>
+                                <p class="store-kpi-subtitle">Current mall capacity</p>
+                            </div>
+                        </div>
+                        <div class="store-kpi-value">94%</div>
+                        <div class="store-kpi-change">
+                            <span class="change-positive">+3%</span>
+                            <span class="change-label">vs last quarter</span>
+                        </div>
+                    </div>
+                    
+                    <div class="store-kpi-card">
+                        <div class="store-kpi-header">
+                            <i class="fas fa-star"></i>
+                            <div>
+                                <h3>Avg. Rating</h3>
+                                <p class="store-kpi-subtitle">Customer satisfaction</p>
+                            </div>
+                        </div>
+                        <div class="store-kpi-value">4.2</div>
+                        <div class="store-kpi-change">
+                            <span class="change-positive">+0.3</span>
+                            <span class="change-label">this month</span>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Store Categories Filter -->
+                <section class="store-categories">
+                    <div class="section-header">
+                        <h3>Store Categories</h3>
+                        <div class="category-filters">
+                            <button class="filter-btn active" data-category="all">All Stores</button>
+                            <button class="filter-btn" data-category="fashion">Fashion</button>
+                            <button class="filter-btn" data-category="electronics">Electronics</button>
+                            <button class="filter-btn" data-category="food">Food & Dining</button>
+                            <button class="filter-btn" data-category="entertainment">Entertainment</button>
+                            <button class="filter-btn" data-category="beauty">Beauty</button>
+                            <button class="filter-btn" data-category="home">Home & Living</button>
+                            <button class="filter-btn" data-category="other">Others</button>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Stores Grid/List View -->
+                <section class="stores-display">
+                    <div class="stores-grid" id="storesGrid">
+                        <!-- Store cards will be populated here -->
+                    </div>
+                    
+                    <div class="stores-list" id="storesList" style="display: none;">
+                        <!-- List view will be populated here -->
+                    </div>
+                </section>
+                
+                <!-- Store Analytics Section -->
+                <section class="store-analytics">
+                    <div class="analytics-header">
+                        <h3>Store Performance Analytics</h3>
+                        <div class="analytics-controls">
+                            <select id="analyticsPeriod">
+                                <option value="week">Last 7 Days</option>
+                                <option value="month" selected>Last 30 Days</option>
+                                <option value="quarter">Last Quarter</option>
+                                <option value="year">Last Year</option>
+                            </select>
+                            <button class="export-btn">
+                                <i class="fas fa-download"></i> Export Report
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <div class="analytics-card-header">
+                                <h4>Revenue by Category</h4>
+                                <i class="fas fa-chart-pie"></i>
+                            </div>
+                            <div class="analytics-chart-container">
+                                <canvas id="categoryRevenueChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <div class="analytics-card-header">
+                                <h4>Top Performing Stores</h4>
+                                <i class="fas fa-trophy"></i>
+                            </div>
+                            <div class="top-stores-list" id="topStoresList">
+                                <!-- Top stores will be populated here -->
+                            </div>
+                        </div>
+                        
+                        <div class="analytics-card">
+                            <div class="analytics-card-header">
+                                <h4>Lease Expiry Timeline</h4>
+                                <i class="fas fa-calendar-times"></i>
+                            </div>
+                            <div class="lease-timeline" id="leaseTimeline">
+                                <!-- Lease timeline will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Store Management Actions -->
+                <section class="store-actions">
+                    <div class="actions-header">
+                        <h3>Quick Actions</h3>
+                        <p>Manage stores, leases, and maintenance</p>
+                    </div>
+                    
+                    <div class="actions-grid">
+                        <button class="action-card" id="manageLeasesBtn">
+                            <div class="action-icon">
+                                <i class="fas fa-file-contract"></i>
+                            </div>
+                            <h4>Manage Leases</h4>
+                            <p>View and update store lease agreements</p>
+                            <span class="action-badge">3 expiring soon</span>
+                        </button>
+                        
+                        <button class="action-card" id="maintenanceRequestsBtn">
+                            <div class="action-icon">
+                                <i class="fas fa-tools"></i>
+                            </div>
+                            <h4>Maintenance</h4>
+                            <p>Track maintenance requests</p>
+                            <span class="action-badge">5 pending</span>
+                        </button>
+                        
+                        <button class="action-card" id="rentCollectionBtn">
+                            <div class="action-icon">
+                                <i class="fas fa-rupee-sign"></i>
+                            </div>
+                            <h4>Rent Collection</h4>
+                            <p>Manage monthly rent payments</p>
+                            <span class="action-badge">2 overdue</span>
+                        </button>
+                        
+                        <button class="action-card" id="storePerformanceBtn">
+                            <div class="action-icon">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <h4>Performance Reports</h4>
+                            <p>Generate detailed store reports</p>
+                            <span class="action-badge">New</span>
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Add Store Modal -->
+    <div class="modal" id="addStoreModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Store</h3>
+                <button class="modal-close" id="closeStoreModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addStoreForm" class="store-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="storeName">
+                                <i class="fas fa-signature"></i> Store Name *
+                            </label>
+                            <input 
+                                type="text" 
+                                id="storeName" 
+                                placeholder="Enter store name"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="storeCategory">
+                                <i class="fas fa-tags"></i> Category *
+                            </label>
+                            <select id="storeCategory" required>
+                                <option value="">Select Category</option>
+                                <option value="fashion">Fashion & Apparel</option>
+                                <option value="electronics">Electronics</option>
+                                <option value="food">Food & Dining</option>
+                                <option value="entertainment">Entertainment</option>
+                                <option value="beauty">Beauty & Cosmetics</option>
+                                <option value="home">Home & Living</option>
+                                <option value="sports">Sports & Fitness</option>
+                                <option value="books">Books & Stationery</option>
+                                <option value="jewelry">Jewelry & Accessories</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="storeLocation">
+                                <i class="fas fa-map-marker-alt"></i> Location *
+                            </label>
+                            <select id="storeLocation" required>
+                                <option value="">Select Floor & Wing</option>
+                                <option value="GF-North">Ground Floor - North Wing</option>
+                                <option value="GF-South">Ground Floor - South Wing</option>
+                                <option value="GF-East">Ground Floor - East Wing</option>
+                                <option value="GF-West">Ground Floor - West Wing</option>
+                                <option value="1F-North">First Floor - North Wing</option>
+                                <option value="1F-South">First Floor - South Wing</option>
+                                <option value="1F-East">First Floor - East Wing</option>
+                                <option value="1F-West">First Floor - West Wing</option>
+                                <option value="2F-North">Second Floor - North Wing</option>
+                                <option value="2F-South">Second Floor - South Wing</option>
+                                <option value="2F-East">Second Floor - East Wing</option>
+                                <option value="2F-West">Second Floor - West Wing</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="storeSize">
+                                <i class="fas fa-arrows-alt"></i> Store Size (sq. ft.) *
+                            </label>
+                            <input 
+                                type="number" 
+                                id="storeSize" 
+                                min="100" 
+                                max="10000" 
+                                placeholder="e.g., 1500"
+                                required
+                            >
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="monthlyRent">
+                                <i class="fas fa-rupee-sign"></i> Monthly Rent (₹) *
+                            </label>
+                            <input 
+                                type="number" 
+                                id="monthlyRent" 
+                                min="1000" 
+                                step="1000"
+                                placeholder="e.g., 50000"
+                                required
+                            >
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="storeManager">
+                                <i class="fas fa-user-tie"></i> Store Manager *
+                            </label>
+                            <input 
+                                type="text" 
+                                id="storeManager" 
+                                placeholder="Manager's name"
+                                required
+                            >
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="storeDescription">
+                            <i class="fas fa-align-left"></i> Store Description
+                        </label>
+                        <textarea 
+                            id="storeDescription" 
+                            rows="3"
+                            placeholder="Brief description of the store, products/services offered..."
+                        ></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="storeContact">
+                            <i class="fas fa-phone"></i> Contact Information
+                        </label>
+                        <input 
+                            type="text" 
+                            id="storeContact" 
+                            placeholder="Phone number or email"
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="storeHours">
+                            <i class="fas fa-clock"></i> Operating Hours
+                        </label>
+                        <input 
+                            type="text" 
+                            id="storeHours" 
+                            placeholder="e.g., 10:00 AM - 9:00 PM"
+                            value="10:00 AM - 9:00 PM"
+                        >
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelStoreBtn">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-plus-circle"></i> Add Store
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Store Detail Modal -->
+    <div class="modal" id="storeDetailModal">
+        <div class="modal-content store-detail-modal">
+            <div class="modal-header">
+                <h3 id="detailStoreName">Store Details</h3>
+                <button class="modal-close" id="closeDetailModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="store-detail-content" id="storeDetailContent">
+                    <!-- Store details will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">
+            <h3>Store Notifications</h3>
+            <button class="close-notifications" id="closeNotifications">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-list">
+            <div class="notification-item unread">
+                <div class="notification-icon store-notification">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Lease Expiry Alert</h4>
+                    <p>Fashion Hub lease expires in 15 days.</p>
+                    <span class="notification-time">2 hours ago</span>
+                </div>
+            </div>
+            <div class="notification-item unread">
+                <div class="notification-icon store-notification">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Maintenance Request</h4>
+                    <p>ElectroTech reported AC issue in store.</p>
+                    <span class="notification-time">5 hours ago</span>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon store-notification">
+                    <i class="fas fa-rupee-sign"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Rent Overdue</h4>
+                    <p>Food Court - Stall 3 rent overdue by 7 days.</p>
+                    <span class="notification-time">1 day ago</span>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon store-notification">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Sales Milestone</h4>
+                    <p>TechZone achieved record sales this month.</p>
+                    <span class="notification-time">2 days ago</span>
+                </div>
+            </div>
+        </div>
+        <div class="notification-footer">
+            <a href="#" class="mark-all-read">Mark all as read</a>
+        </div>
+    </div>
+    
+    <script src="{% static 'javascripts/scripts.js' %}"></script>
+    <script src="{% static 'javascripts/stores.js' %}"></script>
+</body>
+</html>
