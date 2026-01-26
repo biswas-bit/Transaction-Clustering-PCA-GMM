@@ -6,3 +6,6 @@ def index(request):
 
 def dashboard(request):
     return render(request, 'dashboard/dashboard.html')
+
+def stores(request):
+    return render(request, 'stores.html')
