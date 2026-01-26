@@ -9,3 +9,7 @@ def dashboard(request):
 
 def stores(request):
     return render(request, 'stores/stores.html')
+
+def sales(request):
+    return render(request, 'sales/sales.html')
+
