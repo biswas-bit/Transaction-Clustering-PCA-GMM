@@ -1,3 +1,586 @@
+// Add these variables to the top of your existing script.js
+let transactionsData = [];
+let totalRevenue = 0;
+let todayRevenue = 0;
+
+// Add these functions to your existing script.js
+
+// Initialize Transaction System
+function initTransactionSystem() {
+    // Load sample transactions
+    loadSampleTransactions();
+    
+    // Initialize transaction form
+    initTransactionForm();
+    
+    // Update current time display
+    updateCurrentTime();
+    setInterval(updateCurrentTime, 1000);
+    
+    // Update auto-captured features
+    updateAutoFeatures();
+    setInterval(updateAutoFeatures, 60000); // Update every minute
+    
+    // Setup event listeners for transaction system
+    setupTransactionEventListeners();
+    
+    // Calculate initial totals
+    updateTransactionTotals();
+    
+    // Update charts with transaction data
+    updateChartsWithTransactionData();
+}
+
+// Load sample transactions for demo
+function loadSampleTransactions() {
+    const sampleTransactions = [
+        {
+            id: generateTransactionId(),
+            product: "Wireless Headphones",
+            quantity: 2,
+            unitPrice: 2999,
+            totalValue: 5998,
+            category: "electronics",
+            hour: 14,
+            dayOfWeek: "Monday",
+            month: 1,
+            timestamp: new Date()
+        },
+        {
+            id: generateTransactionId(),
+            product: "Designer T-Shirt",
+            quantity: 1,
+            unitPrice: 2499,
+            totalValue: 2499,
+            category: "fashion",
+            hour: 15,
+            dayOfWeek: "Monday",
+            month: 1,
+            timestamp: new Date()
+        },
+        {
+            id: generateTransactionId(),
+            product: "Premium Coffee",
+            quantity: 3,
+            unitPrice: 350,
+            totalValue: 1050,
+            category: "food",
+            hour: 16,
+            dayOfWeek: "Monday",
+            month: 1,
+            timestamp: new Date()
+        },
+        {
+            id: generateTransactionId(),
+            product: "Yoga Mat",
+            quantity: 1,
+            unitPrice: 1899,
+            totalValue: 1899,
+            category: "sports",
+            hour: 17,
+            dayOfWeek: "Monday",
+            month: 1,
+            timestamp: new Date()
+        }
+    ];
+    
+    transactionsData = sampleTransactions;
+    updateTransactionTotals();
+    updateLiveTransactionsTable();
+}
+
+// Initialize Transaction Form
+function initTransactionForm() {
+    const form = document.getElementById('transactionForm');
+    const quantityInput = document.getElementById('quantity');
+    const priceInput = document.getElementById('unitPrice');
+    
+    // Calculate total when quantity or price changes
+    quantityInput.addEventListener('input', updateTotalPreview);
+    priceInput.addEventListener('input', updateTotalPreview);
+    
+    // Form submission
+    form.addEventListener('submit', handleTransactionSubmit);
+    
+    // Quick add button
+    document.getElementById('quickAddBtn').addEventListener('click', addSampleTransaction);
+    
+    // Clear transactions button
+    document.getElementById('clearTransactionsBtn').addEventListener('click', clearAllTransactions);
+    
+    // Transaction tab click
+    document.getElementById('transactionTab').addEventListener('click', scrollToTransactionSection);
+}
+
+// Update current time display
+function updateCurrentTime() {
+    const now = new Date();
+    const timeString = now.toLocaleTimeString('en-IN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+    });
+    document.getElementById('timeDisplay').textContent = timeString;
+}
+
+// Update auto-captured ML features
+function updateAutoFeatures() {
+    const now = new Date();
+    
+    // Get hour (0-23)
+    const hour = now.getHours();
+    document.getElementById('autoHour').textContent = hour + ':00';
+    
+    // Get day of week
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayOfWeek = days[now.getDay()];
+    document.getElementById('autoDay').textContent = dayOfWeek;
+    
+    // Get month
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const month = months[now.getMonth()];
+    const monthNumber = now.getMonth() + 1;
+    document.getElementById('autoMonth').textContent = `${month} (${monthNumber})`;
+}
+
+// Update total preview
+function updateTotalPreview() {
+    const quantity = parseInt(document.getElementById('quantity').value) || 0;
+    const unitPrice = parseFloat(document.getElementById('unitPrice').value) || 0;
+    const total = quantity * unitPrice;
+    
+    document.getElementById('totalPreview').textContent = 
+        `₹ ${total.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+// Handle transaction submission
+function handleTransactionSubmit(event) {
+    event.preventDefault();
+    
+    const productName = document.getElementById('productName').value.trim();
+    const quantity = parseInt(document.getElementById('quantity').value);
+    const unitPrice = parseFloat(document.getElementById('unitPrice').value);
+    const category = document.getElementById('category').value;
+    
+    if (!productName || !quantity || !unitPrice || !category) {
+        showErrorToast("Please fill all fields correctly");
+        return;
+    }
+    
+    // Get current timestamp and derive ML features
+    const now = new Date();
+    const hour = now.getHours();
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dayOfWeek = days[now.getDay()];
+    const month = now.getMonth() + 1; // 1-12
+    const totalValue = quantity * unitPrice;
+    
+    // Create transaction object
+    const transaction = {
+        id: generateTransactionId(),
+        product: productName,
+        quantity: quantity,
+        unitPrice: unitPrice,
+        totalValue: totalValue,
+        category: category,
+        hour: hour,
+        dayOfWeek: dayOfWeek,
+        month: month,
+        timestamp: now
+    };
+    
+    // Add to transactions array
+    transactionsData.unshift(transaction); // Add to beginning
+    
+    // Update UI
+    updateLiveTransactionsTable();
+    updateTransactionTotals();
+    updateChartsWithTransactionData();
+    
+    // Update dashboard KPIs
+    updateDashboardKPIs();
+    
+    // Show success toast
+    showSuccessToast(transaction);
+    
+    // Reset form
+    resetTransactionForm();
+    
+    console.log('Transaction added:', transaction);
+    console.log('All transactions:', transactionsData);
+}
+
+// Add sample transaction
+function addSampleTransaction() {
+    const sampleProducts = [
+        { product: "Smartphone Case", price: 899, category: "electronics" },
+        { product: "Leather Jacket", price: 5999, category: "fashion" },
+        { product: "Gourmet Pizza", price: 599, category: "food" },
+        { product: "LED Desk Lamp", price: 1299, category: "home" },
+        { product: "Face Cream", price: 2499, category: "beauty" },
+        { product: "Running Shoes", price: 3999, category: "sports" },
+        { product: "Movie Ticket", price: 350, category: "entertainment" },
+        { product: "Novel Book", price: 499, category: "books" }
+    ];
+    
+    const randomProduct = sampleProducts[Math.floor(Math.random() * sampleProducts.length)];
+    const quantity = Math.floor(Math.random() * 3) + 1; // 1-3
+    
+    // Fill form with sample data
+    document.getElementById('productName').value = randomProduct.product;
+    document.getElementById('quantity').value = quantity;
+    document.getElementById('unitPrice').value = randomProduct.price;
+    document.getElementById('category').value = randomProduct.category;
+    
+    // Update preview
+    updateTotalPreview();
+    updateAutoFeatures();
+    
+    // Submit the form
+    const form = document.getElementById('transactionForm');
+    form.dispatchEvent(new Event('submit'));
+}
+
+// Clear all transactions
+function clearAllTransactions() {
+    if (transactionsData.length === 0) return;
+    
+    if (confirm('Are you sure you want to clear all transactions? This action cannot be undone.')) {
+        transactionsData = [];
+        updateLiveTransactionsTable();
+        updateTransactionTotals();
+        updateChartsWithTransactionData();
+        updateDashboardKPIs();
+        
+        showToast('All transactions cleared', 'info');
+    }
+}
+
+// Update live transactions table
+function updateLiveTransactionsTable() {
+    const tableBody = document.getElementById('liveTransactionsTable');
+    const emptyRow = tableBody.querySelector('.empty-row');
+    
+    if (transactionsData.length === 0) {
+        if (!emptyRow) {
+            tableBody.innerHTML = `
+                <tr class="empty-row">
+                    <td colspan="6" class="empty-message">
+                        <i class="fas fa-shopping-cart"></i>
+                        <p>No transactions yet. Add your first transaction!</p>
+                    </td>
+                </tr>
+            `;
+        }
+        return;
+    }
+    
+    // Remove empty row if it exists
+    if (emptyRow) {
+        emptyRow.remove();
+    }
+    
+    // Add transactions (show latest 10)
+    const transactionsToShow = transactionsData.slice(0, 10);
+    let tableHTML = '';
+    
+    transactionsToShow.forEach((transaction, index) => {
+        const timeString = transaction.timestamp.toLocaleTimeString('en-IN', {
+            hour: '2-digit',
+            minute: '2-digit',
+            hour12: true
+        });
+        
+        tableHTML += `
+            <tr class="${index === 0 ? 'transaction-highlight' : ''}">
+                <td>${timeString}</td>
+                <td><strong>${transaction.product}</strong></td>
+                <td>
+                    <span class="category-badge ${transaction.category}">
+                        ${transaction.category}
+                    </span>
+                </td>
+                <td>${transaction.quantity}</td>
+                <td>₹ ${transaction.unitPrice.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+                <td><strong>₹ ${transaction.totalValue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong></td>
+            </tr>
+        `;
+    });
+    
+    tableBody.innerHTML = tableHTML;
+    
+    // Update transaction count
+    document.getElementById('transactionCount').textContent = transactionsData.length;
+}
+
+// Update transaction totals
+function updateTransactionTotals() {
+    // Calculate today's revenue
+    const today = new Date().toDateString();
+    const todayTransactions = transactionsData.filter(t => 
+        t.timestamp.toDateString() === today
+    );
+    
+    todayRevenue = todayTransactions.reduce((sum, t) => sum + t.totalValue, 0);
+    document.getElementById('todayTotal').textContent = 
+        `₹ ${todayRevenue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    
+    // Calculate average transaction value
+    const avgValue = transactionsData.length > 0 
+        ? transactionsData.reduce((sum, t) => sum + t.totalValue, 0) / transactionsData.length
+        : 0;
+    
+    document.getElementById('avgTransaction').textContent = 
+        `₹ ${avgValue.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+}
+
+// Update dashboard KPIs with transaction data
+function updateDashboardKPIs() {
+    // Update total sales
+    const totalSales = transactionsData.reduce((sum, t) => sum + t.totalValue, 0);
+    
+    // Format as Indian Rupees with lakhs/crores
+    let formattedTotal;
+    if (totalSales >= 10000000) { // 1 crore
+        formattedTotal = `₹ ${(totalSales / 10000000).toFixed(2)}Cr`;
+    } else if (totalSales >= 100000) { // 1 lakh
+        formattedTotal = `₹ ${(totalSales / 100000).toFixed(2)}L`;
+    } else {
+        formattedTotal = `₹ ${totalSales.toLocaleString('en-IN')}`;
+    }
+    
+    document.getElementById('totalSales').textContent = formattedTotal;
+    
+    // Animate the update
+    const kpiCard = document.querySelector('.kpi-card:first-child');
+    kpiCard.style.transform = 'scale(1.05)';
+    setTimeout(() => {
+        kpiCard.style.transform = 'scale(1)';
+    }, 300);
+}
+
+// Update charts with transaction data
+function updateChartsWithTransactionData() {
+    // Update category chart
+    updateCategoryChart();
+    
+    // Update hourly chart
+    updateHourlyChart();
+}
+
+// Update category contribution chart
+function updateCategoryChart() {
+    if (!sourceChart || transactionsData.length === 0) return;
+    
+    // Calculate category totals
+    const categoryTotals = {};
+    transactionsData.forEach(transaction => {
+        if (!categoryTotals[transaction.category]) {
+            categoryTotals[transaction.category] = 0;
+        }
+        categoryTotals[transaction.category] += transaction.totalValue;
+    });
+    
+    // Prepare data for chart
+    const categories = Object.keys(categoryTotals);
+    const values = Object.values(categoryTotals);
+    
+    // Update chart data
+    sourceChart.data.labels = categories.map(cat => 
+        cat.charAt(0).toUpperCase() + cat.slice(1)
+    );
+    sourceChart.data.datasets[0].data = values;
+    
+    // Generate colors for categories
+    const categoryColors = {
+        electronics: '#4361ee',
+        fashion: '#7209b7',
+        food: '#4cc9f0',
+        home: '#f72585',
+        beauty: '#b5179e',
+        sports: '#3a0ca3',
+        entertainment: '#560bad',
+        books: '#480ca8',
+        other: '#3f37c9'
+    };
+    
+    sourceChart.data.datasets[0].backgroundColor = categories.map(cat => 
+        categoryColors[cat] || '#6c757d'
+    );
+    
+    sourceChart.update();
+}
+
+// Update hourly transaction volume chart
+function updateHourlyChart() {
+    if (!visitorsChart) return;
+    
+    // Calculate transactions per hour
+    const hourlyCounts = Array(24).fill(0);
+    transactionsData.forEach(transaction => {
+        hourlyCounts[transaction.hour]++;
+    });
+    
+    // Update chart data
+    visitorsChart.data.datasets[0].data = hourlyCounts.slice(10, 22); // 10AM to 10PM
+    
+    visitorsChart.update();
+}
+
+// Reset transaction form
+function resetTransactionForm() {
+    document.getElementById('transactionForm').reset();
+    document.getElementById('quantity').value = 1;
+    updateTotalPreview();
+    document.getElementById('productName').focus();
+}
+
+// Generate unique transaction ID
+function generateTransactionId() {
+    return 'TX' + Date.now() + Math.floor(Math.random() * 1000);
+}
+
+// Show success toast
+function showSuccessToast(transaction) {
+    const toast = document.getElementById('successToast');
+    const toastContent = toast.querySelector('.toast-content p');
+    
+    toastContent.textContent = `Added ${transaction.product} - ₹${transaction.totalValue.toLocaleString('en-IN')}`;
+    
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+    }, 3000);
+}
+
+// Show error toast
+function showErrorToast(message) {
+    const toast = document.getElementById('successToast');
+    const toastIcon = toast.querySelector('.toast-icon i');
+    const toastTitle = toast.querySelector('.toast-content h4');
+    const toastContent = toast.querySelector('.toast-content p');
+    
+    toastIcon.className = 'fas fa-exclamation-circle';
+    toastIcon.style.color = '#e74c3c';
+    toastTitle.textContent = 'Error';
+    toastContent.textContent = message;
+    toast.style.borderLeftColor = '#e74c3c';
+    
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        // Reset toast to success style
+        toastIcon.className = 'fas fa-check-circle';
+        toastIcon.style.color = '#2ecc71';
+        toastTitle.textContent = 'Transaction Added!';
+        toast.style.borderLeftColor = '#2ecc71';
+    }, 3000);
+}
+
+// Show generic toast
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('successToast');
+    const toastIcon = toast.querySelector('.toast-icon i');
+    const toastTitle = toast.querySelector('.toast-content h4');
+    const toastContent = toast.querySelector('.toast-content p');
+    
+    const styles = {
+        info: { icon: 'fas fa-info-circle', color: '#3498db', title: 'Info' },
+        success: { icon: 'fas fa-check-circle', color: '#2ecc71', title: 'Success' },
+        warning: { icon: 'fas fa-exclamation-triangle', color: '#f39c12', title: 'Warning' },
+        error: { icon: 'fas fa-exclamation-circle', color: '#e74c3c', title: 'Error' }
+    };
+    
+    const style = styles[type] || styles.info;
+    
+    toastIcon.className = style.icon;
+    toastIcon.style.color = style.color;
+    toastTitle.textContent = style.title;
+    toastContent.textContent = message;
+    toast.style.borderLeftColor = style.color;
+    
+    toast.classList.add('show');
+    
+    setTimeout(() => {
+        toast.classList.remove('show');
+        // Reset to default success style
+        toastIcon.className = 'fas fa-check-circle';
+        toastIcon.style.color = '#2ecc71';
+        toastTitle.textContent = 'Transaction Added!';
+        toast.style.borderLeftColor = '#2ecc71';
+    }, 3000);
+}
+
+// Scroll to transaction section
+function scrollToTransactionSection(event) {
+    event.preventDefault();
+    const transactionSection = document.querySelector('.transaction-entry-section');
+    transactionSection.scrollIntoView({ behavior: 'smooth' });
+    
+    // Highlight the section
+    transactionSection.style.boxShadow = '0 0 0 3px rgba(67, 97, 238, 0.3)';
+    setTimeout(() => {
+        transactionSection.style.boxShadow = 'none';
+    }, 2000);
+}
+
+// Setup transaction event listeners
+function setupTransactionEventListeners() {
+    // Close toast
+    document.querySelector('.toast-close').addEventListener('click', function() {
+        document.getElementById('successToast').classList.remove('show');
+    });
+    
+    // Refresh categories chart
+    document.getElementById('refreshCategories').addEventListener('click', function() {
+        updateCategoryChart();
+        this.style.transform = 'rotate(360deg)';
+        setTimeout(() => {
+            this.style.transform = 'rotate(0deg)';
+        }, 300);
+    });
+    
+    // Update total on form changes
+    document.getElementById('productName').addEventListener('input', updateAutoFeatures);
+    document.getElementById('category').addEventListener('change', updateAutoFeatures);
+}
+
+// Add this to your existing document ready function
+document.addEventListener('DOMContentLoaded', function() {
+    // ... existing initialization code ...
+    
+    // Initialize transaction system
+    initTransactionSystem();
+    
+    // ... rest of existing code ...
+});
+
+// Update your existing updateDashboardKPIs function to include transaction data
+function updateDashboardKPIs() {
+    // Existing code...
+    
+    // Add transaction-based updates
+    const totalTransactions = transactionsData.length;
+    const totalRevenueFromTransactions = transactionsData.reduce((sum, t) => sum + t.totalValue, 0);
+    
+    // Update conversion rate based on transactions
+    const conversionRateElement = document.getElementById('conversionRate');
+    const baseConversion = 4.8;
+    const transactionImpact = Math.min(totalTransactions * 0.01, 2); // Max 2% increase
+    const newConversionRate = (baseConversion + transactionImpact).toFixed(1);
+    conversionRateElement.textContent = `${newConversionRate}%`;
+    
+    // Update profit margin based on transaction volume
+    const profitMarginElement = document.getElementById('profitMargin');
+    const baseMargin = 24.6;
+    const marginImpact = Math.min(totalTransactions * 0.05, 5); // Max 5% increase
+    const newProfitMargin = (baseMargin + marginImpact).toFixed(1);
+    profitMarginElement.textContent = `${newProfitMargin}%`;
+}
+
 // Dashboard Data
 const dashboardData = {
     kpis: {
