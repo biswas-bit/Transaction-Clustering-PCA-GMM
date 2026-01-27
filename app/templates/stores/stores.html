@@ -24,18 +24,26 @@
             
             <nav class="main-nav">
                 <ul>
+                    <li class="active">
+                        <a href="{% url 'mall_management_system:index'%}">
+                            <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
                     <li>
                         <a href="{% url 'mall_management_system:dashboard'%}">
-                            <i class="fas fa-home"></i>
+                            <i class="fas fa-store"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
-                    <li class="active">
+
+                    <li>
                         <a href="{% url 'mall_management_system:stores'%}">
                             <i class="fas fa-store"></i>
                             <span>Stores</span>
                         </a>
                     </li>
+
                     <li>
                         <a href="{% url 'mall_management_system:sales'%}">
                             <i class="fas fa-shopping-bag"></i>
@@ -49,7 +57,7 @@
                         </a>
                     </li>
                     <li>
-                        <a href="{% url "mall_management_system:inventory" %}">
+                        <a href="{% url 'mall_management_system:inventory'%}">
                             <i class="fas fa-boxes"></i>
                             <span>Inventory</span>
                         </a>
@@ -66,8 +74,16 @@
                             <span>Settings</span>
                         </a>
                     </li>
+                    <li>
+                        <a href="#" id="transactionTab">
+                            <i class="fas fa-cash-register"></i>
+                            <span>Transaction Entry</span>
+                            <span class="new-badge">New</span>
+                        </a>
+                    </li>
                 </ul>
             </nav>
+            
             
             <div class="calendar-widget">
                 <h3><i class="fas fa-calendar-alt"></i> Stores Status</h3>
