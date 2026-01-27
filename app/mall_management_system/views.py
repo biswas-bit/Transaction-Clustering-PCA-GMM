@@ -13,3 +13,6 @@ def stores(request):
 def sales(request):
     return render(request, 'sales/sales.html')
 
+def customers(request):
+    return render(request, 'customers/customers.html')
+
