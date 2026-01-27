@@ -24,17 +24,25 @@
             <nav class="main-nav">
                 <ul>
                     <li class="active">
-                        <a href="{% url 'mall_management_system:dashboard'%}">
+                        <a href="{% url 'mall_management_system:index'%}">
                             <i class="fas fa-home"></i>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'mall_management_system:dashboard'%}">
+                            <i class="fas fa-store"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
+
                     <li>
                         <a href="{% url 'mall_management_system:stores'%}">
                             <i class="fas fa-store"></i>
                             <span>Stores</span>
                         </a>
                     </li>
+
                     <li>
                         <a href="{% url 'mall_management_system:sales'%}">
                             <i class="fas fa-shopping-bag"></i>
@@ -63,6 +71,13 @@
                         <a href="#">
                             <i class="fas fa-cog"></i>
                             <span>Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" id="transactionTab">
+                            <i class="fas fa-cash-register"></i>
+                            <span>Transaction Entry</span>
+                            <span class="new-badge">New</span>
                         </a>
                     </li>
                 </ul>
