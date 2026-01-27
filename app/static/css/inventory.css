@@ -67,6 +67,20 @@
     font-size: 14px;
 }
 
+.change-positive {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.change-negative {
+    color: var(--danger-color);
+    font-weight: 600;
+}
+
+.change-label {
+    color: var(--dark-gray);
+}
+
 /* Navbar Inventory Elements */
 .inventory-filters {
     display: flex;
@@ -437,8 +451,8 @@
 }
 
 .action-icon-btn.view:hover {
-    background-color: var(--light-blue);
-    border-color: var(--light-blue);
+    background-color: #3498db;
+    border-color: #3498db;
 }
 
 .action-icon-btn.edit:hover {
@@ -936,6 +950,7 @@
     transition: var(--transition);
     text-align: left;
     border: none;
+    width: 100%;
 }
 
 .operation-card:hover {
@@ -1293,6 +1308,49 @@
     color: #3498db;
 }
 
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state i {
+    font-size: 48px;
+    color: var(--medium-gray);
+    margin-bottom: 16px;
+}
+
+.empty-state p {
+    color: var(--dark-gray);
+    font-size: 16px;
+}
+
+/* Stock Value Colors */
+.stock-value.high {
+    color: var(--success-color);
+    font-weight: 600;
+}
+
+.stock-value.medium {
+    color: var(--warning-color);
+    font-weight: 600;
+}
+
+.stock-value.low {
+    color: var(--danger-color);
+    font-weight: 600;
+}
+
+.stock-value.out {
+    color: #95a5a6;
+    font-weight: 600;
+}
+
+/* Selected Row */
+.product-row.selected {
+    background-color: rgba(67, 97, 238, 0.05);
+}
+
 /* Responsive Styles */
 @media (max-width: 1200px) {
     .inventory-kpis {
@@ -1445,25 +1503,4 @@
 
 .products-table-container::-webkit-scrollbar-thumb:hover {
     background: var(--dark-gray);
-}
-
-/* Stock Level Colors */
-.stock-value.high {
-    color: var(--success-color);
-    font-weight: 600;
-}
-
-.stock-value.medium {
-    color: var(--warning-color);
-    font-weight: 600;
-}
-
-.stock-value.low {
-    color: var(--danger-color);
-    font-weight: 600;
-}
-
-.stock-value.out {
-    color: #95a5a6;
-    font-weight: 600;
 }
