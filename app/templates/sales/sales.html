@@ -26,25 +26,25 @@
             <nav class="main-nav">
                 <ul>
                     <li>
-                        <a href="index.html">
+                        <a href="{% url 'mall_management_system:dashboard' %}">
                             <i class="fas fa-home"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
                     <li>
-                        <a href="stores.html">
+                        <a href="{% url 'mall_management_system:stores'%}">
                             <i class="fas fa-store"></i>
                             <span>Stores</span>
                         </a>
                     </li>
                     <li class="active">
-                        <a href="sales.html">
+                        <a href="{% url 'mall_management_system:sales' %}">
                             <i class="fas fa-shopping-bag"></i>
                             <span>Sales</span>
                         </a>
                     </li>
                     <li>
-                        <a href="#">
+                        <a href="{% url 'mall_management_system:customers'%}">
                             <i class="fas fa-users"></i>
                             <span>Customers</span>
                         </a>
