@@ -1,0 +1,811 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MallX Analytics | Customer Management</title>
+    <link rel="stylesheet" href="{% static "css/style.css"%}">
+    <link rel="stylesheet" href="{% static "css/customers.css"%}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4/build/global/luxon.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <h1>MallX Analytics</h1>
+            </div>
+            
+            <nav class="main-nav">
+                <ul>
+                    <li>
+                        <a href="index.html">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="stores.html">
+                            <i class="fas fa-store"></i>
+                            <span>Stores</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="sales.html">
+                            <i class="fas fa-shopping-bag"></i>
+                            <span>Sales</span>
+                        </a>
+                    </li>
+                    <li class="active">
+                        <a href="customers.html">
+                            <i class="fas fa-users"></i>
+                            <span>Customers</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-boxes"></i>
+                            <span>Inventory</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="calendar-widget">
+                <h3><i class="fas fa-users"></i> Customer Insights</h3>
+                <div class="customer-insights-summary">
+                    <div class="insight-item">
+                        <i class="fas fa-user-plus"></i>
+                        <div class="insight-details">
+                            <span class="insight-value" id="newCustomersToday">0</span>
+                            <span class="insight-label">New Today</span>
+                        </div>
+                    </div>
+                    <div class="insight-item">
+                        <i class="fas fa-star"></i>
+                        <div class="insight-details">
+                            <span class="insight-value" id="loyalCustomers">0</span>
+                            <span class="insight-label">Loyal Customers</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="avatar">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="user-details">
+                        <span class="username">Admin User</span>
+                        <span class="role">Customer Relations</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+        
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Top Navbar -->
+            <header class="navbar">
+                <div class="navbar-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="page-title">
+                        <h2>Customer Management</h2>
+                        <p class="date-range" id="currentDateRange">Manage customer relationships and insights</p>
+                    </div>
+                </div>
+                
+                <div class="search-container">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="search-input" id="customerSearch" placeholder="Search customers by name, email, phone...">
+                </div>
+                
+                <div class="navbar-right">
+                    <div class="customer-segments">
+                        <select id="customerSegmentFilter">
+                            <option value="all">All Customers</option>
+                            <option value="new">New Customers</option>
+                            <option value="loyal">Loyal Customers</option>
+                            <option value="vip">VIP Customers</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="high-value">High Value</option>
+                        </select>
+                    </div>
+                    
+                    <button class="action-btn customer-action-btn" id="addCustomerBtn">
+                        <i class="fas fa-user-plus"></i> Add Customer
+                    </button>
+                    
+                    <button class="notification-btn" id="notificationBtn">
+                        <i class="fas fa-bell"></i>
+                        <span class="notification-badge">4</span>
+                    </button>
+                    
+                    <div class="profile-dropdown">
+                        <div class="profile-icon">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <div class="dropdown-content">
+                            <a href="#"><i class="fas fa-user"></i> My Profile</a>
+                            <a href="#"><i class="fas fa-cog"></i> Account Settings</a>
+                            <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <!-- Customer Management Content -->
+            <div class="customers-content">
+                <!-- Customer KPIs -->
+                <section class="customer-kpis">
+                    <div class="customer-kpi-card">
+                        <div class="customer-kpi-header">
+                            <i class="fas fa-users"></i>
+                            <div>
+                                <h3>Total Customers</h3>
+                                <p class="customer-kpi-subtitle">Registered in system</p>
+                            </div>
+                        </div>
+                        <div class="customer-kpi-value" id="totalCustomers">0</div>
+                        <div class="customer-kpi-change">
+                            <span class="change-positive" id="customerGrowth">+0%</span>
+                            <span class="change-label">this month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="customer-kpi-card">
+                        <div class="customer-kpi-header">
+                            <i class="fas fa-wallet"></i>
+                            <div>
+                                <h3>Avg. Spend</h3>
+                                <p class="customer-kpi-subtitle">Per customer (monthly)</p>
+                            </div>
+                        </div>
+                        <div class="customer-kpi-value" id="avgCustomerSpend">₹ 0</div>
+                        <div class="customer-kpi-change">
+                            <span class="change-positive" id="spendGrowth">+0%</span>
+                            <span class="change-label">vs last month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="customer-kpi-card">
+                        <div class="customer-kpi-header">
+                            <i class="fas fa-sync-alt"></i>
+                            <div>
+                                <h3>Repeat Rate</h3>
+                                <p class="customer-kpi-subtitle">Returning customers</p>
+                            </div>
+                        </div>
+                        <div class="customer-kpi-value" id="repeatRate">0%</div>
+                        <div class="customer-kpi-change">
+                            <span class="change-positive" id="repeatRateChange">+0%</span>
+                            <span class="change-label">vs last month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="customer-kpi-card">
+                        <div class="customer-kpi-header">
+                            <i class="fas fa-smile"></i>
+                            <div>
+                                <h3>Satisfaction</h3>
+                                <p class="customer-kpi-subtitle">Average rating</p>
+                            </div>
+                        </div>
+                        <div class="customer-kpi-value" id="satisfactionScore">0.0</div>
+                        <div class="customer-kpi-change">
+                            <span class="change-positive" id="satisfactionChange">+0%</span>
+                            <span class="change-label">this month</span>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Customer Analytics Charts -->
+                <section class="customer-charts-section">
+                    <div class="charts-grid">
+                        <div class="chart-card large">
+                            <div class="chart-header">
+                                <h3>Customer Acquisition Trend</h3>
+                                <div class="chart-controls">
+                                    <select id="acquisitionChartPeriod">
+                                        <option value="daily">Daily</option>
+                                        <option value="weekly">Weekly</option>
+                                        <option value="monthly">Monthly</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="acquisitionChart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-card">
+                            <div class="chart-header">
+                                <h3>Customer Segments</h3>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="segmentsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Customers List Section -->
+                <section class="customers-list-section">
+                    <div class="section-header">
+                        <h3>Customer Directory</h3>
+                        <div class="section-actions">
+                            <div class="sort-dropdown">
+                                <select id="customerSort">
+                                    <option value="recent">Recently Added</option>
+                                    <option value="name">Name (A-Z)</option>
+                                    <option value="spend">Highest Spend</option>
+                                    <option value="visits">Most Visits</option>
+                                    <option value="loyalty">Loyalty Points</option>
+                                </select>
+                            </div>
+                            <button class="export-btn" id="exportCustomersBtn">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="bulk-action-btn" id="bulkActionBtn">
+                                <i class="fas fa-bullhorn"></i> Send Campaign
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="customers-table-container">
+                        <table class="customers-table">
+                            <thead>
+                                <tr>
+                                    <th>
+                                        <input type="checkbox" id="selectAllCustomers">
+                                    </th>
+                                    <th>Customer</th>
+                                    <th>Contact</th>
+                                    <th>Segment</th>
+                                    <th>Total Spend</th>
+                                    <th>Visits</th>
+                                    <th>Last Visit</th>
+                                    <th>Loyalty Points</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="customersTable">
+                                <!-- Customers will be populated here -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="table-footer">
+                        <div class="pagination">
+                            <button class="pagination-btn" id="prevPageBtn" disabled>
+                                <i class="fas fa-chevron-left"></i> Previous
+                            </button>
+                            <span class="page-info">Page <span id="currentPage">1</span> of <span id="totalPages">1</span></span>
+                            <button class="pagination-btn" id="nextPageBtn" disabled>
+                                Next <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        <div class="table-summary">
+                            Showing <span id="showingCount">0</span> of <span id="totalCount">0</span> customers
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Customer Insights -->
+                <section class="customer-insights">
+                    <div class="insights-header">
+                        <h3>Customer Insights & Analytics</h3>
+                        <div class="insights-tabs">
+                            <button class="insights-tab active" data-tab="demographics">Demographics</button>
+                            <button class="insights-tab" data-tab="behavior">Shopping Behavior</button>
+                            <button class="insights-tab" data-tab="loyalty">Loyalty Analysis</button>
+                            <button class="insights-tab" data-tab="feedback">Customer Feedback</button>
+                        </div>
+                    </div>
+                    
+                    <div class="insights-content">
+                        <div class="insights-tab-content active" id="demographicsTab">
+                            <div class="demographics-grid">
+                                <div class="demographics-chart">
+                                    <h4>Age Distribution</h4>
+                                    <div class="chart-container">
+                                        <canvas id="ageDistributionChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="demographics-chart">
+                                    <h4>Gender Distribution</h4>
+                                    <div class="chart-container">
+                                        <canvas id="genderDistributionChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="demographics-chart">
+                                    <h4>Location Distribution</h4>
+                                    <div class="top-locations-list" id="topLocationsList">
+                                        <!-- Top locations will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="insights-tab-content" id="behaviorTab">
+                            <div class="behavior-grid">
+                                <div class="behavior-chart">
+                                    <h4>Visit Frequency</h4>
+                                    <div class="chart-container">
+                                        <canvas id="visitFrequencyChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="behavior-chart">
+                                    <h4>Preferred Time</h4>
+                                    <div class="chart-container">
+                                        <canvas id="preferredTimeChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="behavior-stats">
+                                    <h4>Shopping Patterns</h4>
+                                    <div class="stats-grid" id="shoppingPatterns">
+                                        <!-- Shopping patterns will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="insights-tab-content" id="loyaltyTab">
+                            <div class="loyalty-analysis">
+                                <div class="loyalty-chart">
+                                    <h4>Loyalty Tier Distribution</h4>
+                                    <div class="chart-container">
+                                        <canvas id="loyaltyTierChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="loyalty-benefits">
+                                    <h4>Loyalty Program Benefits</h4>
+                                    <div class="benefits-list" id="loyaltyBenefits">
+                                        <!-- Loyalty benefits will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="insights-tab-content" id="feedbackTab">
+                            <div class="feedback-analysis">
+                                <div class="feedback-chart">
+                                    <h4>Customer Satisfaction</h4>
+                                    <div class="chart-container">
+                                        <canvas id="satisfactionChart"></canvas>
+                                    </div>
+                                </div>
+                                <div class="recent-feedback">
+                                    <h4>Recent Feedback</h4>
+                                    <div class="feedback-list" id="recentFeedbackList">
+                                        <!-- Recent feedback will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                
+                <!-- Customer Engagement Tools -->
+                <section class="customer-engagement">
+                    <div class="engagement-header">
+                        <h3>Customer Engagement Tools</h3>
+                        <p>Connect and engage with your customers</p>
+                    </div>
+                    
+                    <div class="engagement-grid">
+                        <button class="engagement-card" id="emailCampaignBtn">
+                            <div class="engagement-icon email">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <h4>Email Campaign</h4>
+                            <p>Send personalized emails to customer segments</p>
+                            <span class="engagement-badge">New Template</span>
+                        </button>
+                        
+                        <button class="engagement-card" id="smsCampaignBtn">
+                            <div class="engagement-icon sms">
+                                <i class="fas fa-sms"></i>
+                            </div>
+                            <h4>SMS Campaign</h4>
+                            <p>Send promotional SMS to targeted customers</p>
+                            <span class="engagement-badge">98% Open Rate</span>
+                        </button>
+                        
+                        <button class="engagement-card" id="loyaltyRewardsBtn">
+                            <div class="engagement-icon loyalty">
+                                <i class="fas fa-gift"></i>
+                            </div>
+                            <h4>Loyalty Rewards</h4>
+                            <p>Manage loyalty points and rewards program</p>
+                            <span class="engagement-badge">500+ Redemptions</span>
+                        </button>
+                        
+                        <button class="engagement-card" id="feedbackSurveyBtn">
+                            <div class="engagement-icon survey">
+                                <i class="fas fa-poll"></i>
+                            </div>
+                            <h4>Feedback Survey</h4>
+                            <p>Create and send customer satisfaction surveys</p>
+                            <span class="engagement-badge">High Response</span>
+                        </button>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Add Customer Modal -->
+    <div class="modal" id="addCustomerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Customer</h3>
+                <button class="modal-close" id="closeCustomerModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="addCustomerForm" class="customer-form">
+                    <div class="form-section">
+                        <h4><i class="fas fa-user-circle"></i> Personal Information</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="customerName">
+                                    <i class="fas fa-user"></i> Full Name *
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="customerName" 
+                                    placeholder="Enter customer's full name"
+                                    required
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="customerGender">
+                                    <i class="fas fa-venus-mars"></i> Gender
+                                </label>
+                                <select id="customerGender">
+                                    <option value="">Select Gender</option>
+                                    <option value="male">Male</option>
+                                    <option value="female">Female</option>
+                                    <option value="other">Other</option>
+                                    <option value="prefer-not-to-say">Prefer not to say</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="customerAge">
+                                    <i class="fas fa-birthday-cake"></i> Age
+                                </label>
+                                <input 
+                                    type="number" 
+                                    id="customerAge" 
+                                    min="1" 
+                                    max="120"
+                                    placeholder="Age"
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="customerDOB">
+                                    <i class="fas fa-calendar"></i> Date of Birth
+                                </label>
+                                <input 
+                                    type="date" 
+                                    id="customerDOB" 
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4><i class="fas fa-address-book"></i> Contact Information</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="customerEmail">
+                                    <i class="fas fa-envelope"></i> Email Address *
+                                </label>
+                                <input 
+                                    type="email" 
+                                    id="customerEmail" 
+                                    placeholder="customer@example.com"
+                                    required
+                                >
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="customerPhone">
+                                    <i class="fas fa-phone"></i> Phone Number *
+                                </label>
+                                <input 
+                                    type="tel" 
+                                    id="customerPhone" 
+                                    placeholder="+91 98765 43210"
+                                    required
+                                >
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="customerAddress">
+                                    <i class="fas fa-home"></i> Address
+                                </label>
+                                <textarea 
+                                    id="customerAddress" 
+                                    rows="2"
+                                    placeholder="Full address"
+                                ></textarea>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="customerCity">
+                                    <i class="fas fa-city"></i> City
+                                </label>
+                                <input 
+                                    type="text" 
+                                    id="customerCity" 
+                                    placeholder="City"
+                                >
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4><i class="fas fa-tags"></i> Customer Profile</h4>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="customerSegment">
+                                    <i class="fas fa-chart-pie"></i> Customer Segment
+                                </label>
+                                <select id="customerSegment">
+                                    <option value="new">New Customer</option>
+                                    <option value="regular">Regular</option>
+                                    <option value="loyal">Loyal Customer</option>
+                                    <option value="vip">VIP</option>
+                                    <option value="high-value">High Value</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="customerSource">
+                                    <i class="fas fa-sign-in-alt"></i> Source
+                                </label>
+                                <select id="customerSource">
+                                    <option value="walk-in">Walk-in</option>
+                                    <option value="online">Online Registration</option>
+                                    <option value="referral">Referral</option>
+                                    <option value="campaign">Marketing Campaign</option>
+                                    <option value="event">Mall Event</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="customerInterests">
+                                    <i class="fas fa-heart"></i> Interests
+                                </label>
+                                <div class="interests-tags" id="interestsContainer">
+                                    <!-- Interests will be added dynamically -->
+                                </div>
+                                <input 
+                                    type="text" 
+                                    id="customerInterests" 
+                                    placeholder="Add interests (press Enter)"
+                                >
+                                <small class="form-help">Type interest and press Enter to add</small>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h4><i class="fas fa-bell"></i> Communication Preferences</h4>
+                        <div class="communication-preferences">
+                            <div class="preference-item">
+                                <input type="checkbox" id="prefEmail" checked>
+                                <label for="prefEmail">Email Communications</label>
+                            </div>
+                            <div class="preference-item">
+                                <input type="checkbox" id="prefSMS" checked>
+                                <label for="prefSMS">SMS Notifications</label>
+                            </div>
+                            <div class="preference-item">
+                                <input type="checkbox" id="prefWhatsApp" checked>
+                                <label for="prefWhatsApp">WhatsApp Updates</label>
+                            </div>
+                            <div class="preference-item">
+                                <input type="checkbox" id="prefPromotions" checked>
+                                <label for="prefPromotions">Promotional Offers</label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelCustomerBtn">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-user-plus"></i> Add Customer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Customer Detail Modal -->
+    <div class="modal" id="customerDetailModal">
+        <div class="modal-content customer-detail-modal">
+            <div class="modal-header">
+                <h3 id="customerDetailName">Customer Details</h3>
+                <button class="modal-close" id="closeDetailModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="customer-detail-content" id="customerDetailContent">
+                    <!-- Customer details will be populated here -->
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Send Campaign Modal -->
+    <div class="modal" id="campaignModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Send Campaign</h3>
+                <button class="modal-close" id="closeCampaignModal">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="campaignForm">
+                    <div class="form-group">
+                        <label for="campaignType">
+                            <i class="fas fa-bullhorn"></i> Campaign Type
+                        </label>
+                        <select id="campaignType">
+                            <option value="email">Email Campaign</option>
+                            <option value="sms">SMS Campaign</option>
+                            <option value="whatsapp">WhatsApp Campaign</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="campaignAudience">
+                            <i class="fas fa-users"></i> Target Audience
+                        </label>
+                        <select id="campaignAudience">
+                            <option value="selected">Selected Customers (0 selected)</option>
+                            <option value="all">All Customers</option>
+                            <option value="segment">By Segment</option>
+                            <option value="location">By Location</option>
+                            <option value="spend">By Spending Pattern</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="campaignSubject">
+                            <i class="fas fa-heading"></i> Subject Line
+                        </label>
+                        <input 
+                            type="text" 
+                            id="campaignSubject" 
+                            placeholder="Enter campaign subject"
+                            required
+                        >
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="campaignMessage">
+                            <i class="fas fa-comment-alt"></i> Message Content
+                        </label>
+                        <textarea 
+                            id="campaignMessage" 
+                            rows="6"
+                            placeholder="Write your campaign message here..."
+                            required
+                        ></textarea>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelCampaignBtn">
+                            Cancel
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-paper-plane"></i> Send Campaign
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Notification Panel -->
+    <div class="notification-panel" id="notificationPanel">
+        <div class="notification-header">
+            <h3>Customer Notifications</h3>
+            <button class="close-notifications" id="closeNotifications">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="notification-list">
+            <div class="notification-item unread">
+                <div class="notification-icon customer-notification">
+                    <i class="fas fa-birthday-cake"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Birthday Alert</h4>
+                    <p>15 customers have birthdays this week.</p>
+                    <span class="notification-time">Today</span>
+                </div>
+            </div>
+            <div class="notification-item unread">
+                <div class="notification-icon customer-notification">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>New Customer</h4>
+                    <p>Rohit Sharma registered as new customer.</p>
+                    <span class="notification-time">2 hours ago</span>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon customer-notification">
+                    <i class="fas fa-star"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>Loyalty Milestone</h4>
+                    <p>Priya Patel reached Gold tier in loyalty program.</p>
+                    <span class="notification-time">1 day ago</span>
+                </div>
+            </div>
+            <div class="notification-item">
+                <div class="notification-icon customer-notification">
+                    <i class="fas fa-comment-alt"></i>
+                </div>
+                <div class="notification-content">
+                    <h4>New Feedback</h4>
+                    <p>5 new customer feedback received.</p>
+                    <span class="notification-time">2 days ago</span>
+                </div>
+            </div>
+        </div>
+        <div class="notification-footer">
+            <a href="#" class="mark-all-read">Mark all as read</a>
+        </div>
+    </div>
+    
+    <script src="{% static "javascripts/scripts.js"%}"></script>
+    <script src="{% static "javascripts/customers.js"%}"></script>
+</body>
+</html>
