@@ -16,3 +16,6 @@ def sales(request):
 def customers(request):
     return render(request, 'customers/customers.html')
 
+def inventory(request):
+    return render(request, 'inventory/inventory.html')
+
