@@ -1,0 +1,54 @@
+name: Mall System CI/CD
+
+on:
+  push:
+    branches: ["main"] # Triggered whenevry we push codel to the main branch
+  pull_request:
+    branches: ["main"] # Triggred when a pull request is made to the main branch
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set UP DOcker Buildx
+        uuses: docker/setup-buildx-action@v3
+
+      - name: llogin to DOcker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ serects.DOCKERHUB_TOKEN }}
+
+      - name: Build and Push Django Image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/mall-system:latest
+          cache-from: type=gha
+          cache-to: type=gha,mode=max 
+  
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to server via SSH
+        uses: applebpy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_IP }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd/home/${{ secrets.SERVER_USER }}/Transaction_clustering 
+            
+            docker-compose pull
+
+            docker-compose up -d --remove-orphans
+
+            docker compose exec -T app python manage.py migrate 
