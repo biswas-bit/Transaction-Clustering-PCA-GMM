@@ -47,6 +47,7 @@ jobs:
           script: |
             cd/home/${{ secrets.SERVER_USER }}/Transaction_clustering 
             
+           # Pull the latest image we just pushed
             docker-compose pull
 
             docker-compose up -d --remove-orphans
