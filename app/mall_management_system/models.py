@@ -41,7 +41,7 @@ class store(models.Model):
     class Meta:
         indexes = [
             djongo_models.Index(fields=['store_id']),
-            djongo_models.index(fields=['category']),
+            djongo_models.Index(fields=['category']),
             djongo_models.Index(fields=['loaction'])
         ]
     def __str__(self):
