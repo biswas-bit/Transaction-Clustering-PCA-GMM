@@ -42,7 +42,7 @@ class store(models.Model):
         indexes = [
             djongo_models.Index(fields=['store_id']),
             djongo_models.Index(fields=['category']),
-            djongo_models.Index(fields=['loaction'])
+            djongo_models.Index(fields=['location'])
         ]
     def __str__(self):
         return f"{self.name}({self.store_id})"
