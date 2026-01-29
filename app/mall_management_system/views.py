@@ -263,6 +263,32 @@ def api_store_stats(request):
     })
     
 
+def api_top_stores(request):
+    """API endpoint for top performing stores"""
+    # Get all stores with sample revenue data
+    stores_list = store.objects.all()
+    top_stores = []
+    
+    for store_obj in stores_list:
+        revenue = random.randint(300000, 5000000)
+        top_stores.append({
+            'id': store_obj.store_id,
+            'name': store_obj.name,
+            'category': store_obj.get_category_display(),
+            'revenue': revenue,
+            'rating': round(random.uniform(3.5, 5.0), 1)
+        })
+    
+    # Sort by revenue and take top 5
+    top_stores.sort(key=lambda x: x['revenue'], reverse=True)
+    top_stores = top_stores[:5]
+    
+    return JsonResponse({
+        'success': True,
+        'top_stores': top_stores
+    })
+
+
 def sales(request):
     return render(request, 'sales/sales.html')
 
