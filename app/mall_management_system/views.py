@@ -142,6 +142,78 @@ def api_stores(request):
     
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
+@csrf_exempt
+def api_store_detail(request, store_id):
+    """API endpoint for individual store"""
+    try:
+        store_obj = get_object_or_404(store, store_id=store_id)
+        
+        if request.method == 'GET':
+            # Get store details
+            store_data = {
+                'id': store_obj.store_id,
+                'name': store_obj.name,
+                'category': store_obj.category,
+                'category_display': store_obj.get_category_display(),
+                'location': store_obj.get_location_display(),
+                'location_code': store_obj.location,
+                'owner': store_obj.owner,
+                'contact_email': store_obj.contact_email,
+                'contact_phone': store_obj.contact_phone,
+                'opening_hours': store_obj.opening_hours,
+                'status': store_obj.status,
+                'status_display': store_obj.get_status_display(),
+                'created_at': store_obj.created_at.strftime('%Y-%m-%d'),
+                'updated_at': store_obj.updated_at.strftime('%Y-%m-%d')
+            }
+            
+            # Add sample performance data
+            performance_data = {
+                'size': random.randint(600, 5000),
+                'monthly_rent': random.randint(35000, 250000),
+                'revenue': random.randint(300000, 5000000),
+                'rating': round(random.uniform(3.5, 5.0), 1),
+                'performance': random.choice(['low', 'medium', 'high', 'very-high']),
+                'lease_end': (datetime.now() + timedelta(days=random.randint(30, 365))).strftime('%Y-%m-%d')
+            }
+            
+            return JsonResponse({
+                'success': True,
+                'store': {**store_data, **performance_data}
+            })
+        
+        elif request.method == 'PUT':
+            # Update store
+            data = json.loads(request.body)
+            
+            store_obj.name = data.get('name', store_obj.name)
+            store_obj.category = data.get('category', store_obj.category)
+            store_obj.location = data.get('location', store_obj.location)
+            store_obj.owner = data.get('manager', store_obj.owner)
+            store_obj.contact_email = data.get('contact', store_obj.contact_email)
+            store_obj.status = data.get('status', store_obj.status)
+            store_obj.save()
+            
+            return JsonResponse({
+                'success': True,
+                'message': 'Store updated successfully'
+            })
+        
+        elif request.method == 'DELETE':
+            # Delete store
+            store_obj.delete()
+            return JsonResponse({
+                'success': True,
+                'message': 'Store deleted successfully'
+            })
+    
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'error': str(e)
+        }, status=400)
+
+
 def api_store_stats(request):
     """API endpoint for store statistics"""
     total_stores = store.objects.count()
