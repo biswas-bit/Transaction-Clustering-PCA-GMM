@@ -142,6 +142,54 @@ def api_stores(request):
     
     return JsonResponse({'success': False, 'error': 'Invalid method'})
 
+def api_store_stats(request):
+    """API endpoint for store statistics"""
+    total_stores = store.objects.count()
+    open_stores = store.objects.filter(status='active').count()
+    closed_stores = store.objects.filter(status='inactive').count()
+    maintenance_stores = store.objects.filter(status='maintenance').count()
+    
+    # Category distribution
+    categories = {}
+    for cat_code, cat_name in store._meta.get_field('category').choices:
+        count = store.objects.filter(category=cat_code).count()
+        if count > 0:
+            categories[cat_name] = count
+    
+    # Calculate revenue by category (sample data)
+    category_revenue = {}
+    revenue_multipliers = {
+        'electronics': 2.5,
+        'fashion': 1.8,
+        'food': 1.2,
+        'entertainment': 3.0,
+        'beauty': 1.5,
+        'home': 1.3,
+        'sports': 1.6,
+        'books': 0.8,
+        'jewelry': 2.2
+    }
+    
+    for cat_code, cat_name in store._meta.get_field('category').choices:
+        count = store.objects.filter(category=cat_code).count()
+        multiplier = revenue_multipliers.get(cat_code, 1.0)
+        category_revenue[cat_name] = count * 500000 * multiplier  # Base 5L per store
+    
+    return JsonResponse({
+        'success': True,
+        'stats': {
+            'total_stores': total_stores,
+            'open_stores': open_stores,
+            'closed_stores': closed_stores,
+            'maintenance_stores': maintenance_stores,
+            'occupancy_rate': int((total_stores / 60) * 100),  # 60 max capacity
+            'avg_revenue': 820000,
+            'avg_rating': 4.2,
+            'categories': categories,
+            'category_revenue': category_revenue
+        }
+    })
+    
 
 def sales(request):
     return render(request, 'sales/sales.html')
