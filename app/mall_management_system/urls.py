@@ -10,5 +10,5 @@ urlpatterns = [
     path('sales/',views.sales, name='sales'),
     path('customers/',views.customers, name='customers'),
     path('inventory/',views.inventory, name='inventory'),
-    
+    path('api/stores/', views.api_stores, name='api_stores'),
 ]
