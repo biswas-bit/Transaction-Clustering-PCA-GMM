@@ -289,6 +289,31 @@ def api_top_stores(request):
     })
 
 
+def api_lease_timeline(request):
+    """API endpoint for lease expiry timeline"""
+    stores_list = store.objects.all()
+    lease_timeline = []
+    
+    for store_obj in stores_list:
+        # Generate random lease end dates for demo
+        days_until_lease = random.randint(15, 365)
+        lease_end = datetime.now() + timedelta(days=days_until_lease)
+        
+        lease_timeline.append({
+            'id': store_obj.store_id,
+            'name': store_obj.name,
+            'lease_end': lease_end.strftime('%Y-%m-%d'),
+            'days_until': days_until_lease
+        })
+    
+    # Sort by lease end date
+    lease_timeline.sort(key=lambda x: x['days_until'])
+    
+    return JsonResponse({
+        'success': True,
+        'lease_timeline': lease_timeline[:5]  # Top 5 closest expiries
+    })
+
 def sales(request):
     return render(request, 'sales/sales.html')
 
