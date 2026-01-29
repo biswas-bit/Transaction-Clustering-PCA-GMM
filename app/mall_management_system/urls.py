@@ -14,5 +14,6 @@ urlpatterns = [
      path('api/stores/<str:store_id>/', views.api_store_detail, name='api_store_detail'),
     path('api/store-stats/', views.api_store_stats, name='api_store_stats'),
      path('api/top-stores/', views.api_top_stores, name='api_top_stores'),
+     path('api/lease-timeline/', views.api_lease_timeline, name='api_lease_timeline'),
     
 ]
