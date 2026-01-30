@@ -1,4 +1,4 @@
-// Store Management JavaScript with API Integration
+// Store Management JavaScript
 
 // Store Data Structure
 let storesData = [];
@@ -6,13 +6,10 @@ let filteredStores = [];
 let currentCategory = 'all';
 let currentView = 'grid';
 
-// API Base URL - adjust based on your Django setup
-const API_BASE = '/api';
-
 // Initialize Store Management System
-async function initStoreManagement() {
-    // Load stores from API
-    await loadStoresFromAPI();
+function initStoreManagement() {
+    // Load sample store data
+    loadSampleStores();
     
     // Initialize UI components
     initStoreUI();
@@ -21,38 +18,15 @@ async function initStoreManagement() {
     setupStoreEventListeners();
     
     // Initialize charts
-    await initStoreCharts();
+    initStoreCharts();
     
     // Update store displays
     updateStoresDisplay();
-    await updateTopStoresList();
-    await updateLeaseTimeline();
-    await updateStoreKPIs();
+    updateTopStoresList();
+    updateLeaseTimeline();
 }
 
-// Load stores from API
-async function loadStoresFromAPI() {
-    try {
-        const response = await fetch(`${API_BASE}/stores/`);
-        const data = await response.json();
-        
-        if (data.success) {
-            storesData = data.stores;
-            filteredStores = [...storesData];
-            console.log('Loaded stores from API:', storesData.length);
-        } else {
-            console.error('Failed to load stores:', data.error);
-            // Load sample data as fallback
-            loadSampleStores();
-        }
-    } catch (error) {
-        console.error('Error loading stores from API:', error);
-        // Load sample data as fallback
-        loadSampleStores();
-    }
-}
-
-// Load sample store data (fallback)
+// Load sample store data
 function loadSampleStores() {
     storesData = [
         {
@@ -88,6 +62,142 @@ function loadSampleStores() {
             rating: 4.8,
             leaseEnd: '2024-08-20',
             performance: 'very-high'
+        },
+        {
+            id: 'ST003',
+            name: 'Food Court - Italian Corner',
+            category: 'food',
+            location: 'GF-West',
+            size: 800,
+            monthlyRent: 45000,
+            manager: 'Marco Rossi',
+            contact: 'marco@italiancorner.com',
+            description: 'Authentic Italian cuisine and desserts',
+            hours: '11:00 AM - 11:00 PM',
+            status: 'open',
+            revenue: 850000,
+            rating: 4.3,
+            leaseEnd: '2024-03-10',
+            performance: 'medium'
+        },
+        {
+            id: 'ST004',
+            name: 'CineMax',
+            category: 'entertainment',
+            location: '2F-South',
+            size: 5000,
+            monthlyRent: 250000,
+            manager: 'Anil Kapoor',
+            contact: 'anil@cinemax.com',
+            description: 'Multiplex with 6 screens and premium seating',
+            hours: '9:00 AM - 1:00 AM',
+            status: 'open',
+            revenue: 4200000,
+            rating: 4.7,
+            leaseEnd: '2024-12-01',
+            performance: 'very-high'
+        },
+        {
+            id: 'ST005',
+            name: 'Beauty Glow',
+            category: 'beauty',
+            location: '1F-North',
+            size: 1200,
+            monthlyRent: 65000,
+            manager: 'Sneha Reddy',
+            contact: 'sneha@beautyglow.com',
+            description: 'Premium beauty products and cosmetics',
+            hours: '10:00 AM - 9:00 PM',
+            status: 'open',
+            revenue: 950000,
+            rating: 4.4,
+            leaseEnd: '2024-05-22',
+            performance: 'high'
+        },
+        {
+            id: 'ST006',
+            name: 'Home & Living',
+            category: 'home',
+            location: '2F-North',
+            size: 1800,
+            monthlyRent: 95000,
+            manager: 'Vikram Singh',
+            contact: 'vikram@homeandliving.com',
+            description: 'Furniture and home decor items',
+            hours: '10:00 AM - 9:00 PM',
+            status: 'maintenance',
+            revenue: 1100000,
+            rating: 4.2,
+            leaseEnd: '2024-09-30',
+            performance: 'medium'
+        },
+        {
+            id: 'ST007',
+            name: 'Sports Zone',
+            category: 'sports',
+            location: '2F-East',
+            size: 2200,
+            monthlyRent: 110000,
+            manager: 'Arjun Patel',
+            contact: 'arjun@sportszone.com',
+            description: 'Sports equipment and fitness gear',
+            hours: '10:00 AM - 9:00 PM',
+            status: 'open',
+            revenue: 1350000,
+            rating: 4.6,
+            leaseEnd: '2024-07-15',
+            performance: 'high'
+        },
+        {
+            id: 'ST008',
+            name: 'Book Haven',
+            category: 'books',
+            location: '1F-West',
+            size: 900,
+            monthlyRent: 40000,
+            manager: 'Meera Iyer',
+            contact: 'meera@bookhaven.com',
+            description: 'Books, magazines, and stationery',
+            hours: '10:00 AM - 8:00 PM',
+            status: 'open',
+            revenue: 650000,
+            rating: 4.1,
+            leaseEnd: '2024-04-18',
+            performance: 'low'
+        },
+        {
+            id: 'ST009',
+            name: 'Jewel Palace',
+            category: 'jewelry',
+            location: 'GF-South',
+            size: 1600,
+            monthlyRent: 85000,
+            manager: 'Rajesh Nair',
+            contact: 'rajesh@jewelpalace.com',
+            description: 'Fine jewelry and watches',
+            hours: '10:30 AM - 8:30 PM',
+            status: 'closed',
+            revenue: 1850000,
+            rating: 4.9,
+            leaseEnd: '2024-11-05',
+            performance: 'very-high'
+        },
+        {
+            id: 'ST010',
+            name: 'Coffee Brew',
+            category: 'food',
+            location: 'GF-East',
+            size: 600,
+            monthlyRent: 35000,
+            manager: 'Alex Johnson',
+            contact: 'alex@coffeebrew.com',
+            description: 'Specialty coffee and baked goods',
+            hours: '7:00 AM - 10:00 PM',
+            status: 'open',
+            revenue: 750000,
+            rating: 4.7,
+            leaseEnd: '2024-02-28',
+            performance: 'medium'
         }
     ];
     
@@ -101,9 +211,7 @@ function initStoreUI() {
     
     // Initialize search functionality
     const searchInput = document.getElementById('storeSearch');
-    if (searchInput) {
-        searchInput.addEventListener('input', handleStoreSearch);
-    }
+    searchInput.addEventListener('input', handleStoreSearch);
     
     // Initialize category filters
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -125,28 +233,19 @@ function setupStoreEventListeners() {
     const cancelStoreBtn = document.getElementById('cancelStoreBtn');
     const addStoreForm = document.getElementById('addStoreForm');
     
-    if (addStoreBtn) {
-        addStoreBtn.addEventListener('click', () => {
-            resetAddStoreForm();
-            addStoreModal.classList.add('active');
-        });
-    }
+    addStoreBtn.addEventListener('click', () => {
+        addStoreModal.classList.add('active');
+    });
     
-    if (closeStoreModal) {
-        closeStoreModal.addEventListener('click', () => {
-            addStoreModal.classList.remove('active');
-        });
-    }
+    closeStoreModal.addEventListener('click', () => {
+        addStoreModal.classList.remove('active');
+    });
     
-    if (cancelStoreBtn) {
-        cancelStoreBtn.addEventListener('click', () => {
-            addStoreModal.classList.remove('active');
-        });
-    }
+    cancelStoreBtn.addEventListener('click', () => {
+        addStoreModal.classList.remove('active');
+    });
     
-    if (addStoreForm) {
-        addStoreForm.addEventListener('submit', handleAddStore);
-    }
+    addStoreForm.addEventListener('submit', handleAddStore);
     
     // Close modal when clicking outside
     window.addEventListener('click', (e) => {
@@ -161,157 +260,116 @@ function setupStoreEventListeners() {
     });
     
     // Quick action buttons
-    const manageLeasesBtn = document.getElementById('manageLeasesBtn');
-    const maintenanceRequestsBtn = document.getElementById('maintenanceRequestsBtn');
-    const rentCollectionBtn = document.getElementById('rentCollectionBtn');
-    const storePerformanceBtn = document.getElementById('storePerformanceBtn');
+    document.getElementById('manageLeasesBtn').addEventListener('click', () => {
+        alert('Lease management feature will be implemented soon!');
+    });
     
-    if (manageLeasesBtn) {
-        manageLeasesBtn.addEventListener('click', () => {
-            alert('Lease management feature will be implemented soon!');
-        });
-    }
+    document.getElementById('maintenanceRequestsBtn').addEventListener('click', () => {
+        alert('Maintenance management feature will be implemented soon!');
+    });
     
-    if (maintenanceRequestsBtn) {
-        maintenanceRequestsBtn.addEventListener('click', () => {
-            alert('Maintenance management feature will be implemented soon!');
-        });
-    }
+    document.getElementById('rentCollectionBtn').addEventListener('click', () => {
+        alert('Rent collection feature will be implemented soon!');
+    });
     
-    if (rentCollectionBtn) {
-        rentCollectionBtn.addEventListener('click', () => {
-            alert('Rent collection feature will be implemented soon!');
-        });
-    }
-    
-    if (storePerformanceBtn) {
-        storePerformanceBtn.addEventListener('click', () => {
-            alert('Performance reports feature will be implemented soon!');
-        });
-    }
+    document.getElementById('storePerformanceBtn').addEventListener('click', () => {
+        alert('Performance reports feature will be implemented soon!');
+    });
     
     // Export button
-    const exportBtn = document.querySelector('.export-btn');
-    if (exportBtn) {
-        exportBtn.addEventListener('click', () => {
-            alert('Export feature will be implemented soon!');
-        });
-    }
+    document.querySelector('.export-btn').addEventListener('click', () => {
+        alert('Export feature will be implemented soon!');
+    });
     
     // Analytics period change
-    const analyticsPeriod = document.getElementById('analyticsPeriod');
-    if (analyticsPeriod) {
-        analyticsPeriod.addEventListener('change', updateStoreCharts);
-    }
+    document.getElementById('analyticsPeriod').addEventListener('change', updateStoreCharts);
     
     // Notification panel
     const notificationBtn = document.getElementById('notificationBtn');
     const notificationPanel = document.getElementById('notificationPanel');
     const closeNotifications = document.getElementById('closeNotifications');
     
-    if (notificationBtn && notificationPanel) {
-        notificationBtn.addEventListener('click', () => {
-            notificationPanel.classList.toggle('active');
-        });
-    }
+    notificationBtn.addEventListener('click', () => {
+        notificationPanel.classList.toggle('active');
+    });
     
-    if (closeNotifications && notificationPanel) {
-        closeNotifications.addEventListener('click', () => {
-            notificationPanel.classList.remove('active');
-        });
-    }
+    closeNotifications.addEventListener('click', () => {
+        notificationPanel.classList.remove('active');
+    });
     
     // Mark all as read
-    const markAllRead = document.querySelector('.mark-all-read');
-    if (markAllRead) {
-        markAllRead.addEventListener('click', (e) => {
-            e.preventDefault();
-            document.querySelectorAll('.notification-item.unread').forEach(item => {
-                item.classList.remove('unread');
-            });
-            const badge = document.querySelector('.notification-badge');
-            if (badge) badge.textContent = '0';
+    document.querySelector('.mark-all-read').addEventListener('click', (e) => {
+        e.preventDefault();
+        document.querySelectorAll('.notification-item.unread').forEach(item => {
+            item.classList.remove('unread');
         });
-    }
+        document.querySelector('.notification-badge').textContent = '0';
+    });
 }
 
 // Initialize store charts
-async function initStoreCharts() {
-    try {
-        const response = await fetch(`${API_BASE}/store-stats/`);
-        const data = await response.json();
-        
-        if (data.success && data.stats.category_revenue) {
-            const categoryRevenue = data.stats.category_revenue;
-            const labels = Object.keys(categoryRevenue);
-            const values = Object.values(categoryRevenue);
-            
-            const ctx = document.getElementById('categoryRevenueChart');
-            if (ctx) {
-                window.categoryRevenueChart = new Chart(ctx.getContext('2d'), {
-                    type: 'doughnut',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            data: values,
-                            backgroundColor: [
-                                '#4361ee', '#4cc9f0', '#7209b7', '#f72585', '#b5179e',
-                                '#3a0ca3', '#560bad', '#480ca8', '#3f37c9'
-                            ],
-                            borderWidth: 2,
-                            borderColor: '#ffffff'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: {
-                                    padding: 20,
-                                    usePointStyle: true,
-                                    pointStyle: 'circle',
-                                    font: {
-                                        size: 11
-                                    }
-                                }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        const value = context.parsed;
-                                        if (value >= 1000000) {
-                                            label += '₹ ' + (value / 1000000).toFixed(1) + 'M';
-                                        } else if (value >= 100000) {
-                                            label += '₹ ' + (value / 100000).toFixed(1) + 'L';
-                                        } else {
-                                            label += '₹ ' + value.toLocaleString('en-IN');
-                                        }
-                                        return label;
-                                    }
-                                }
-                            }
+function initStoreCharts() {
+    // Category Revenue Chart
+    const ctx = document.getElementById('categoryRevenueChart').getContext('2d');
+    window.categoryRevenueChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Fashion', 'Electronics', 'Food', 'Entertainment', 'Beauty', 'Home', 'Sports', 'Books', 'Jewelry'],
+            datasets: [{
+                data: [1250000, 2850000, 1600000, 4200000, 950000, 1100000, 1350000, 650000, 1850000],
+                backgroundColor: [
+                    '#4361ee', '#4cc9f0', '#7209b7', '#f72585', '#b5179e',
+                    '#3a0ca3', '#560bad', '#480ca8', '#3f37c9'
+                ],
+                borderWidth: 2,
+                borderColor: '#ffffff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        padding: 20,
+                        usePointStyle: true,
+                        pointStyle: 'circle',
+                        font: {
+                            size: 11
                         }
                     }
-                });
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            const value = context.parsed;
+                            if (value >= 1000000) {
+                                label += '₹ ' + (value / 1000000).toFixed(1) + 'M';
+                            } else if (value >= 100000) {
+                                label += '₹ ' + (value / 100000).toFixed(1) + 'L';
+                            } else {
+                                label += '₹ ' + value.toLocaleString('en-IN');
+                            }
+                            return label;
+                        }
+                    }
+                }
             }
         }
-    } catch (error) {
-        console.error('Error initializing charts:', error);
-    }
+    });
 }
 
 // Update store charts
 function updateStoreCharts() {
-    if (!window.categoryRevenueChart) return;
-    
     const period = document.getElementById('analyticsPeriod').value;
     
+    // In a real app, this would fetch new data based on period
+    // For now, we'll simulate data changes
     const multipliers = {
         week: 0.25,
         month: 1,
@@ -334,8 +392,6 @@ function updateStoreCharts() {
 function updateStoresDisplay() {
     const storesGrid = document.getElementById('storesGrid');
     const storesList = document.getElementById('storesList');
-    
-    if (!storesGrid || !storesList) return;
     
     if (filteredStores.length === 0) {
         const emptyHTML = `
@@ -370,7 +426,7 @@ function updateStoresDisplay() {
     storesList.innerHTML = listHTML;
     
     // Add event listeners to store cards
-    document.querySelectorAll('.store-card, .store-list-item').forEach(card => {
+    document.querySelectorAll('.store-card').forEach(card => {
         const storeId = card.dataset.storeId;
         card.addEventListener('click', () => showStoreDetails(storeId));
     });
@@ -378,6 +434,18 @@ function updateStoresDisplay() {
 
 // Create store card HTML
 function createStoreCardHTML(store) {
+    const statusColors = {
+        open: 'success',
+        closed: 'danger',
+        maintenance: 'warning'
+    };
+    
+    const statusIcons = {
+        open: 'door-open',
+        closed: 'door-closed',
+        maintenance: 'tools'
+    };
+    
     const performanceColors = {
         'very-high': '#2ecc71',
         'high': '#3498db',
@@ -452,6 +520,12 @@ function createStoreCardHTML(store) {
 
 // Create store list HTML
 function createStoreListHTML(store) {
+    const statusColors = {
+        open: 'success',
+        closed: 'danger',
+        maintenance: 'warning'
+    };
+    
     return `
         <div class="store-list-item" data-store-id="${store.id}">
             <div class="list-item-main">
@@ -486,71 +560,65 @@ function createStoreListHTML(store) {
 }
 
 // Update top stores list
-async function updateTopStoresList() {
-    try {
-        const response = await fetch(`${API_BASE}/top-stores/`);
-        const data = await response.json();
-        
-        if (data.success) {
-            const topStoresList = document.getElementById('topStoresList');
-            if (!topStoresList) return;
-            
-            let html = '';
-            data.top_stores.forEach((store, index) => {
-                html += `
-                    <div class="top-store-item">
-                        <div class="top-store-info">
-                            <div class="top-store-rank">${index + 1}</div>
-                            <div class="top-store-name">${store.name}</div>
-                        </div>
-                        <div class="top-store-revenue">₹ ${formatRevenue(store.revenue)}</div>
-                    </div>
-                `;
-            });
-            
-            topStoresList.innerHTML = html;
-        }
-    } catch (error) {
-        console.error('Error updating top stores:', error);
-    }
+function updateTopStoresList() {
+    const topStoresList = document.getElementById('topStoresList');
+    
+    // Sort stores by revenue and take top 5
+    const topStores = [...storesData]
+        .sort((a, b) => b.revenue - a.revenue)
+        .slice(0, 5);
+    
+    let html = '';
+    topStores.forEach((store, index) => {
+        html += `
+            <div class="top-store-item">
+                <div class="top-store-info">
+                    <div class="top-store-rank">${index + 1}</div>
+                    <div class="top-store-name">${store.name}</div>
+                </div>
+                <div class="top-store-revenue">₹ ${formatRevenue(store.revenue)}</div>
+            </div>
+        `;
+    });
+    
+    topStoresList.innerHTML = html;
 }
 
 // Update lease timeline
-async function updateLeaseTimeline() {
-    try {
-        const response = await fetch(`${API_BASE}/lease-timeline/`);
-        const data = await response.json();
+function updateLeaseTimeline() {
+    const leaseTimeline = document.getElementById('leaseTimeline');
+    
+    // Sort stores by lease end date
+    const upcomingLeases = [...storesData]
+        .filter(store => {
+            const daysUntilLease = daysBetween(new Date(), new Date(store.leaseEnd));
+            return daysUntilLease <= 90; // Show leases expiring in next 90 days
+        })
+        .sort((a, b) => new Date(a.leaseEnd) - new Date(b.leaseEnd))
+        .slice(0, 5);
+    
+    let html = '';
+    upcomingLeases.forEach(store => {
+        const daysUntilLease = daysBetween(new Date(), new Date(store.leaseEnd));
+        let daysClass = 'normal';
         
-        if (data.success) {
-            const leaseTimeline = document.getElementById('leaseTimeline');
-            if (!leaseTimeline) return;
-            
-            let html = '';
-            data.lease_timeline.forEach(lease => {
-                const daysUntilLease = lease.days_until;
-                let daysClass = 'normal';
-                
-                if (daysUntilLease <= 30) {
-                    daysClass = 'danger';
-                } else if (daysUntilLease <= 60) {
-                    daysClass = 'warning';
-                }
-                
-                html += `
-                    <div class="lease-item">
-                        <div class="lease-store">${lease.name}</div>
-                        <div class="lease-days ${daysClass}">
-                            ${daysUntilLease} days
-                        </div>
-                    </div>
-                `;
-            });
-            
-            leaseTimeline.innerHTML = html;
+        if (daysUntilLease <= 30) {
+            daysClass = 'danger';
+        } else if (daysUntilLease <= 60) {
+            daysClass = 'warning';
         }
-    } catch (error) {
-        console.error('Error updating lease timeline:', error);
-    }
+        
+        html += `
+            <div class="lease-item">
+                <div class="lease-store">${store.name}</div>
+                <div class="lease-days ${daysClass}">
+                    ${daysUntilLease} days
+                </div>
+            </div>
+        `;
+    });
+    
+    leaseTimeline.innerHTML = html;
 }
 
 // Handle store search
@@ -572,7 +640,7 @@ function handleStoreSearch(e) {
 }
 
 // Handle category filter
-async function handleCategoryFilter(e) {
+function handleCategoryFilter(e) {
     const category = e.target.dataset.category;
     
     // Update active button
@@ -583,29 +651,13 @@ async function handleCategoryFilter(e) {
     
     currentCategory = category;
     
-    // Reload data with filter
-    try {
-        const url = category === 'all' 
-            ? `${API_BASE}/stores/` 
-            : `${API_BASE}/stores/?category=${category}`;
-        
-        const response = await fetch(url);
-        const data = await response.json();
-        
-        if (data.success) {
-            filteredStores = data.stores;
-            updateStoresDisplay();
-        }
-    } catch (error) {
-        console.error('Error filtering stores:', error);
-        // Fallback to client-side filtering
-        if (category === 'all') {
-            filteredStores = [...storesData];
-        } else {
-            filteredStores = storesData.filter(store => store.category === category);
-        }
-        updateStoresDisplay();
+    if (category === 'all') {
+        filteredStores = [...storesData];
+    } else {
+        filteredStores = storesData.filter(store => store.category === category);
     }
+    
+    updateStoresDisplay();
 }
 
 // Handle view toggle
@@ -633,10 +685,12 @@ function handleViewToggle(e) {
 }
 
 // Handle add store form submission
-async function handleAddStore(e) {
+function handleAddStore(e) {
     e.preventDefault();
     
-    const formData = {
+    const form = e.target;
+    const storeData = {
+        id: 'ST' + (100 + storesData.length + 1),
         name: document.getElementById('storeName').value,
         category: document.getElementById('storeCategory').value,
         location: document.getElementById('storeLocation').value,
@@ -645,68 +699,55 @@ async function handleAddStore(e) {
         manager: document.getElementById('storeManager').value,
         contact: document.getElementById('storeContact').value,
         description: document.getElementById('storeDescription').value,
-        hours: document.getElementById('storeHours').value
+        hours: document.getElementById('storeHours').value,
+        status: 'open',
+        revenue: Math.floor(Math.random() * 2000000) + 300000, // Random revenue for demo
+        rating: (Math.random() * 1.5 + 3.5).toFixed(1), // Random rating 3.5-5.0
+        leaseEnd: generateLeaseEndDate(),
+        performance: ['low', 'medium', 'high', 'very-high'][Math.floor(Math.random() * 4)]
     };
     
-    try {
-        const response = await fetch(`${API_BASE}/stores/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            // Close modal
-            document.getElementById('addStoreModal').classList.remove('active');
-            
-            // Reset form
-            document.getElementById('addStoreForm').reset();
-            
-            // Reload stores
-            await loadStoresFromAPI();
-            
-            // Update UI
-            updateStoresDisplay();
-            await updateTopStoresList();
-            await updateLeaseTimeline();
-            await updateStoreKPIs();
-            await updateStoreCharts();
-            
-            // Show success message
-            showStoreNotification(`Store "${formData.name}" added successfully!`, 'success');
-        } else {
-            showStoreNotification(`Error: ${data.error}`, 'error');
-        }
-    } catch (error) {
-        console.error('Error adding store:', error);
-        showStoreNotification('Failed to add store. Please try again.', 'error');
-    }
+    // Add to stores data
+    storesData.unshift(storeData);
+    filteredStores.unshift(storeData);
+    
+    // Close modal
+    document.getElementById('addStoreModal').classList.remove('active');
+    
+    // Reset form
+    form.reset();
+    
+    // Update UI
+    updateStoresDisplay();
+    updateTopStoresList();
+    updateLeaseTimeline();
+    updateStoreKPIs();
+    updateStoreCharts();
+    
+    // Show success message
+    showStoreNotification(`Store "${storeData.name}" added successfully!`, 'success');
+    
+    console.log('New store added:', storeData);
 }
 
 // Show store details
-async function showStoreDetails(storeId) {
-    try {
-        const response = await fetch(`${API_BASE}/stores/${storeId}/`);
-        const data = await response.json();
-        
-        if (data.success) {
-            const modal = document.getElementById('storeDetailModal');
-            const content = document.getElementById('storeDetailContent');
-            
-            // Populate store details
-            content.innerHTML = createStoreDetailHTML(data.store);
-            
-            // Show modal
-            modal.classList.add('active');
-        }
-    } catch (error) {
-        console.error('Error loading store details:', error);
-        showStoreNotification('Failed to load store details', 'error');
-    }
+function showStoreDetails(storeId) {
+    const store = storesData.find(s => s.id === storeId);
+    if (!store) return;
+    
+    const modal = document.getElementById('storeDetailModal');
+    const content = document.getElementById('storeDetailContent');
+    
+    // Populate store details
+    content.innerHTML = createStoreDetailHTML(store);
+    
+    // Show modal
+    modal.classList.add('active');
+    
+    // Add close button event listener
+    document.getElementById('closeDetailModal').addEventListener('click', () => {
+        modal.classList.remove('active');
+    });
 }
 
 // Create store detail HTML
@@ -754,7 +795,7 @@ function createStoreDetailHTML(store) {
                 <h4>Store Information</h4>
                 <div class="detail-info-item">
                     <span class="detail-label">Location</span>
-                    <span class="detail-value">${store.location_display || formatLocation(store.location)}</span>
+                    <span class="detail-value">${formatLocation(store.location)}</span>
                 </div>
                 <div class="detail-info-item">
                     <span class="detail-label">Store Size</span>
@@ -762,7 +803,7 @@ function createStoreDetailHTML(store) {
                 </div>
                 <div class="detail-info-item">
                     <span class="detail-label">Operating Hours</span>
-                    <span class="detail-value">${store.hours || '10:00 AM - 9:00 PM'}</span>
+                    <span class="detail-value">${store.hours}</span>
                 </div>
                 <div class="detail-info-item">
                     <span class="detail-label">Status</span>
@@ -776,11 +817,11 @@ function createStoreDetailHTML(store) {
                 <h4>Management</h4>
                 <div class="detail-info-item">
                     <span class="detail-label">Manager</span>
-                    <span class="detail-value">${store.owner || store.manager}</span>
+                    <span class="detail-value">${store.manager}</span>
                 </div>
                 <div class="detail-info-item">
                     <span class="detail-label">Contact</span>
-                    <span class="detail-value">${store.contact_email || store.contact}</span>
+                    <span class="detail-value">${store.contact}</span>
                 </div>
                 <div class="detail-info-item">
                     <span class="detail-label">Monthly Rent</span>
@@ -813,12 +854,10 @@ function createStoreDetailHTML(store) {
             </div>
         </div>
         
-        ${store.description ? `
         <div class="store-description">
             <h4>Description</h4>
             <p>${store.description}</p>
         </div>
-        ` : ''}
         
         <div class="form-actions">
             <button class="btn-secondary" onclick="closeStoreDetail()">
@@ -832,57 +871,52 @@ function createStoreDetailHTML(store) {
 }
 
 // Edit store
-async function editStore(storeId) {
-    try {
-        const response = await fetch(`${API_BASE}/stores/${storeId}/`);
-        const data = await response.json();
-        
-        if (data.success) {
-            const store = data.store;
-            
-            // Fill the form with existing data
-            document.getElementById('storeName').value = store.name;
-            document.getElementById('storeCategory').value = store.category;
-            document.getElementById('storeLocation').value = store.location;
-            document.getElementById('storeSize').value = store.size;
-            document.getElementById('monthlyRent').value = store.monthlyRent;
-            document.getElementById('storeManager').value = store.owner || store.manager;
-            document.getElementById('storeContact').value = store.contact_email || store.contact;
-            document.getElementById('storeDescription').value = store.description || '';
-            document.getElementById('storeHours').value = store.hours || '10:00 AM - 9:00 PM';
-            
-            // Change form to update mode
-            const form = document.getElementById('addStoreForm');
-            const submitBtn = form.querySelector('button[type="submit"]');
-            const modalTitle = document.querySelector('#addStoreModal h3');
-            
-            modalTitle.textContent = 'Edit Store';
-            submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Store';
-            
-            // Remove existing submit listener
-            const newForm = form.cloneNode(true);
-            form.parentNode.replaceChild(newForm, form);
-            
-            // Add new submit listener for update
-            newForm.addEventListener('submit', (e) => handleUpdateStore(e, storeId));
-            
-            // Close detail modal if open
-            document.getElementById('storeDetailModal').classList.remove('active');
-            
-            // Show edit modal
-            document.getElementById('addStoreModal').classList.add('active');
-        }
-    } catch (error) {
-        console.error('Error loading store for edit:', error);
-        showStoreNotification('Failed to load store details', 'error');
-    }
+function editStore(storeId) {
+    const store = storesData.find(s => s.id === storeId);
+    if (!store) return;
+    
+    // Fill the add store form with existing data
+    document.getElementById('storeName').value = store.name;
+    document.getElementById('storeCategory').value = store.category;
+    document.getElementById('storeLocation').value = store.location;
+    document.getElementById('storeSize').value = store.size;
+    document.getElementById('monthlyRent').value = store.monthlyRent;
+    document.getElementById('storeManager').value = store.manager;
+    document.getElementById('storeContact').value = store.contact;
+    document.getElementById('storeDescription').value = store.description;
+    document.getElementById('storeHours').value = store.hours;
+    
+    // Change form to update mode
+    const form = document.getElementById('addStoreForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const modalTitle = document.querySelector('#addStoreModal h3');
+    
+    modalTitle.textContent = 'Edit Store';
+    submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Store';
+    
+    // Remove existing submit listener
+    const newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+    
+    // Add new submit listener for update
+    newForm.addEventListener('submit', (e) => handleUpdateStore(e, storeId));
+    
+    // Show modal
+    document.getElementById('addStoreModal').classList.add('active');
 }
 
 // Handle update store
-async function handleUpdateStore(e, storeId) {
+function handleUpdateStore(e, storeId) {
     e.preventDefault();
     
-    const formData = {
+    const form = e.target;
+    const storeIndex = storesData.findIndex(s => s.id === storeId);
+    
+    if (storeIndex === -1) return;
+    
+    // Update store data
+    storesData[storeIndex] = {
+        ...storesData[storeIndex],
         name: document.getElementById('storeName').value,
         category: document.getElementById('storeCategory').value,
         location: document.getElementById('storeLocation').value,
@@ -894,77 +928,47 @@ async function handleUpdateStore(e, storeId) {
         hours: document.getElementById('storeHours').value
     };
     
-    try {
-        const response = await fetch(`${API_BASE}/stores/${storeId}/`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(formData)
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            // Close modal
-            document.getElementById('addStoreModal').classList.remove('active');
-            
-            // Reset form to add mode
-            resetAddStoreForm();
-            
-            // Reload stores
-            await loadStoresFromAPI();
-            
-            // Update UI
-            updateStoresDisplay();
-            await updateTopStoresList();
-            await updateLeaseTimeline();
-            
-            // Show success message
-            showStoreNotification(`Store "${formData.name}" updated successfully!`, 'success');
-        } else {
-            showStoreNotification(`Error: ${data.error}`, 'error');
-        }
-    } catch (error) {
-        console.error('Error updating store:', error);
-        showStoreNotification('Failed to update store. Please try again.', 'error');
+    // Update filtered stores
+    const filteredIndex = filteredStores.findIndex(s => s.id === storeId);
+    if (filteredIndex !== -1) {
+        filteredStores[filteredIndex] = storesData[storeIndex];
     }
+    
+    // Close modal
+    document.getElementById('addStoreModal').classList.remove('active');
+    
+    // Reset form to add mode
+    resetAddStoreForm();
+    
+    // Update UI
+    updateStoresDisplay();
+    updateTopStoresList();
+    updateLeaseTimeline();
+    
+    // Show success message
+    showStoreNotification(`Store "${storesData[storeIndex].name}" updated successfully!`, 'success');
 }
 
 // Delete store
-async function deleteStore(storeId) {
-    const store = storesData.find(s => s.id === storeId);
-    
-    if (!confirm(`Are you sure you want to delete "${store?.name}"? This action cannot be undone.`)) {
+function deleteStore(storeId) {
+    if (!confirm('Are you sure you want to delete this store? This action cannot be undone.')) {
         return;
     }
     
-    try {
-        const response = await fetch(`${API_BASE}/stores/${storeId}/`, {
-            method: 'DELETE'
-        });
-        
-        const data = await response.json();
-        
-        if (data.success) {
-            // Reload stores
-            await loadStoresFromAPI();
-            
-            // Update UI
-            updateStoresDisplay();
-            await updateTopStoresList();
-            await updateLeaseTimeline();
-            await updateStoreKPIs();
-            
-            // Show success message
-            showStoreNotification(data.message || `Store deleted successfully!`, 'success');
-        } else {
-            showStoreNotification(`Error: ${data.error}`, 'error');
-        }
-    } catch (error) {
-        console.error('Error deleting store:', error);
-        showStoreNotification('Failed to delete store. Please try again.', 'error');
-    }
+    const store = storesData.find(s => s.id === storeId);
+    
+    // Remove from stores data
+    storesData = storesData.filter(s => s.id !== storeId);
+    filteredStores = filteredStores.filter(s => s.id !== storeId);
+    
+    // Update UI
+    updateStoresDisplay();
+    updateTopStoresList();
+    updateLeaseTimeline();
+    updateStoreKPIs();
+    
+    // Show success message
+    showStoreNotification(`Store "${store?.name}" deleted successfully!`, 'success');
 }
 
 // Reset add store form to default
@@ -990,8 +994,9 @@ function closeStoreDetail() {
 }
 
 // Reset all filters
-async function resetFilters() {
+function resetFilters() {
     currentCategory = 'all';
+    filteredStores = [...storesData];
     
     // Update UI
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -1004,45 +1009,25 @@ async function resetFilters() {
     // Clear search
     document.getElementById('storeSearch').value = '';
     
-    // Reload all stores
-    await loadStoresFromAPI();
     updateStoresDisplay();
 }
 
 // Update store KPIs
-async function updateStoreKPIs() {
-    try {
-        const response = await fetch(`${API_BASE}/store-stats/`);
-        const data = await response.json();
-        
-        if (data.success) {
-            const stats = data.stats;
-            
-            // Update KPI values
-            const kpiCards = document.querySelectorAll('.store-kpi-card');
-            if (kpiCards[0]) {
-                kpiCards[0].querySelector('.store-kpi-value').textContent = stats.total_stores;
-            }
-            if (kpiCards[1]) {
-                kpiCards[1].querySelector('.store-kpi-value').textContent = `₹ ${formatRevenue(stats.avg_revenue)}`;
-            }
-            if (kpiCards[2]) {
-                kpiCards[2].querySelector('.store-kpi-value').textContent = `${stats.occupancy_rate}%`;
-            }
-            if (kpiCards[3]) {
-                kpiCards[3].querySelector('.store-kpi-value').textContent = stats.avg_rating.toFixed(1);
-            }
-            
-            // Update status summary in sidebar
-            const openCount = document.querySelector('.status-item.open .status-count');
-            const closedCount = document.querySelector('.status-item.closed .status-count');
-            
-            if (openCount) openCount.textContent = stats.open_stores;
-            if (closedCount) closedCount.textContent = stats.closed_stores;
-        }
-    } catch (error) {
-        console.error('Error updating KPIs:', error);
-    }
+function updateStoreKPIs() {
+    const totalStores = storesData.length;
+    const openStores = storesData.filter(s => s.status === 'open').length;
+    const closedStores = storesData.filter(s => s.status === 'closed').length;
+    
+    // Update KPI values
+    document.querySelector('.store-kpi-card:first-child .store-kpi-value').textContent = totalStores;
+    
+    // Update status summary in sidebar
+    document.querySelector('.status-item.open .status-count').textContent = openStores;
+    document.querySelector('.status-item.closed .status-count').textContent = closedStores;
+    
+    // Update occupancy rate
+    const occupancyRate = Math.round((totalStores / 50) * 100); // Assuming 50 is max capacity
+    document.querySelector('.store-kpi-card:nth-child(3) .store-kpi-value').textContent = `${occupancyRate}%`;
 }
 
 // Show store notification
@@ -1052,7 +1037,7 @@ function showStoreNotification(message, type = 'info') {
     notification.className = `store-notification-toast ${type}`;
     notification.innerHTML = `
         <div class="toast-icon">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
+            <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
         </div>
         <div class="toast-content">
             <p>${message}</p>
@@ -1105,22 +1090,14 @@ function formatLocation(locationCode) {
         '2F-North': 'Second Floor, North Wing',
         '2F-South': 'Second Floor, South Wing',
         '2F-East': 'Second Floor, East Wing',
-        '2F-West': 'Second Floor, West Wing',
-        'ground_floor': 'Ground Floor',
-        'first_floor': 'First Floor',
-        'second_floor': 'Second Floor',
-        'third_floor': 'Third Floor',
-        'food_court': 'Food Court',
-        'entertainment_zone': 'Entertainment Zone'
+        '2F-West': 'Second Floor, West Wing'
     };
     
     return mapping[locationCode] || locationCode;
 }
 
 function formatRevenue(revenue) {
-    if (revenue >= 10000000) {
-        return (revenue / 10000000).toFixed(1) + ' Cr';
-    } else if (revenue >= 1000000) {
+    if (revenue >= 1000000) {
         return (revenue / 1000000).toFixed(1) + 'M';
     } else if (revenue >= 100000) {
         return (revenue / 100000).toFixed(1) + 'L';
@@ -1142,13 +1119,21 @@ function daysBetween(date1, date2) {
     return Math.ceil(diff / (1000 * 60 * 60 * 24));
 }
 
+function generateLeaseEndDate() {
+    const date = new Date();
+    date.setMonth(date.getMonth() + Math.floor(Math.random() * 24) + 3); // 3-27 months from now
+    return date.toISOString().split('T')[0];
+}
+
 function updateCurrentDate() {
     const now = new Date();
     const dateRange = document.querySelector('.date-range');
-    if (dateRange && dateRange.textContent.includes('Manage stores')) {
-        // Keep the original subtitle
-        return;
-    }
+    dateRange.textContent = now.toLocaleDateString('en-IN', {
+        weekday: 'long',
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    });
 }
 
 // Initialize store management when page loads
