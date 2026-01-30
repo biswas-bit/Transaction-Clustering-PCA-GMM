@@ -1,7 +1,7 @@
 from django.contrib import admin
 from . models import *
 
-@admin.register(store)
+@admin.register(Store)
 class StoreAdmin(admin.ModelAdmin):
     list_display = ('name', 'store_id', 'category', 'location', 'status', 'created_at')
     list_filter = ('category', 'location', 'status')
