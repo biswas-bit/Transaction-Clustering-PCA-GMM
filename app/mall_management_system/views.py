@@ -51,40 +51,40 @@ def api_stores(request):
         stores_qs = store.objects.all()
         
         # Apply filters
-        if category != 'all':
+        if category and category != 'all':
             stores_qs = stores_qs.filter(category=category)
         
-        if status_filter != 'all':
+        if status_filter and status_filter != 'all':
             stores_qs = stores_qs.filter(status=status_filter)
         
         if search:
             stores_qs = stores_qs.filter(
-                models.Q(name__icontains=search) |
-                models.Q(store_id__icontains=search) |
-                models.Q(location__icontains=search) |
-                models.Q(owner__icontains=search)
+                django_models.Q(name__icontains=search) |
+                django_models.Q(store_id__icontains=search) |
+                django_models.Q(location__icontains=search) |
+                django_models.Q(owner__icontains=search)
             )
         
-        
+        # Build stores data
         stores_data = []
         for store_obj in stores_qs:
-            # Generate sample data for demonstration
+            # Generate sample data for demonstration (in production, this would come from related models)
             store_data = {
                 'id': store_obj.store_id,
                 'name': store_obj.name,
                 'category': store_obj.category,
-                'location': store_obj.get_location_display(),
-                'location_code': store_obj.location,
-                'size': random.randint(600, 5000),  # Sample data
-                'monthly_rent': random.randint(35000, 250000),  # Sample data
-                'manager': store_obj.owner,  # Using owner as manager for demo
+                'location': store_obj.location,
+                'location_display': store_obj.get_location_display(),
+                'size': random.randint(600, 5000),  # Sample data - would be in a related model
+                'monthlyRent': random.randint(35000, 250000),  # Sample data
+                'manager': store_obj.owner,
                 'contact': store_obj.contact_email,
-                'description': f"{store_obj.name} - {store_obj.category} store",
-                'hours': "10:00 AM - 9:00 PM",  # Default hours
-                'status': store_obj.status,
+                'description': f"{store_obj.name} - {store_obj.get_category_display()} store",
+                'hours': store_obj.opening_hours.get('Monday', '10:00 AM - 9:00 PM') if store_obj.opening_hours else '10:00 AM - 9:00 PM',
+                'status': 'open' if store_obj.status == 'active' else 'closed' if store_obj.status == 'inactive' else 'maintenance',
                 'revenue': random.randint(300000, 5000000),  # Sample data
                 'rating': round(random.uniform(3.5, 5.0), 1),
-                'lease_end': (datetime.now() + timedelta(days=random.randint(30, 365))).strftime('%Y-%m-%d'),
+                'leaseEnd': (datetime.now() + timedelta(days=random.randint(30, 365))).strftime('%Y-%m-%d'),
                 'performance': random.choice(['low', 'medium', 'high', 'very-high'])
             }
             stores_data.append(store_data)
@@ -100,39 +100,71 @@ def api_stores(request):
         try:
             data = json.loads(request.body)
             
-            
+            # Generate new store ID
             last_store = store.objects.order_by('-store_id').first()
-            if last_store:
-                last_num = int(last_store.store_id[2:])
-                new_id = f"ST{last_num + 1:03d}"
+            if last_store and last_store.store_id.startswith('ST'):
+                try:
+                    last_num = int(last_store.store_id[2:])
+                    new_id = f"ST{last_num + 1:03d}"
+                except:
+                    new_id = f"ST{store.objects.count() + 1:03d}"
             else:
                 new_id = "ST001"
             
-        
+            # Map location from frontend format to model format
+            location_mapping = {
+                'GF-North': 'ground_floor',
+                'GF-South': 'ground_floor',
+                'GF-East': 'ground_floor',
+                'GF-West': 'ground_floor',
+                '1F-North': 'first_floor',
+                '1F-South': 'first_floor',
+                '1F-East': 'first_floor',
+                '1F-West': 'first_floor',
+                '2F-North': 'second_floor',
+                '2F-South': 'second_floor',
+                '2F-East': 'second_floor',
+                '2F-West': 'second_floor'
+            }
+            
+            location_code = location_mapping.get(data.get('location'), 'ground_floor')
+            
+            # Create opening hours
+            opening_hours = {
+                'Monday': data.get('hours', '10:00 AM - 9:00 PM'),
+                'Tuesday': data.get('hours', '10:00 AM - 9:00 PM'),
+                'Wednesday': data.get('hours', '10:00 AM - 9:00 PM'),
+                'Thursday': data.get('hours', '10:00 AM - 9:00 PM'),
+                'Friday': data.get('hours', '10:00 AM - 10:00 PM'),
+                'Saturday': data.get('hours', '10:00 AM - 10:00 PM'),
+                'Sunday': data.get('hours', '11:00 AM - 8:00 PM')
+            }
+            
+            # Create new store
             new_store = store.objects.create(
                 store_id=new_id,
                 name=data.get('name'),
                 category=data.get('category'),
-                location=data.get('location'),
+                location=location_code,
                 owner=data.get('manager'),
-                contact_email=data.get('contact'),
-                contact_phone=data.get('contact', ''),
-                opening_hours={
-                    'Monday': '10:00 AM - 9:00 PM',
-                    'Tuesday': '10:00 AM - 9:00 PM',
-                    'Wednesday': '10:00 AM - 9:00 PM',
-                    'Thursday': '10:00 AM - 9:00 PM',
-                    'Friday': '10:00 AM - 10:00 PM',
-                    'Saturday': '10:00 AM - 10:00 PM',
-                    'Sunday': '11:00 AM - 8:00 PM'
-                },
+                contact_email=data.get('contact', f"{new_id.lower()}@store.com"),
+                contact_phone=data.get('phone', ''),
+                opening_hours=opening_hours,
                 status='active'
             )
             
             return JsonResponse({
                 'success': True,
                 'message': 'Store created successfully',
-                'store_id': new_store.store_id
+                'store_id': new_store.store_id,
+                'store': {
+                    'id': new_store.store_id,
+                    'name': new_store.name,
+                    'category': new_store.category,
+                    'location': data.get('location'),
+                    'manager': new_store.owner,
+                    'contact': new_store.contact_email
+                }
             })
         
         except Exception as e:
@@ -141,7 +173,7 @@ def api_stores(request):
                 'error': str(e)
             }, status=400)
     
-    return JsonResponse({'success': False, 'error': 'Invalid method'})
+    return JsonResponse({'success': False, 'error': 'Invalid method'}, status=405)
 
 @csrf_exempt
 def api_store_detail(request, store_id):
