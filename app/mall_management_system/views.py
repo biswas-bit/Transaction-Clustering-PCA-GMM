@@ -362,7 +362,7 @@ def api_lease_timeline(request):
     lease_timeline = []
     
     for store_obj in stores_list:
-        # Generate random lease end dates for demo
+        # Generate random lease end dates for demo (in production, this would come from a Lease model)
         days_until_lease = random.randint(15, 365)
         lease_end = datetime.now() + timedelta(days=days_until_lease)
         
