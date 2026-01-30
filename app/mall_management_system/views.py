@@ -5,6 +5,7 @@ import random
 import json
 from django.views.decorators.csrf import csrf_exempt
 from . models import *
+from django.db import models as django_models
 
 def index(request):
     return render(request, 'index.html')
@@ -188,26 +189,26 @@ def api_store_detail(request, store_id):
                 'name': store_obj.name,
                 'category': store_obj.category,
                 'category_display': store_obj.get_category_display(),
-                'location': store_obj.get_location_display(),
-                'location_code': store_obj.location,
+                'location': store_obj.location,
+                'location_display': store_obj.get_location_display(),
                 'owner': store_obj.owner,
                 'contact_email': store_obj.contact_email,
                 'contact_phone': store_obj.contact_phone,
                 'opening_hours': store_obj.opening_hours,
-                'status': store_obj.status,
+                'status': 'open' if store_obj.status == 'active' else 'closed' if store_obj.status == 'inactive' else 'maintenance',
                 'status_display': store_obj.get_status_display(),
-                'created_at': store_obj.created_at.strftime('%Y-%m-%d'),
-                'updated_at': store_obj.updated_at.strftime('%Y-%m-%d')
+                'created_at': store_obj.created_at.strftime('%Y-%m-%d %H:%M:%S'),
+                'updated_at': store_obj.updated_at.strftime('%Y-%m-%d %H:%M:%S')
             }
             
-            # Add sample performance data
+            # Add sample performance data (in production, this would come from related models)
             performance_data = {
                 'size': random.randint(600, 5000),
-                'monthly_rent': random.randint(35000, 250000),
+                'monthlyRent': random.randint(35000, 250000),
                 'revenue': random.randint(300000, 5000000),
                 'rating': round(random.uniform(3.5, 5.0), 1),
                 'performance': random.choice(['low', 'medium', 'high', 'very-high']),
-                'lease_end': (datetime.now() + timedelta(days=random.randint(30, 365))).strftime('%Y-%m-%d')
+                'leaseEnd': (datetime.now() + timedelta(days=random.randint(30, 365))).strftime('%Y-%m-%d')
             }
             
             return JsonResponse({
@@ -219,25 +220,56 @@ def api_store_detail(request, store_id):
             # Update store
             data = json.loads(request.body)
             
+            # Map location if provided
+            if 'location' in data:
+                location_mapping = {
+                    'GF-North': 'ground_floor',
+                    'GF-South': 'ground_floor',
+                    'GF-East': 'ground_floor',
+                    'GF-West': 'ground_floor',
+                    '1F-North': 'first_floor',
+                    '1F-South': 'first_floor',
+                    '1F-East': 'first_floor',
+                    '1F-West': 'first_floor',
+                    '2F-North': 'second_floor',
+                    '2F-South': 'second_floor',
+                    '2F-East': 'second_floor',
+                    '2F-West': 'second_floor'
+                }
+                store_obj.location = location_mapping.get(data.get('location'), store_obj.location)
+            
             store_obj.name = data.get('name', store_obj.name)
             store_obj.category = data.get('category', store_obj.category)
-            store_obj.location = data.get('location', store_obj.location)
             store_obj.owner = data.get('manager', store_obj.owner)
             store_obj.contact_email = data.get('contact', store_obj.contact_email)
-            store_obj.status = data.get('status', store_obj.status)
+            
+            if 'status' in data:
+                # Map frontend status to model status
+                status_mapping = {
+                    'open': 'active',
+                    'closed': 'inactive',
+                    'maintenance': 'maintenance'
+                }
+                store_obj.status = status_mapping.get(data.get('status'), store_obj.status)
+            
             store_obj.save()
             
             return JsonResponse({
                 'success': True,
-                'message': 'Store updated successfully'
+                'message': 'Store updated successfully',
+                'store': {
+                    'id': store_obj.store_id,
+                    'name': store_obj.name
+                }
             })
         
         elif request.method == 'DELETE':
             # Delete store
+            store_name = store_obj.name
             store_obj.delete()
             return JsonResponse({
                 'success': True,
-                'message': 'Store deleted successfully'
+                'message': f'Store "{store_name}" deleted successfully'
             })
     
     except Exception as e:
@@ -246,6 +278,7 @@ def api_store_detail(request, store_id):
             'error': str(e)
         }, status=400)
 
+    return JsonResponse({'success': False, 'error': 'Invalid method'}, status=405)
 
 def api_store_stats(request):
     """API endpoint for store statistics"""
@@ -261,8 +294,7 @@ def api_store_stats(request):
         if count > 0:
             categories[cat_name] = count
     
-    # Calculate revenue by category (sample data)
-    category_revenue = {}
+    # Calculate revenue by category (sample data - in production this would be calculated from actual sales)
     revenue_multipliers = {
         'electronics': 2.5,
         'fashion': 1.8,
@@ -272,9 +304,10 @@ def api_store_stats(request):
         'home': 1.3,
         'sports': 1.6,
         'books': 0.8,
-        'jewelry': 2.2
+        'other': 1.0
     }
     
+    category_revenue = {}
     for cat_code, cat_name in store._meta.get_field('category').choices:
         count = store.objects.filter(category=cat_code).count()
         multiplier = revenue_multipliers.get(cat_code, 1.0)
@@ -294,6 +327,7 @@ def api_store_stats(request):
             'category_revenue': category_revenue
         }
     })
+
     
 
 def api_top_stores(request):
