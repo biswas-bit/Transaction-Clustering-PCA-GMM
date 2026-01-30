@@ -337,6 +337,7 @@ def api_top_stores(request):
     top_stores = []
     
     for store_obj in stores_list:
+        # In production, revenue would come from a related Sales model
         revenue = random.randint(300000, 5000000)
         top_stores.append({
             'id': store_obj.store_id,
@@ -354,8 +355,7 @@ def api_top_stores(request):
         'success': True,
         'top_stores': top_stores
     })
-
-
+    
 def api_lease_timeline(request):
     """API endpoint for lease expiry timeline"""
     stores_list = store.objects.all()
