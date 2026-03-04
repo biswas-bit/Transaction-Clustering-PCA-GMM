@@ -12,17 +12,35 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Advanced Home Page Styles */
+        /* Professional Dashboard Styles */
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-            --info-gradient: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
-            --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            --hover-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            --border-radius: 16px;
-            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --radius-sm: 0.375rem;
+            --radius: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
+            --transition: all 0.2s ease;
         }
 
         * {
@@ -33,8 +51,9 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.5;
         }
 
         .container {
@@ -42,279 +61,279 @@
             min-height: 100vh;
         }
 
-        /* Enhanced Sidebar */
+        /* Professional Sidebar */
         .sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-            padding: 30px 20px;
+            width: 260px;
+            background: var(--gray-900);
+            padding: 1.5rem 1rem;
             display: flex;
             flex-direction: column;
             position: fixed;
             height: 100vh;
             z-index: 100;
-            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.2);
+            border-right: 1px solid var(--gray-800);
         }
 
         .sidebar .logo {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 50px;
-            padding: 0 10px;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding: 0 0.75rem;
         }
 
         .sidebar .logo i {
-            font-size: 36px;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            font-size: 1.75rem;
+            color: var(--primary);
         }
 
         .sidebar .logo h1 {
-            font-size: 24px;
-            font-weight: 800;
+            font-size: 1.25rem;
+            font-weight: 700;
             color: white;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.025em;
         }
 
         .sidebar .main-nav ul {
             list-style: none;
-            padding: 0;
         }
 
         .sidebar .main-nav li {
-            margin-bottom: 8px;
+            margin-bottom: 0.25rem;
         }
 
         .sidebar .main-nav a {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 15px 20px;
-            color: rgba(255, 255, 255, 0.7);
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--gray-400);
             text-decoration: none;
-            border-radius: 12px;
+            border-radius: var(--radius);
             transition: var(--transition);
             font-weight: 500;
+            font-size: 0.9375rem;
         }
 
         .sidebar .main-nav a:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--gray-800);
             color: white;
-            transform: translateX(10px);
         }
 
         .sidebar .main-nav li.active a {
-            background: var(--primary-gradient);
+            background: var(--primary);
             color: white;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
         }
 
         .sidebar .main-nav a i {
-            font-size: 20px;
-            width: 24px;
+            font-size: 1.25rem;
+            width: 1.5rem;
         }
 
         .sidebar .main-nav .new-badge {
-            background: #f5576c;
+            background: var(--primary);
             color: white;
-            font-size: 10px;
-            padding: 3px 8px;
-            border-radius: 20px;
+            font-size: 0.625rem;
+            padding: 0.125rem 0.375rem;
+            border-radius: var(--radius-lg);
             margin-left: auto;
         }
 
         /* Main Content */
         .main-content {
             flex: 1;
-            margin-left: 280px;
-            padding: 30px 40px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            margin-left: 260px;
+            padding: 1.5rem 2rem;
         }
 
-        /* Enhanced Navbar */
+        /* Professional Navbar */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
+            margin-bottom: 2rem;
             background: white;
-            padding: 20px 30px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--card-shadow);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
         }
 
         .navbar-left {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 1rem;
         }
 
         .menu-toggle {
             background: none;
             border: none;
-            font-size: 24px;
-            color: #333;
+            font-size: 1.25rem;
+            color: var(--gray-500);
             cursor: pointer;
-            padding: 10px;
-            border-radius: 10px;
+            padding: 0.5rem;
+            border-radius: var(--radius);
             transition: var(--transition);
         }
 
         .menu-toggle:hover {
-            background: #f0f0f0;
+            background: var(--gray-100);
+            color: var(--gray-700);
         }
 
         .page-title h2 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 5px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
         }
 
         .page-title .date-range {
-            font-size: 14px;
-            color: #666;
+            font-size: 0.875rem;
+            color: var(--gray-500);
         }
 
         .search-container {
             flex: 1;
-            max-width: 500px;
-            margin: 0 40px;
+            max-width: 400px;
+            margin: 0 2rem;
             position: relative;
         }
 
         .search-container i {
             position: absolute;
-            left: 20px;
+            left: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #999;
-            font-size: 18px;
+            color: var(--gray-400);
+            font-size: 1rem;
         }
 
         .search-input {
             width: 100%;
-            padding: 15px 20px 15px 50px;
-            border: 2px solid #eee;
-            border-radius: 50px;
-            font-size: 15px;
+            padding: 0.625rem 1rem 0.625rem 2.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            font-size: 0.9375rem;
             transition: var(--transition);
-            background: #f8f9fa;
+            background: var(--gray-50);
         }
 
         .search-input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary);
             background: white;
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.15);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .navbar-right {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 1rem;
         }
 
         .date-selector {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
-            background: #f8f9fa;
-            border-radius: 50px;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--gray-50);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
         }
 
         .date-selector i {
-            color: #667eea;
+            color: var(--primary);
+            font-size: 0.875rem;
         }
 
         .date-selector select {
             border: none;
             background: transparent;
-            font-size: 14px;
+            font-size: 0.875rem;
             font-weight: 500;
-            color: #333;
+            color: var(--gray-700);
             cursor: pointer;
+            outline: none;
         }
 
         .notification-btn {
             position: relative;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: #f8f9fa;
-            border: none;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--radius-lg);
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
             cursor: pointer;
             transition: var(--transition);
-            font-size: 18px;
-            color: #666;
+            font-size: 1rem;
+            color: var(--gray-600);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .notification-btn:hover {
-            background: #f0f4ff;
-            color: #667eea;
+            background: white;
+            border-color: var(--primary);
+            color: var(--primary);
         }
 
         .notification-badge {
             position: absolute;
-            top: 5px;
-            right: 5px;
-            background: #f5576c;
+            top: -0.25rem;
+            right: -0.25rem;
+            background: var(--danger);
             color: white;
-            font-size: 10px;
-            width: 18px;
-            height: 18px;
+            font-size: 0.625rem;
+            width: 1.25rem;
+            height: 1.25rem;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 2px solid white;
         }
 
-        .profile-dropdown {
-            position: relative;
-        }
-
-        .profile-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: var(--primary-gradient);
+        .profile-dropdown .profile-icon {
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--radius-lg);
+            background: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 20px;
+            font-size: 1.25rem;
             color: white;
             cursor: pointer;
             transition: var(--transition);
         }
 
-        .profile-icon:hover {
-            transform: scale(1.1);
+        .profile-dropdown .profile-icon:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
         }
 
-        /* Enhanced KPI Cards */
+        /* Compact KPI Cards */
         .kpi-section {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
-            margin-bottom: 40px;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
         .kpi-card {
             background: white;
-            border-radius: var(--border-radius);
-            padding: 30px;
-            box-shadow: var(--card-shadow);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            border: 1px solid var(--gray-200);
             transition: var(--transition);
             position: relative;
             overflow: hidden;
+        }
+
+        .kpi-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
         }
 
         .kpi-card::before {
@@ -322,193 +341,175 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 5px;
-            background: var(--primary-gradient);
+            right: 0;
+            height: 3px;
+            background: var(--primary);
+            opacity: 0;
+            transition: opacity 0.2s;
         }
 
-        .kpi-card:nth-child(2)::before {
-            background: var(--secondary-gradient);
-        }
-
-        .kpi-card:nth-child(3)::before {
-            background: var(--success-gradient);
-        }
-
-        .kpi-card:nth-child(4)::before {
-            background: var(--warning-gradient);
-        }
-
-        .kpi-card:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--hover-shadow);
+        .kpi-card:hover::before {
+            opacity: 1;
         }
 
         .kpi-header {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
 
         .kpi-header .icon-box {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--radius);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .kpi-card:nth-child(2) .icon-box {
-            background: var(--secondary-gradient);
-        }
-
-        .kpi-card:nth-child(3) .icon-box {
-            background: var(--success-gradient);
-        }
-
-        .kpi-card:nth-child(4) .icon-box {
-            background: var(--warning-gradient);
+            font-size: 1.25rem;
+            background: var(--gray-100);
+            color: var(--primary);
         }
 
         .kpi-header h3 {
-            font-size: 14px;
-            font-weight: 600;
-            color: #666;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-500);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.025em;
         }
 
         .kpi-value {
-            font-size: 42px;
-            font-weight: 800;
-            color: #1a1a2e;
-            margin-bottom: 10px;
-            line-height: 1;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            line-height: 1.2;
+            margin-bottom: 0.5rem;
         }
 
         .kpi-change {
-            font-size: 14px;
+            font-size: 0.75rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.375rem;
         }
 
         .kpi-change.positive {
-            color: #10b981;
+            color: var(--success);
         }
 
         .kpi-change.negative {
-            color: #ef4444;
+            color: var(--danger);
         }
 
         .change-label {
-            color: #999;
+            color: var(--gray-500);
         }
 
         /* Transaction Entry Section */
         .transaction-entry-section {
             background: white;
-            border-radius: var(--border-radius);
-            padding: 30px;
-            margin-bottom: 40px;
-            box-shadow: var(--card-shadow);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            border: 1px solid var(--gray-200);
         }
 
         .section-header {
-            margin-bottom: 30px;
+            margin-bottom: 1.5rem;
         }
 
         .section-header h3 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 8px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 0.5rem;
         }
 
         .section-header h3 i {
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: var(--primary);
         }
 
         .section-subtitle {
-            color: #666;
-            font-size: 15px;
+            color: var(--gray-500);
+            font-size: 0.875rem;
         }
 
         .transaction-entry-grid {
             display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 1.5rem;
         }
 
         .transaction-form-card,
         .transactions-table-card {
-            background: #f8f9fa;
-            border-radius: 16px;
-            padding: 25px;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            border: 1px solid var(--gray-200);
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 1.25rem;
         }
 
         .card-header h4 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1a1a2e;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
         }
 
         .current-time {
             display: flex;
             align-items: center;
-            gap: 8px;
-            color: #667eea;
-            font-weight: 600;
+            gap: 0.375rem;
+            color: var(--primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+            background: white;
+            padding: 0.375rem 0.75rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
         }
 
         .transaction-form {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 1rem;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 0.375rem;
         }
 
         .form-group label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1a1a2e;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--gray-700);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.375rem;
         }
 
         .form-group label i {
-            color: #667eea;
+            color: var(--primary);
+            font-size: 0.875rem;
         }
 
         .form-group input,
         .form-group select {
-            padding: 14px 16px;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            font-size: 15px;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
             transition: var(--transition);
             background: white;
         }
@@ -516,109 +517,109 @@
         .form-group input:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.15);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 0.75rem;
         }
 
         .auto-data-info {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 20px;
+            background: var(--primary);
+            border-radius: var(--radius);
+            padding: 1rem;
             color: white;
         }
 
         .auto-data-info h5 {
-            font-size: 14px;
-            margin-bottom: 15px;
+            font-size: 0.8125rem;
+            margin-bottom: 0.75rem;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.375rem;
+            opacity: 0.9;
         }
 
         .features-list {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 0.5rem;
         }
 
         .feature {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-sm);
+            padding: 0.5rem;
             text-align: center;
         }
 
         .feature-name {
-            font-size: 11px;
+            font-size: 0.625rem;
             opacity: 0.8;
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 0.25rem;
         }
 
         .feature-value {
-            font-size: 18px;
-            font-weight: 700;
+            font-size: 1rem;
+            font-weight: 600;
         }
 
         .total-preview {
-            background: #f0f4ff;
-            padding: 20px;
-            border-radius: 12px;
+            background: white;
+            padding: 1rem;
+            border-radius: var(--radius);
             text-align: center;
+            border: 1px solid var(--gray-200);
         }
 
         .total-amount {
-            font-size: 32px;
-            font-weight: 800;
-            color: #667eea;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
         }
 
         .submit-btn {
-            padding: 16px 30px;
-            background: var(--primary-gradient);
+            padding: 0.75rem 1.5rem;
+            background: var(--primary);
             color: white;
             border: none;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            font-weight: 500;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            gap: 0.5rem;
         }
 
         .submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+            background: var(--primary-dark);
         }
 
         .quick-add-btn {
-            padding: 12px 20px;
+            padding: 0.75rem 1.5rem;
             background: transparent;
-            color: #667eea;
-            border: 2px solid #667eea;
-            border-radius: 50px;
-            font-size: 14px;
-            font-weight: 600;
+            color: var(--primary);
+            border: 1px solid var(--primary);
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            font-weight: 500;
             cursor: pointer;
             transition: var(--transition);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 0.5rem;
         }
 
         .quick-add-btn:hover {
-            background: #667eea;
+            background: var(--primary);
             color: white;
         }
 
@@ -626,78 +627,80 @@
         .transactions-count {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 0.5rem;
         }
 
         .count-badge {
-            background: var(--primary-gradient);
+            background: var(--primary);
             color: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-lg);
+            font-size: 0.75rem;
+            font-weight: 500;
         }
 
         .table-container {
             max-height: 300px;
             overflow-y: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+            background: white;
         }
 
         .live-transactions-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 0.8125rem;
         }
 
         .live-transactions-table th {
-            background: #f0f4ff;
-            padding: 15px;
+            background: var(--gray-50);
+            padding: 0.75rem;
             text-align: left;
-            font-size: 12px;
+            font-size: 0.6875rem;
             font-weight: 600;
-            color: #666;
+            color: var(--gray-500);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.025em;
             position: sticky;
             top: 0;
+            border-bottom: 1px solid var(--gray-200);
         }
 
         .live-transactions-table td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-            color: #333;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--gray-100);
+            color: var(--gray-700);
         }
 
         .empty-row td {
             text-align: center;
-            padding: 40px;
-            color: #999;
+            padding: 2rem;
+            color: var(--gray-400);
         }
 
         .empty-message {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 0.5rem;
         }
 
         .empty-message i {
-            font-size: 40px;
-            color: #ddd;
+            font-size: 2rem;
+            color: var(--gray-300);
         }
 
         .table-footer {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
+            margin-top: 1rem;
         }
 
         .summary-stats {
             display: flex;
-            gap: 30px;
+            gap: 1.5rem;
         }
 
         .stat {
@@ -706,30 +709,34 @@
         }
 
         .stat-label {
-            font-size: 12px;
-            color: #999;
+            font-size: 0.6875rem;
+            color: var(--gray-500);
         }
 
         .stat-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1a1a2e;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
         }
 
         .clear-btn {
-            padding: 10px 20px;
-            background: #fee2e2;
-            color: #ef4444;
-            border: none;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 600;
+            padding: 0.5rem 1rem;
+            background: var(--gray-100);
+            color: var(--gray-600);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            font-size: 0.75rem;
+            font-weight: 500;
             cursor: pointer;
             transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
         }
 
         .clear-btn:hover {
-            background: #ef4444;
+            background: var(--danger);
+            border-color: var(--danger);
             color: white;
         }
 
@@ -738,65 +745,65 @@
         .charts-row-2 {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 25px;
-            margin-bottom: 30px;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
         }
 
         .chart-card {
             background: white;
-            border-radius: var(--border-radius);
-            padding: 25px;
-            box-shadow: var(--card-shadow);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            border: 1px solid var(--gray-200);
             transition: var(--transition);
         }
 
         .chart-card:hover {
-            transform: translateY(-5px);
-            box-shadow: var(--hover-shadow);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
         }
 
         .chart-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 1rem;
         }
 
         .chart-header h3 {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1a1a2e;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
         }
 
         .chart-legend {
             display: flex;
-            gap: 20px;
+            gap: 1rem;
         }
 
         .legend-item {
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 13px;
-            color: #666;
+            gap: 0.375rem;
+            font-size: 0.75rem;
+            color: var(--gray-600);
         }
 
         .legend-color {
-            width: 12px;
-            height: 12px;
-            border-radius: 3px;
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: var(--radius-sm);
         }
 
         .legend-color.current-week {
-            background: #667eea;
+            background: var(--primary);
         }
 
         .legend-color.last-week {
-            background: #c4c4c4;
+            background: var(--gray-300);
         }
 
         .refresh-icon {
-            color: #667eea;
+            color: var(--primary);
             cursor: pointer;
             transition: var(--transition);
         }
@@ -806,47 +813,47 @@
         }
 
         .chart-container {
-            height: 250px;
+            height: 200px;
         }
 
         /* Transactions Section */
         .transactions-section {
-            margin-top: 30px;
+            margin-top: 1.5rem;
         }
 
         .transactions-card {
             background: white;
-            border-radius: var(--border-radius);
-            padding: 25px;
-            box-shadow: var(--card-shadow);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            border: 1px solid var(--gray-200);
         }
 
         .transactions-card .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 1rem;
         }
 
         .transactions-card .card-header h3 {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1a1a2e;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
         }
 
         .view-all {
-            color: #667eea;
+            color: var(--primary);
             text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 0.8125rem;
+            font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 5px;
+            gap: 0.375rem;
             transition: var(--transition);
         }
 
         .view-all:hover {
-            gap: 10px;
+            gap: 0.5rem;
         }
 
         .transactions-table {
@@ -855,34 +862,36 @@
         }
 
         .transactions-table th {
-            background: #f8f9fa;
-            padding: 15px;
+            background: var(--gray-50);
+            padding: 0.75rem;
             text-align: left;
-            font-size: 12px;
+            font-size: 0.6875rem;
             font-weight: 600;
-            color: #666;
+            color: var(--gray-500);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.025em;
+            border-bottom: 1px solid var(--gray-200);
         }
 
         .transactions-table td {
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            font-size: 14px;
-            color: #333;
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--gray-100);
+            font-size: 0.875rem;
+            color: var(--gray-700);
         }
 
         /* Notification Panel */
         .notification-panel {
             position: fixed;
             top: 0;
-            right: -400px;
-            width: 400px;
+            right: -320px;
+            width: 320px;
             height: 100vh;
             background: white;
-            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+            border-left: 1px solid var(--gray-200);
             z-index: 1000;
             transition: var(--transition);
+            box-shadow: var(--shadow-lg);
         }
 
         .notification-panel.active {
@@ -893,107 +902,123 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 25px;
-            border-bottom: 1px solid #eee;
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--gray-200);
         }
 
         .notification-header h3 {
-            font-size: 20px;
-            font-weight: 700;
-            color: #1a1a2e;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-900);
         }
 
         .close-notifications {
-            background: none;
-            border: none;
-            font-size: 20px;
-            color: #999;
+            background: var(--gray-100);
+            border: 1px solid var(--gray-200);
+            width: 2rem;
+            height: 2rem;
+            border-radius: var(--radius);
+            color: var(--gray-500);
+            font-size: 0.875rem;
             cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-notifications:hover {
+            background: var(--gray-200);
+            color: var(--gray-700);
         }
 
         .notification-list {
-            padding: 20px;
-            height: calc(100vh - 180px);
+            padding: 1rem;
+            height: calc(100vh - 130px);
             overflow-y: auto;
         }
 
         .notification-item {
             display: flex;
-            gap: 15px;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 15px;
+            gap: 0.75rem;
+            padding: 0.875rem;
+            border-radius: var(--radius);
+            margin-bottom: 0.5rem;
             transition: var(--transition);
+            border: 1px solid transparent;
         }
 
         .notification-item:hover {
-            background: #f8f9fa;
+            background: var(--gray-50);
+            border-color: var(--gray-200);
         }
 
         .notification-item.unread {
-            background: #f0f4ff;
+            background: var(--gray-50);
+            border-color: var(--gray-200);
         }
 
         .notification-icon {
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background: var(--primary-gradient);
+            width: 2rem;
+            height: 2rem;
+            border-radius: var(--radius);
+            background: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-size: 18px;
+            font-size: 0.875rem;
             flex-shrink: 0;
         }
 
         .notification-content h4 {
-            font-size: 15px;
+            font-size: 0.8125rem;
             font-weight: 600;
-            color: #1a1a2e;
-            margin-bottom: 5px;
+            color: var(--gray-900);
+            margin-bottom: 0.25rem;
         }
 
         .notification-content p {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 8px;
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            margin-bottom: 0.375rem;
         }
 
         .notification-time {
-            font-size: 12px;
-            color: #999;
+            font-size: 0.625rem;
+            color: var(--gray-400);
         }
 
         .notification-footer {
-            padding: 20px;
-            border-top: 1px solid #eee;
+            padding: 1rem;
+            border-top: 1px solid var(--gray-200);
             text-align: center;
         }
 
         .mark-all-read {
-            color: #667eea;
+            color: var(--primary);
             text-decoration: none;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 0.75rem;
+            font-weight: 500;
         }
 
         /* Toast */
         .toast {
             position: fixed;
-            bottom: 30px;
-            right: 30px;
+            bottom: 1.5rem;
+            right: 1.5rem;
             background: white;
-            border-radius: 16px;
-            padding: 20px 25px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+            box-shadow: var(--shadow-lg);
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 0.75rem;
             z-index: 1001;
             transform: translateX(400px);
             transition: var(--transition);
-            border-left: 5px solid #10b981;
+            border-left: 3px solid var(--success);
+            min-width: 300px;
         }
 
         .toast.show {
@@ -1001,74 +1026,80 @@
         }
 
         .toast-icon {
-            font-size: 24px;
-            color: #10b981;
+            font-size: 1.25rem;
+            color: var(--success);
         }
 
         .toast-content h4 {
-            font-size: 15px;
+            font-size: 0.875rem;
             font-weight: 600;
-            color: #1a1a2e;
+            color: var(--gray-900);
         }
 
         .toast-content p {
-            font-size: 13px;
-            color: #666;
+            font-size: 0.75rem;
+            color: var(--gray-500);
         }
 
         .toast-close {
             background: none;
             border: none;
-            color: #999;
+            color: var(--gray-400);
             cursor: pointer;
-            margin-left: 20px;
+            margin-left: auto;
+            font-size: 0.875rem;
+            padding: 0.25rem;
+        }
+
+        .toast-close:hover {
+            color: var(--gray-600);
         }
 
         /* Calendar Widget */
         .calendar-widget {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 16px;
-            padding: 25px;
+            background: var(--primary);
+            border-radius: var(--radius);
+            padding: 1rem;
             color: white;
             margin-top: auto;
-            margin-bottom: 20px;
+            margin-bottom: 1rem;
         }
 
         .calendar-widget h3 {
-            font-size: 14px;
-            font-weight: 600;
-            margin-bottom: 20px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.375rem;
             opacity: 0.9;
         }
 
         .date-display {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
         }
 
         .date-display .day {
-            font-size: 48px;
-            font-weight: 800;
+            font-size: 2rem;
+            font-weight: 700;
             line-height: 1;
         }
 
         .month-year .month {
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 0.875rem;
+            font-weight: 500;
         }
 
         .month-year .year {
-            font-size: 14px;
+            font-size: 0.75rem;
             opacity: 0.8;
         }
 
         .weekday {
-            font-size: 14px;
+            font-size: 0.75rem;
             opacity: 0.9;
         }
 
@@ -1080,14 +1111,14 @@
         .user-info {
             display: flex;
             align-items: center;
-            gap: 12px;
-            padding: 15px;
+            gap: 0.75rem;
+            padding: 0.75rem;
             background: rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
+            border-radius: var(--radius);
         }
 
         .avatar i {
-            font-size: 36px;
+            font-size: 1.5rem;
             color: white;
         }
 
@@ -1098,13 +1129,13 @@
 
         .username {
             color: white;
-            font-weight: 600;
-            font-size: 14px;
+            font-weight: 500;
+            font-size: 0.8125rem;
         }
 
         .role {
             color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
+            font-size: 0.6875rem;
         }
 
         /* Responsive */
@@ -1123,23 +1154,36 @@
             }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 1024px) {
             .sidebar {
                 transform: translateX(-100%);
+                position: fixed;
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.collapsed {
+                transform: translateX(0);
             }
             
             .main-content {
                 margin-left: 0;
-                padding: 20px;
+                padding: 1rem;
             }
-            
+        }
+
+        @media (max-width: 768px) {
             .kpi-section {
                 grid-template-columns: 1fr;
             }
             
             .navbar {
                 flex-direction: column;
-                gap: 20px;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .navbar-left {
+                justify-content: space-between;
             }
             
             .search-container {
@@ -1149,7 +1193,11 @@
             
             .navbar-right {
                 flex-wrap: wrap;
-                justify-content: center;
+                justify-content: flex-start;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -1157,7 +1205,7 @@
 <body>
     <div class="container">
         <!-- Left Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <i class="fas fa-chart-line"></i>
                 <h1>MallX</h1>
@@ -1257,7 +1305,7 @@
                         <i class="fas fa-bars"></i>
                     </button>
                     <div class="page-title">
-                        <h2>Analytics Overview</h2>
+                        <h2>Analytics Dashboard</h2>
                         <p class="date-range" id="dateRange">March 2026</p>
                     </div>
                 </div>
@@ -1270,7 +1318,7 @@
                 <div class="navbar-right">
                     <div class="date-selector">
                         <i class="fas fa-calendar"></i>
-                        <select id="dateRange">
+                        <select id="dateRangeSelect">
                             <option>Last 7 days</option>
                             <option selected>Last 30 days</option>
                             <option>Last quarter</option>
@@ -1285,7 +1333,7 @@
                     
                     <div class="profile-dropdown">
                         <div class="profile-icon">
-                            <i class="fas fa-user-circle"></i>
+                            <i class="fas fa-user"></i>
                         </div>
                     </div>
                 </div>
@@ -1293,14 +1341,14 @@
             
             <!-- Dashboard Content -->
             <div class="dashboard-content">
-                <!-- KPI Cards -->
+                <!-- Compact KPI Cards -->
                 <section class="kpi-section">
                     <div class="kpi-card">
                         <div class="kpi-header">
                             <div class="icon-box"><i class="fas fa-wallet"></i></div>
                             <h3>Total Sales</h3>
                         </div>
-                        <div class="kpi-value" id="totalSales">₹ 12,84,560</div>
+                        <div class="kpi-value" id="totalSales">₹12.84L</div>
                         <div class="kpi-change positive">
                             <i class="fas fa-arrow-up"></i>
                             <span>12.5%</span>
@@ -1311,9 +1359,9 @@
                     <div class="kpi-card">
                         <div class="kpi-header">
                             <div class="icon-box"><i class="fas fa-users"></i></div>
-                            <h3>Total Visitors</h3>
+                            <h3>Visitors</h3>
                         </div>
-                        <div class="kpi-value" id="totalVisitors">45,820</div>
+                        <div class="kpi-value" id="totalVisitors">45.8K</div>
                         <div class="kpi-change positive">
                             <i class="fas fa-arrow-up"></i>
                             <span>8.3%</span>
@@ -1324,7 +1372,7 @@
                     <div class="kpi-card">
                         <div class="kpi-header">
                             <div class="icon-box"><i class="fas fa-percentage"></i></div>
-                            <h3>Conversion Rate</h3>
+                            <h3>Conversion</h3>
                         </div>
                         <div class="kpi-value" id="conversionRate">4.8%</div>
                         <div class="kpi-change negative">
@@ -1351,17 +1399,17 @@
                 <!-- Transaction Entry Section -->
                 <section class="transaction-entry-section">
                     <div class="section-header">
-                        <h3><i class="fas fa-cash-register"></i> Transaction Data Entry</h3>
-                        <p class="section-subtitle">Enter sales transactions. Time data is auto-captured for ML features.</p>
+                        <h3><i class="fas fa-cash-register"></i> Transaction Entry</h3>
+                        <p class="section-subtitle">Add new transactions with auto-captured ML features</p>
                     </div>
                     
                     <div class="transaction-entry-grid">
-                        <!-- Transaction Entry Form -->
+                        <!-- Transaction Form -->
                         <div class="transaction-form-card">
                             <div class="card-header">
                                 <h4>New Transaction</h4>
                                 <div class="current-time">
-                                    <i class="fas fa-clock"></i> <span id="timeDisplay">Loading...</span>
+                                    <i class="fas fa-clock"></i> <span id="timeDisplay">--:--:--</span>
                                 </div>
                             </div>
                             
@@ -1370,66 +1418,60 @@
                                     <label for="productName">
                                         <i class="fas fa-tag"></i> Product Name
                                     </label>
-                                    <input type="text" id="productName" placeholder="e.g., Premium Headphones, T-shirt, Coffee" required>
+                                    <input type="text" id="productName" placeholder="e.g., Headphones, T-shirt, Coffee" required>
                                 </div>
                                 
                                 <div class="form-row">
                                     <div class="form-group">
                                         <label for="quantity">
-                                            <i class="fas fa-boxes"></i> Quantity
+                                            <i class="fas fa-boxes"></i> Qty
                                         </label>
-                                        <input type="number" id="quantity" min="1" max="1000" value="1" required>
+                                        <input type="number" id="quantity" min="1" value="1" required>
                                     </div>
                                     
                                     <div class="form-group">
                                         <label for="unitPrice">
-                                            <i class="fas fa-rupee-sign"></i> Unit Price (₹)
+                                            <i class="fas fa-rupee-sign"></i> Price (₹)
                                         </label>
-                                        <input type="number" id="unitPrice" min="1" max="1000000" step="0.01" placeholder="0.00" required>
+                                        <input type="number" id="unitPrice" min="1" step="0.01" placeholder="0.00" required>
                                     </div>
                                 </div>
                                 
                                 <div class="form-group">
                                     <label for="category">
-                                        <i class="fas fa-store"></i> Store Category
+                                        <i class="fas fa-store"></i> Category
                                     </label>
                                     <select id="category" required>
                                         <option value="">Select Category</option>
                                         <option value="electronics">Electronics</option>
-                                        <option value="fashion">Fashion & Apparel</option>
+                                        <option value="fashion">Fashion</option>
                                         <option value="food">Food & Beverage</option>
-                                        <option value="home">Home & Living</option>
-                                        <option value="beauty">Beauty & Cosmetics</option>
-                                        <option value="sports">Sports & Fitness</option>
-                                        <option value="entertainment">Entertainment</option>
-                                        <option value="books">Books & Stationery</option>
-                                        <option value="other">Other</option>
+                                        <option value="beauty">Beauty</option>
+                                        <option value="sports">Sports</option>
                                     </select>
                                 </div>
                                 
-                                <div class="form-group">
-                                    <div class="auto-data-info">
-                                        <h5><i class="fas fa-robot"></i> Auto-Captured ML Features</h5>
-                                        <div class="features-list">
-                                            <div class="feature">
-                                                <span class="feature-name">Hour</span>
-                                                <span class="feature-value" id="autoHour">--</span>
-                                            </div>
-                                            <div class="feature">
-                                                <span class="feature-name">Day</span>
-                                                <span class="feature-value" id="autoDay">--</span>
-                                            </div>
-                                            <div class="feature">
-                                                <span class="feature-name">Month</span>
-                                                <span class="feature-value" id="autoMonth">--</span>
-                                            </div>
+                                <div class="auto-data-info">
+                                    <h5><i class="fas fa-robot"></i> ML Features</h5>
+                                    <div class="features-list">
+                                        <div class="feature">
+                                            <span class="feature-name">Hour</span>
+                                            <span class="feature-value" id="autoHour">--</span>
+                                        </div>
+                                        <div class="feature">
+                                            <span class="feature-name">Day</span>
+                                            <span class="feature-value" id="autoDay">--</span>
+                                        </div>
+                                        <div class="feature">
+                                            <span class="feature-name">Month</span>
+                                            <span class="feature-value" id="autoMonth">--</span>
                                         </div>
                                     </div>
                                 </div>
                                 
-                                <div class="form-group total-preview">
-                                    <label>Total Value:</label>
-                                    <div class="total-amount" id="totalPreview">₹ 0.00</div>
+                                <div class="total-preview">
+                                    <span>Total:</span>
+                                    <div class="total-amount" id="totalPreview">₹0</div>
                                 </div>
                                 
                                 <button type="submit" class="submit-btn">
@@ -1442,12 +1484,12 @@
                             </form>
                         </div>
                         
-                        <!-- Live Transactions Table -->
+                        <!-- Live Transactions -->
                         <div class="transactions-table-card">
                             <div class="card-header">
                                 <h4>Live Transactions</h4>
                                 <div class="transactions-count">
-                                    <span class="count-badge" id="transactionCount">0</span> transactions
+                                    <span class="count-badge" id="transactionCount">0</span>
                                 </div>
                             </div>
                             
@@ -1459,15 +1501,16 @@
                                             <th>Product</th>
                                             <th>Category</th>
                                             <th>Qty</th>
-                                            <th>Unit Price</th>
                                             <th>Total</th>
                                         </tr>
                                     </thead>
                                     <tbody id="liveTransactionsTable">
                                         <tr class="empty-row">
-                                            <td colspan="6" class="empty-message">
-                                                <i class="fas fa-shopping-cart"></i>
-                                                <p>No transactions yet. Add your first transaction!</p>
+                                            <td colspan="5">
+                                                <div class="empty-message">
+                                                    <i class="fas fa-shopping-cart"></i>
+                                                    <p>No transactions yet</p>
+                                                </div>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -1477,16 +1520,16 @@
                             <div class="table-footer">
                                 <div class="summary-stats">
                                     <div class="stat">
-                                        <span class="stat-label">Today's Total:</span>
-                                        <span class="stat-value" id="todayTotal">₹ 0</span>
+                                        <span class="stat-label">Today's Total</span>
+                                        <span class="stat-value" id="todayTotal">₹0</span>
                                     </div>
                                     <div class="stat">
-                                        <span class="stat-label">Avg. Transaction:</span>
-                                        <span class="stat-value" id="avgTransaction">₹ 0</span>
+                                        <span class="stat-label">Avg</span>
+                                        <span class="stat-value" id="avgTransaction">₹0</span>
                                     </div>
                                 </div>
                                 <button class="clear-btn" id="clearTransactionsBtn">
-                                    <i class="fas fa-trash"></i> Clear All
+                                    <i class="fas fa-trash"></i> Clear
                                 </button>
                             </div>
                         </div>
@@ -1497,15 +1540,15 @@
                 <section class="charts-row-1">
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3>Weekly Sales Trend</h3>
+                            <h3>Weekly Sales</h3>
                             <div class="chart-legend">
                                 <div class="legend-item">
                                     <span class="legend-color current-week"></span>
-                                    <span>Current Week</span>
+                                    <span>Current</span>
                                 </div>
                                 <div class="legend-item">
                                     <span class="legend-color last-week"></span>
-                                    <span>Last Week</span>
+                                    <span>Last</span>
                                 </div>
                             </div>
                         </div>
@@ -1516,13 +1559,8 @@
                     
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3>Category Contribution</h3>
-                            <div class="chart-legend">
-                                <div class="legend-item">
-                                    <i class="fas fa-sync-alt refresh-icon" id="refreshCategories"></i>
-                                    <span>Live Updates</span>
-                                </div>
-                            </div>
+                            <h3>Categories</h3>
+                            <i class="fas fa-sync-alt refresh-icon" id="refreshCategories"></i>
                         </div>
                         <div class="chart-container">
                             <canvas id="sourceChart"></canvas>
@@ -1534,7 +1572,7 @@
                 <section class="charts-row-2">
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3>Hourly Transaction Volume</h3>
+                            <h3>Hourly Volume</h3>
                         </div>
                         <div class="chart-container">
                             <canvas id="visitorsChart"></canvas>
@@ -1543,7 +1581,7 @@
                     
                     <div class="chart-card">
                         <div class="chart-header">
-                            <h3>Sales Heatmap (Hour vs Day)</h3>
+                            <h3>Daily Sales</h3>
                         </div>
                         <div class="chart-container">
                             <canvas id="heatmapChart"></canvas>
@@ -1568,27 +1606,27 @@
                                     <th>Status</th>
                                 </tr>
                             </thead>
-                            <tbody id="transactionsTable">
+                            <tbody>
                                 <tr>
                                     <td>Rahul Sharma</td>
                                     <td>ElectroHub</td>
-                                    <td>₹ 25,000</td>
+                                    <td>₹25,000</td>
                                     <td>10:30 AM</td>
-                                    <td><span style="color: #10b981; font-weight: 600;">Completed</span></td>
+                                    <td><span style="color: var(--success);">Completed</span></td>
                                 </tr>
                                 <tr>
                                     <td>Priya Patel</td>
                                     <td>Fashion Zone</td>
-                                    <td>₹ 8,500</td>
+                                    <td>₹8,500</td>
                                     <td>10:15 AM</td>
-                                    <td><span style="color: #10b981; font-weight: 600;">Completed</span></td>
+                                    <td><span style="color: var(--success);">Completed</span></td>
                                 </tr>
                                 <tr>
-                                    <td> Amit Kumar</td>
+                                    <td>Amit Kumar</td>
                                     <td>Food Court</td>
-                                    <td>₹ 1,200</td>
+                                    <td>₹1,200</td>
                                     <td>09:45 AM</td>
-                                    <td><span style="color: #10b981; font-weight: 600;">Completed</span></td>
+                                    <td><span style="color: var(--success);">Completed</span></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1613,7 +1651,7 @@
                 </div>
                 <div class="notification-content">
                     <h4>High footfall alert</h4>
-                    <p>Food court area experiencing 40% higher traffic than usual.</p>
+                    <p>Food court area +40% traffic</p>
                     <span class="notification-time">10 min ago</span>
                 </div>
             </div>
@@ -1622,8 +1660,8 @@
                     <i class="fas fa-shopping-bag"></i>
                 </div>
                 <div class="notification-content">
-                    <h4>Record sales at Electronics Store</h4>
-                    <p>ElectroHub reported ₹2.5L sales in the last 4 hours.</p>
+                    <h4>Record sales at Electronics</h4>
+                    <p>₹2.5L in last 4 hours</p>
                     <span class="notification-time">1 hour ago</span>
                 </div>
             </div>
@@ -1633,7 +1671,7 @@
                 </div>
                 <div class="notification-content">
                     <h4>Maintenance scheduled</h4>
-                    <p>West wing escalator maintenance scheduled for tonight at 11 PM.</p>
+                    <p>West wing escalator - 11 PM</p>
                     <span class="notification-time">3 hours ago</span>
                 </div>
             </div>
@@ -1650,14 +1688,13 @@
         </div>
         <div class="toast-content">
             <h4>Transaction Added!</h4>
-            <p>Successfully added to database and analytics.</p>
+            <p>Successfully added to database</p>
         </div>
         <button class="toast-close" onclick="document.getElementById('successToast').classList.remove('show')">
             <i class="fas fa-times"></i>
         </button>
     </div>
     
-    <script src="{% static 'javascripts/scripts.js' %}"></script>
     <script>
         // Update date display
         const now = new Date();
@@ -1670,9 +1707,15 @@
         // Update time
         function updateTime() {
             const now = new Date();
-            document.getElementById('timeDisplay').textContent = now.toLocaleTimeString();
+            const timeString = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: false 
+            });
+            document.getElementById('timeDisplay').textContent = timeString;
             
-            // Update auto ML features
+            // Update ML features
             document.getElementById('autoHour').textContent = now.getHours();
             document.getElementById('autoDay').textContent = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][now.getDay()];
             document.getElementById('autoMonth').textContent = now.getMonth() + 1;
@@ -1689,7 +1732,7 @@
         function updateTotal() {
             const qty = parseFloat(quantityInput.value) || 0;
             const price = parseFloat(unitPriceInput.value) || 0;
-            totalPreview.textContent = '₹ ' + (qty * price).toFixed(2);
+            totalPreview.textContent = '₹' + (qty * price).toLocaleString('en-IN');
         }
 
         quantityInput.addEventListener('input', updateTotal);
@@ -1704,12 +1747,17 @@
             document.getElementById('notificationPanel').classList.remove('active');
         });
 
-        // Show toast
+        // Menu toggle for mobile
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+        });
+
+        // Show toast function
         function showToast() {
             document.getElementById('successToast').classList.add('show');
             setTimeout(() => {
                 document.getElementById('successToast').classList.remove('show');
-            }, 5000);
+            }, 3000);
         }
 
         // Initialize charts
@@ -1722,17 +1770,19 @@
                 datasets: [{
                     label: 'Current Week',
                     data: [45000, 52000, 48000, 61000, 55000, 72000, 68000],
-                    borderColor: '#667eea',
-                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
                     fill: true,
-                    tension: 0.4
+                    tension: 0.4,
+                    pointRadius: 3
                 }, {
                     label: 'Last Week',
                     data: [38000, 45000, 42000, 52000, 48000, 58000, 54000],
-                    borderColor: '#c4c4c4',
+                    borderColor: '#9ca3af',
                     backgroundColor: 'transparent',
-                    borderDash: [5, 5],
-                    tension: 0.4
+                    borderDash: [4, 4],
+                    tension: 0.4,
+                    pointRadius: 2
                 }]
             },
             options: {
@@ -1744,24 +1794,23 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: { color: '#f0f0f0' }
+                        grid: { color: '#f3f4f6' },
+                        ticks: { callback: value => '₹' + (value/1000) + 'k' }
                     },
-                    x: {
-                        grid: { display: false }
-                    }
+                    x: { grid: { display: false } }
                 }
             }
         });
 
-        // Source Chart
+        // Category Chart
         const sourceCtx = document.getElementById('sourceChart').getContext('2d');
         new Chart(sourceCtx, {
             type: 'doughnut',
             data: {
-                labels: ['Electronics', 'Fashion', 'Food', 'Beauty', 'Sports', 'Others'],
+                labels: ['Electronics', 'Fashion', 'Food', 'Beauty', 'Sports'],
                 datasets: [{
-                    data: [35, 25, 18, 10, 7, 5],
-                    backgroundColor: ['#667eea', '#f093fb', '#4facfe', '#fa709a', '#fee140', '#a18cd1'],
+                    data: [35, 25, 18, 12, 10],
+                    backgroundColor: ['#2563eb', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6'],
                     borderWidth: 0
                 }]
             },
@@ -1771,23 +1820,26 @@
                 plugins: {
                     legend: {
                         position: 'right',
-                        labels: { padding: 15, usePointStyle: true }
+                        labels: { 
+                            boxWidth: 8,
+                            padding: 10,
+                            font: { size: 11 }
+                        }
                     }
                 }
             }
         });
 
-        // Visitors Chart
+        // Hourly Chart
         const visitorsCtx = document.getElementById('visitorsChart').getContext('2d');
         new Chart(visitorsCtx, {
             type: 'bar',
             data: {
-                labels: ['10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM'],
+                labels: ['10AM', '12PM', '2PM', '4PM', '6PM', '8PM'],
                 datasets: [{
-                    label: 'Transactions',
-                    data: [120, 180, 250, 220, 190, 210, 280, 320, 290, 240, 180],
-                    backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                    borderRadius: 8
+                    data: [120, 250, 190, 280, 290, 180],
+                    backgroundColor: '#2563eb',
+                    borderRadius: 4
                 }]
             },
             options: {
@@ -1795,23 +1847,25 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: '#f3f4f6' } 
+                    },
                     x: { grid: { display: false } }
                 }
             }
         });
 
-        // Heatmap Chart
+        // Daily Chart
         const heatmapCtx = document.getElementById('heatmapChart').getContext('2d');
         new Chart(heatmapCtx, {
             type: 'bar',
             data: {
                 labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
                 datasets: [{
-                    label: 'Sales',
                     data: [65000, 72000, 68000, 81000, 75000, 92000, 88000],
-                    backgroundColor: '#667eea',
-                    borderRadius: 8
+                    backgroundColor: '#2563eb',
+                    borderRadius: 4
                 }]
             },
             options: {
@@ -1819,7 +1873,11 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: '#f3f4f6' },
+                        ticks: { callback: value => '₹' + (value/1000) + 'k' }
+                    },
                     x: { grid: { display: false } }
                 }
             }
@@ -1827,4 +1885,3 @@
     </script>
 </body>
 </html>
-
