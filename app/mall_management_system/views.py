@@ -119,6 +119,7 @@ def get_store_details(request, store_id):
 def create_store(request):
     """API endpoint to create a new store"""
     if request.method != 'POST':
+        print("executed here")
         return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
     
     try:
@@ -146,5 +147,6 @@ def create_store(request):
             }
         })
     except Exception as e:
+        print("print executed in last")
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
