@@ -14,8 +14,6 @@ def stores(request):
     """Main stores view"""
     stores_list = Store.objects.all()
     total_stores = stores_list.count()
-    print("total_stores:", total_stores)
-    print(stores_list)
     # Get real statistics
     active_stores = stores_list.filter(status='active').count()
     inactive_stores = stores_list.filter(status='inactive').count()
@@ -37,6 +35,7 @@ def stores(request):
             'occupancy_rate': round((total_stores / 60) * 100, 1) if total_stores > 0 else 0  # Assuming 60 max capacity
         }
     }
+    
     
     return render(request, 'stores/stores.html', context)
 
