@@ -1,13 +1,12 @@
 from django.db import models
-from djongo import models as djongo_models
 
 class Store(models.Model):
     # Primary Key
-    id = djongo_models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
     
     # Basic Information
-    store_id = djongo_models.CharField(max_length=50, unique=True)
-    name = djongo_models.CharField(max_length=200, verbose_name="Store Name")
+    store_id = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=200, verbose_name="Store Name")
     
     # Category and Location
     CATEGORY_CHOICES = [
@@ -38,49 +37,49 @@ class Store(models.Model):
         ('2F-W', 'Second Floor - West Wing'),
     ]
     
-    category = djongo_models.CharField(
+    category = models.CharField(
         max_length=50, 
         choices=CATEGORY_CHOICES,
         verbose_name="Category"
     )
     
-    location = djongo_models.CharField(
+    location = models.CharField(
         max_length=50, 
         choices=LOCATION_CHOICES,
         verbose_name="Location"
     )
     
     # Store Details
-    size = djongo_models.IntegerField(
+    size = models.IntegerField(
         verbose_name="Store Size (sq. ft.)",
         help_text="Store size in square feet"
     )
     
-    monthly_rent = djongo_models.DecimalField(
+    monthly_rent = models.DecimalField(
         max_digits=10,
         decimal_places=2,
         verbose_name="Monthly Rent (₹)",
         help_text="Monthly rent in Indian Rupees"
     )
     
-    manager = djongo_models.CharField(
+    manager = models.CharField(
         max_length=200,
         verbose_name="Store Manager"
     )
     
-    description = djongo_models.TextField(
+    description = models.TextField(
         verbose_name="Store Description",
         blank=True,
         help_text="Brief description of the store, products/services offered..."
     )
     
-    contact_info = djongo_models.CharField(
+    contact_info = models.CharField(
         max_length=200,
         verbose_name="Contact Information",
         help_text="Phone number or email"
     )
     
-    operating_hours = djongo_models.CharField(
+    operating_hours = models.CharField(
         max_length=100,
         default="10:00 AM - 9:00 PM",
         verbose_name="Operating Hours"
@@ -93,7 +92,7 @@ class Store(models.Model):
         ('maintenance', 'Under Maintenance')
     ]
     
-    status = djongo_models.CharField(
+    status = models.CharField(
         max_length=20,
         choices=STATUS_CHOICES,
         default='active',
@@ -101,15 +100,15 @@ class Store(models.Model):
     )
     
     # Timestamps
-    created_at = djongo_models.DateTimeField(auto_now_add=True)
-    updated_at = djongo_models.DateTimeField(auto_now=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
     
     class Meta:
         indexes = [
-            djongo_models.Index(fields=['store_id']),
-            djongo_models.Index(fields=['category']),
-            djongo_models.Index(fields=['location']),
-            djongo_models.Index(fields=['status'])
+            models.Index(fields=['store_id']),
+            models.Index(fields=['category']),
+            models.Index(fields=['location']),
+            models.Index(fields=['status'])
         ]
         ordering = ['name']
     
