@@ -4,6 +4,35 @@ from django.db.models import Avg
 from django.views.decorators.csrf import csrf_exempt
 from .models import Store
 
+# Try to import Decimal128 for MongoDB compatibility
+# This will only be used when running with MongoDB (djongo)
+try:
+    from bson.decimal128 import Decimal128
+    DECIMAL128_AVAILABLE = True
+except ImportError:
+    Decimal128 = None
+    DECIMAL128_AVAILABLE = False
+
+
+def convert_decimal128(value):
+    """
+    Convert MongoDB Decimal128 to Python float.
+    This handles the 'conversion from Decimal128 to Decimal is not supported' error.
+    Works with both SQLite and MongoDB backends.
+    """
+    if value is None:
+        return 0
+    if DECIMAL128_AVAILABLE and isinstance(value, Decimal128):
+        # Convert Decimal128 to string, then to float
+        return float(str(value))
+    # Handle Python's Decimal type
+    from decimal import Decimal
+    if isinstance(value, Decimal):
+        return float(value)
+    if isinstance(value, (int, float)):
+        return value
+    return value
+
 def index(request):
     return render(request, 'index.html')
 
@@ -20,8 +49,13 @@ def stores(request):
     maintenance_stores = stores_list.filter(status='maintenance').count()
     
     # Calculate averages from actual data
-    avg_size = stores_list.aggregate(avg_size=Avg('size'))['avg_size'] or 0
-    avg_rent = stores_list.aggregate(avg_rent=Avg('monthly_rent'))['avg_rent'] or 0
+    # Use convert_decimal128 to handle MongoDB Decimal128 type
+    avg_size_result = stores_list.aggregate(avg_size=Avg('size'))['avg_size']
+    avg_rent_result = stores_list.aggregate(avg_rent=Avg('monthly_rent'))['avg_rent']
+    
+    # Convert Decimal128 to float if needed (for MongoDB compatibility)
+    avg_size = convert_decimal128(avg_size_result)
+    avg_rent = convert_decimal128(avg_rent_result)
     
     context = {
         'stores': stores_list,
@@ -52,6 +86,10 @@ def get_store_details(request, store_id):
     """API endpoint to get store details"""
     try:
         store = Store.objects.get(store_id=store_id)
+        
+        # Convert monthly_rent to handle MongoDB Decimal128 type
+        monthly_rent_value = convert_decimal128(store.monthly_rent)
+        
         return JsonResponse({
             'success': True,
             'store': {
@@ -64,7 +102,7 @@ def get_store_details(request, store_id):
                 'status': store.status,
                 'status_display': store.get_status_display(),
                 'size': store.size,
-                'monthly_rent': str(store.monthly_rent),
+                'monthly_rent': str(monthly_rent_value),
                 'manager': store.manager,
                 'contact_info': store.contact_info,
                 'operating_hours': store.operating_hours,

@@ -79,7 +79,7 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 # Use SQLite for local development (no MongoDB required)
 # For production with MongoDB, use djongo configuration below
-USE_SQLITE = os.environ.get('USE_SQLITE', 'True') == 'True'
+USE_SQLITE = True
 
 if USE_SQLITE:
     DATABASES = {
