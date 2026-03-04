@@ -5,12 +5,1154 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MallX Analytics | Dashboard</title>
-    <link rel="stylesheet" href="{% static 'css/style.css'%}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Advanced Home Page Styles */
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            --info-gradient: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            --hover-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            --border-radius: 16px;
+            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Enhanced Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            height: 100vh;
+            z-index: 100;
+            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .sidebar .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 50px;
+            padding: 0 10px;
+        }
+
+        .sidebar .logo i {
+            font-size: 36px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .sidebar .logo h1 {
+            font-size: 24px;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar .main-nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar .main-nav li {
+            margin-bottom: 8px;
+        }
+
+        .sidebar .main-nav a {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px 20px;
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .sidebar .main-nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(10px);
+        }
+
+        .sidebar .main-nav li.active a {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .sidebar .main-nav a i {
+            font-size: 20px;
+            width: 24px;
+        }
+
+        .sidebar .main-nav .new-badge {
+            background: #f5576c;
+            color: white;
+            font-size: 10px;
+            padding: 3px 8px;
+            border-radius: 20px;
+            margin-left: auto;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 30px 40px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+        }
+
+        /* Enhanced Navbar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+            background: white;
+            padding: 20px 30px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .menu-toggle {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 10px;
+            transition: var(--transition);
+        }
+
+        .menu-toggle:hover {
+            background: #f0f0f0;
+        }
+
+        .page-title h2 {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 5px;
+        }
+
+        .page-title .date-range {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .search-container {
+            flex: 1;
+            max-width: 500px;
+            margin: 0 40px;
+            position: relative;
+        }
+
+        .search-container i {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 18px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 15px 20px 15px 50px;
+            border: 2px solid #eee;
+            border-radius: 50px;
+            font-size: 15px;
+            transition: var(--transition);
+            background: #f8f9fa;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.15);
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .date-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border-radius: 50px;
+        }
+
+        .date-selector i {
+            color: #667eea;
+        }
+
+        .date-selector select {
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .notification-btn {
+            position: relative;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 18px;
+            color: #666;
+        }
+
+        .notification-btn:hover {
+            background: #f0f4ff;
+            color: #667eea;
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #f5576c;
+            color: white;
+            font-size: 10px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-dropdown {
+            position: relative;
+        }
+
+        .profile-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .profile-icon:hover {
+            transform: scale(1.1);
+        }
+
+        /* Enhanced KPI Cards */
+        .kpi-section {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .kpi-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: var(--primary-gradient);
+        }
+
+        .kpi-card:nth-child(2)::before {
+            background: var(--secondary-gradient);
+        }
+
+        .kpi-card:nth-child(3)::before {
+            background: var(--success-gradient);
+        }
+
+        .kpi-card:nth-child(4)::before {
+            background: var(--warning-gradient);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .kpi-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-header .icon-box {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .kpi-card:nth-child(2) .icon-box {
+            background: var(--secondary-gradient);
+        }
+
+        .kpi-card:nth-child(3) .icon-box {
+            background: var(--success-gradient);
+        }
+
+        .kpi-card:nth-child(4) .icon-box {
+            background: var(--warning-gradient);
+        }
+
+        .kpi-header h3 {
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .kpi-value {
+            font-size: 42px;
+            font-weight: 800;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+            line-height: 1;
+        }
+
+        .kpi-change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .kpi-change.positive {
+            color: #10b981;
+        }
+
+        .kpi-change.negative {
+            color: #ef4444;
+        }
+
+        .change-label {
+            color: #999;
+        }
+
+        /* Transaction Entry Section */
+        .transaction-entry-section {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .section-header {
+            margin-bottom: 30px;
+        }
+
+        .section-header h3 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1a1a2e;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-header h3 i {
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .section-subtitle {
+            color: #666;
+            font-size: 15px;
+        }
+
+        .transaction-entry-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 30px;
+        }
+
+        .transaction-form-card,
+        .transactions-table-card {
+            background: #f8f9fa;
+            border-radius: 16px;
+            padding: 25px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .card-header h4 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .current-time {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .transaction-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1a1a2e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group label i {
+            color: #667eea;
+        }
+
+        .form-group input,
+        .form-group select {
+            padding: 14px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: var(--transition);
+            background: white;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.15);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .auto-data-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 20px;
+            color: white;
+        }
+
+        .auto-data-info h5 {
+            font-size: 14px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .feature-name {
+            font-size: 11px;
+            opacity: 0.8;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .feature-value {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .total-preview {
+            background: #f0f4ff;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .total-amount {
+            font-size: 32px;
+            font-weight: 800;
+            color: #667eea;
+        }
+
+        .submit-btn {
+            padding: 16px 30px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+        }
+
+        .quick-add-btn {
+            padding: 12px 20px;
+            background: transparent;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 50px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .quick-add-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Transactions Table */
+        .transactions-count {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .count-badge {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .table-container {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .live-transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .live-transactions-table th {
+            background: #f0f4ff;
+            padding: 15px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: sticky;
+            top: 0;
+        }
+
+        .live-transactions-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            color: #333;
+        }
+
+        .empty-row td {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+        }
+
+        .empty-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .empty-message i {
+            font-size: 40px;
+            color: #ddd;
+        }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        .summary-stats {
+            display: flex;
+            gap: 30px;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .clear-btn {
+            padding: 10px 20px;
+            background: #fee2e2;
+            color: #ef4444;
+            border: none;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .clear-btn:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Charts */
+        .charts-row-1,
+        .charts-row-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+            transition: var(--transition);
+        }
+
+        .chart-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--hover-shadow);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .chart-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .chart-legend {
+            display: flex;
+            gap: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .legend-color.current-week {
+            background: #667eea;
+        }
+
+        .legend-color.last-week {
+            background: #c4c4c4;
+        }
+
+        .refresh-icon {
+            color: #667eea;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .refresh-icon:hover {
+            transform: rotate(180deg);
+        }
+
+        .chart-container {
+            height: 250px;
+        }
+
+        /* Transactions Section */
+        .transactions-section {
+            margin-top: 30px;
+        }
+
+        .transactions-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 25px;
+            box-shadow: var(--card-shadow);
+        }
+
+        .transactions-card .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .transactions-card .card-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .view-all {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: var(--transition);
+        }
+
+        .view-all:hover {
+            gap: 10px;
+        }
+
+        .transactions-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .transactions-table th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .transactions-table td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+            color: #333;
+        }
+
+        /* Notification Panel */
+        .notification-panel {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .notification-panel.active {
+            right: 0;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .notification-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a1a2e;
+        }
+
+        .close-notifications {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #999;
+            cursor: pointer;
+        }
+
+        .notification-list {
+            padding: 20px;
+            height: calc(100vh - 180px);
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            display: flex;
+            gap: 15px;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: var(--transition);
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notification-item.unread {
+            background: #f0f4ff;
+        }
+
+        .notification-icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: var(--primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .notification-content h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 5px;
+        }
+
+        .notification-content p {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .notification-footer {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+
+        .mark-all-read {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: white;
+            border-radius: 16px;
+            padding: 20px 25px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            z-index: 1001;
+            transform: translateX(400px);
+            transition: var(--transition);
+            border-left: 5px solid #10b981;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast-icon {
+            font-size: 24px;
+            color: #10b981;
+        }
+
+        .toast-content h4 {
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a2e;
+        }
+
+        .toast-content p {
+            font-size: 13px;
+            color: #666;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            margin-left: 20px;
+        }
+
+        /* Calendar Widget */
+        .calendar-widget {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 16px;
+            padding: 25px;
+            color: white;
+            margin-top: auto;
+            margin-bottom: 20px;
+        }
+
+        .calendar-widget h3 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0.9;
+        }
+
+        .date-display {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .date-display .day {
+            font-size: 48px;
+            font-weight: 800;
+            line-height: 1;
+        }
+
+        .month-year .month {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .month-year .year {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .weekday {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        /* Sidebar Footer */
+        .sidebar-footer {
+            margin-top: auto;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .avatar i {
+            font-size: 36px;
+            color: white;
+        }
+
+        .user-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .username {
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .role {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .kpi-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .transaction-entry-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-row-1,
+            .charts-row-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            
+            .kpi-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .navbar {
+                flex-direction: column;
+                gap: 20px;
+            }
+            
+            .search-container {
+                margin: 0;
+                max-width: 100%;
+            }
+            
+            .navbar-right {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -18,45 +1160,43 @@
         <aside class="sidebar">
             <div class="logo">
                 <i class="fas fa-chart-line"></i>
-                <h1>MallX Analytics</h1>
+                <h1>MallX</h1>
             </div>
             
             <nav class="main-nav">
                 <ul>
                     <li class="active">
-                        <a href="{% url 'mall_management_system:index'%}">
+                        <a href="{% url 'mall_management_system:index' %}">
                             <i class="fas fa-home"></i>
                             <span>Home</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'mall_management_system:dashboard'%}">
-                            <i class="fas fa-store"></i>
+                        <a href="{% url 'mall_management_system:dashboard' %}">
+                            <i class="fas fa-th-large"></i>
                             <span>Dashboard</span>
                         </a>
                     </li>
-
                     <li>
-                        <a href="{% url 'mall_management_system:stores'%}">
+                        <a href="{% url 'mall_management_system:stores' %}">
                             <i class="fas fa-store"></i>
                             <span>Stores</span>
                         </a>
                     </li>
-
                     <li>
-                        <a href="{% url 'mall_management_system:sales'%}">
+                        <a href="{% url 'mall_management_system:sales' %}">
                             <i class="fas fa-shopping-bag"></i>
                             <span>Sales</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'mall_management_system:customers'%}">
+                        <a href="{% url 'mall_management_system:customers' %}">
                             <i class="fas fa-users"></i>
                             <span>Customers</span>
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'mall_management_system:inventory'%}">
+                        <a href="{% url 'mall_management_system:inventory' %}">
                             <i class="fas fa-boxes"></i>
                             <span>Inventory</span>
                         </a>
@@ -83,17 +1223,16 @@
                 </ul>
             </nav>
             
-            
             <div class="calendar-widget">
                 <h3><i class="fas fa-calendar-alt"></i> Today</h3>
                 <div class="date-display">
-                    <div class="day">26</div>
+                    <div class="day" id="currentDay">04</div>
                     <div class="month-year">
-                        <div class="month">January</div>
-                        <div class="year">2024</div>
+                        <div class="month" id="currentMonth">March</div>
+                        <div class="year" id="currentYear">2026</div>
                     </div>
                 </div>
-                <div class="weekday">Monday</div>
+                <div class="weekday" id="currentWeekday">Tuesday</div>
             </div>
             
             <div class="sidebar-footer">
@@ -119,7 +1258,7 @@
                     </button>
                     <div class="page-title">
                         <h2>Analytics Overview</h2>
-                        <p class="date-range">Dec 25, 2023 - Jan 26, 2024</p>
+                        <p class="date-range" id="dateRange">March 2026</p>
                     </div>
                 </div>
                 
@@ -136,7 +1275,6 @@
                             <option selected>Last 30 days</option>
                             <option>Last quarter</option>
                             <option>Last year</option>
-                            <option>Custom range</option>
                         </select>
                     </div>
                     
@@ -149,11 +1287,6 @@
                         <div class="profile-icon">
                             <i class="fas fa-user-circle"></i>
                         </div>
-                        <div class="dropdown-content">
-                            <a href="#"><i class="fas fa-user"></i> My Profile</a>
-                            <a href="#"><i class="fas fa-cog"></i> Account Settings</a>
-                            <a href="#"><i class="fas fa-sign-out-alt"></i> Logout</a>
-                        </div>
                     </div>
                 </div>
             </header>
@@ -164,7 +1297,7 @@
                 <section class="kpi-section">
                     <div class="kpi-card">
                         <div class="kpi-header">
-                            <i class="fas fa-wallet"></i>
+                            <div class="icon-box"><i class="fas fa-wallet"></i></div>
                             <h3>Total Sales</h3>
                         </div>
                         <div class="kpi-value" id="totalSales">₹ 12,84,560</div>
@@ -177,7 +1310,7 @@
                     
                     <div class="kpi-card">
                         <div class="kpi-header">
-                            <i class="fas fa-users"></i>
+                            <div class="icon-box"><i class="fas fa-users"></i></div>
                             <h3>Total Visitors</h3>
                         </div>
                         <div class="kpi-value" id="totalVisitors">45,820</div>
@@ -190,7 +1323,7 @@
                     
                     <div class="kpi-card">
                         <div class="kpi-header">
-                            <i class="fas fa-percentage"></i>
+                            <div class="icon-box"><i class="fas fa-percentage"></i></div>
                             <h3>Conversion Rate</h3>
                         </div>
                         <div class="kpi-value" id="conversionRate">4.8%</div>
@@ -203,7 +1336,7 @@
                     
                     <div class="kpi-card">
                         <div class="kpi-header">
-                            <i class="fas fa-chart-line"></i>
+                            <div class="icon-box"><i class="fas fa-chart-line"></i></div>
                             <h3>Profit Margin</h3>
                         </div>
                         <div class="kpi-value" id="profitMargin">24.6%</div>
@@ -227,7 +1360,7 @@
                         <div class="transaction-form-card">
                             <div class="card-header">
                                 <h4>New Transaction</h4>
-                                <div class="current-time" id="currentTime">
+                                <div class="current-time">
                                     <i class="fas fa-clock"></i> <span id="timeDisplay">Loading...</span>
                                 </div>
                             </div>
@@ -237,12 +1370,7 @@
                                     <label for="productName">
                                         <i class="fas fa-tag"></i> Product Name
                                     </label>
-                                    <input 
-                                        type="text" 
-                                        id="productName" 
-                                        placeholder="e.g., Premium Headphones, T-shirt, Coffee"
-                                        required
-                                    >
+                                    <input type="text" id="productName" placeholder="e.g., Premium Headphones, T-shirt, Coffee" required>
                                 </div>
                                 
                                 <div class="form-row">
@@ -250,29 +1378,14 @@
                                         <label for="quantity">
                                             <i class="fas fa-boxes"></i> Quantity
                                         </label>
-                                        <input 
-                                            type="number" 
-                                            id="quantity" 
-                                            min="1" 
-                                            max="1000" 
-                                            value="1"
-                                            required
-                                        >
+                                        <input type="number" id="quantity" min="1" max="1000" value="1" required>
                                     </div>
                                     
                                     <div class="form-group">
                                         <label for="unitPrice">
                                             <i class="fas fa-rupee-sign"></i> Unit Price (₹)
                                         </label>
-                                        <input 
-                                            type="number" 
-                                            id="unitPrice" 
-                                            min="1" 
-                                            max="1000000" 
-                                            step="0.01"
-                                            placeholder="0.00"
-                                            required
-                                        >
+                                        <input type="number" id="unitPrice" min="1" max="1000000" step="0.01" placeholder="0.00" required>
                                     </div>
                                 </div>
                                 
@@ -299,15 +1412,15 @@
                                         <h5><i class="fas fa-robot"></i> Auto-Captured ML Features</h5>
                                         <div class="features-list">
                                             <div class="feature">
-                                                <span class="feature-name">Hour:</span>
+                                                <span class="feature-name">Hour</span>
                                                 <span class="feature-value" id="autoHour">--</span>
                                             </div>
                                             <div class="feature">
-                                                <span class="feature-name">Day of Week:</span>
+                                                <span class="feature-name">Day</span>
                                                 <span class="feature-value" id="autoDay">--</span>
                                             </div>
                                             <div class="feature">
-                                                <span class="feature-name">Month:</span>
+                                                <span class="feature-name">Month</span>
                                                 <span class="feature-value" id="autoMonth">--</span>
                                             </div>
                                         </div>
@@ -347,11 +1460,10 @@
                                             <th>Category</th>
                                             <th>Qty</th>
                                             <th>Unit Price</th>
-                                            <th>Total Value</th>
+                                            <th>Total</th>
                                         </tr>
                                     </thead>
                                     <tbody id="liveTransactionsTable">
-                                        <!-- Transactions will be populated here -->
                                         <tr class="empty-row">
                                             <td colspan="6" class="empty-message">
                                                 <i class="fas fa-shopping-cart"></i>
@@ -439,36 +1551,54 @@
                     </div>
                 </section>
                 
-                <!-- Recent Transactions Panel -->
+                <!-- Recent Transactions -->
                 <section class="transactions-section">
                     <div class="transactions-card">
                         <div class="card-header">
                             <h3>Recent Transactions</h3>
                             <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
                         </div>
-                        <div class="transactions-container">
-                            <table class="transactions-table">
-                                <thead>
-                                    <tr>
-                                        <th>Customer</th>
-                                        <th>Store</th>
-                                        <th>Amount</th>
-                                        <th>Time</th>
-                                        <th>Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="transactionsTable">
-                                    <!-- Transactions will be populated by JavaScript -->
-                                </tbody>
-                            </table>
-                        </div>
+                        <table class="transactions-table">
+                            <thead>
+                                <tr>
+                                    <th>Customer</th>
+                                    <th>Store</th>
+                                    <th>Amount</th>
+                                    <th>Time</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionsTable">
+                                <tr>
+                                    <td>Rahul Sharma</td>
+                                    <td>ElectroHub</td>
+                                    <td>₹ 25,000</td>
+                                    <td>10:30 AM</td>
+                                    <td><span style="color: #10b981; font-weight: 600;">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Priya Patel</td>
+                                    <td>Fashion Zone</td>
+                                    <td>₹ 8,500</td>
+                                    <td>10:15 AM</td>
+                                    <td><span style="color: #10b981; font-weight: 600;">Completed</span></td>
+                                </tr>
+                                <tr>
+                                    <td> Amit Kumar</td>
+                                    <td>Food Court</td>
+                                    <td>₹ 1,200</td>
+                                    <td>09:45 AM</td>
+                                    <td><span style="color: #10b981; font-weight: 600;">Completed</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </section>
             </div>
         </main>
     </div>
     
-    <!-- Notification Panel (Hidden by default) -->
+    <!-- Notification Panel -->
     <div class="notification-panel" id="notificationPanel">
         <div class="notification-header">
             <h3>Notifications</h3>
@@ -507,23 +1637,13 @@
                     <span class="notification-time">3 hours ago</span>
                 </div>
             </div>
-            <div class="notification-item">
-                <div class="notification-icon">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div class="notification-content">
-                    <h4>Monthly report ready</h4>
-                    <p>December 2023 performance report is now available.</p>
-                    <span class="notification-time">1 day ago</span>
-                </div>
-            </div>
         </div>
         <div class="notification-footer">
             <a href="#" class="mark-all-read">Mark all as read</a>
         </div>
     </div>
     
-    <!-- Transaction Success Toast -->
+    <!-- Toast -->
     <div class="toast" id="successToast">
         <div class="toast-icon">
             <i class="fas fa-check-circle"></i>
@@ -532,11 +1652,179 @@
             <h4>Transaction Added!</h4>
             <p>Successfully added to database and analytics.</p>
         </div>
-        <button class="toast-close">
+        <button class="toast-close" onclick="document.getElementById('successToast').classList.remove('show')">
             <i class="fas fa-times"></i>
         </button>
     </div>
     
     <script src="{% static 'javascripts/scripts.js' %}"></script>
+    <script>
+        // Update date display
+        const now = new Date();
+        document.getElementById('currentDay').textContent = now.getDate();
+        document.getElementById('currentMonth').textContent = now.toLocaleString('default', { month: 'long' });
+        document.getElementById('currentYear').textContent = now.getFullYear();
+        document.getElementById('currentWeekday').textContent = now.toLocaleString('default', { weekday: 'long' });
+        document.getElementById('dateRange').textContent = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+
+        // Update time
+        function updateTime() {
+            const now = new Date();
+            document.getElementById('timeDisplay').textContent = now.toLocaleTimeString();
+            
+            // Update auto ML features
+            document.getElementById('autoHour').textContent = now.getHours();
+            document.getElementById('autoDay').textContent = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][now.getDay()];
+            document.getElementById('autoMonth').textContent = now.getMonth() + 1;
+        }
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+
+        // Total preview
+        const quantityInput = document.getElementById('quantity');
+        const unitPriceInput = document.getElementById('unitPrice');
+        const totalPreview = document.getElementById('totalPreview');
+
+        function updateTotal() {
+            const qty = parseFloat(quantityInput.value) || 0;
+            const price = parseFloat(unitPriceInput.value) || 0;
+            totalPreview.textContent = '₹ ' + (qty * price).toFixed(2);
+        }
+
+        quantityInput.addEventListener('input', updateTotal);
+        unitPriceInput.addEventListener('input', updateTotal);
+
+        // Notification panel
+        document.getElementById('notificationBtn').addEventListener('click', () => {
+            document.getElementById('notificationPanel').classList.add('active');
+        });
+
+        document.getElementById('closeNotifications').addEventListener('click', () => {
+            document.getElementById('notificationPanel').classList.remove('active');
+        });
+
+        // Show toast
+        function showToast() {
+            document.getElementById('successToast').classList.add('show');
+            setTimeout(() => {
+                document.getElementById('successToast').classList.remove('show');
+            }, 5000);
+        }
+
+        // Initialize charts
+        // Sales Chart
+        const salesCtx = document.getElementById('salesChart').getContext('2d');
+        new Chart(salesCtx, {
+            type: 'line',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Current Week',
+                    data: [45000, 52000, 48000, 61000, 55000, 72000, 68000],
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                    fill: true,
+                    tension: 0.4
+                }, {
+                    label: 'Last Week',
+                    data: [38000, 45000, 42000, 52000, 48000, 58000, 54000],
+                    borderColor: '#c4c4c4',
+                    backgroundColor: 'transparent',
+                    borderDash: [5, 5],
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f0f0f0' }
+                    },
+                    x: {
+                        grid: { display: false }
+                    }
+                }
+            }
+        });
+
+        // Source Chart
+        const sourceCtx = document.getElementById('sourceChart').getContext('2d');
+        new Chart(sourceCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Electronics', 'Fashion', 'Food', 'Beauty', 'Sports', 'Others'],
+                datasets: [{
+                    data: [35, 25, 18, 10, 7, 5],
+                    backgroundColor: ['#667eea', '#f093fb', '#4facfe', '#fa709a', '#fee140', '#a18cd1'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { padding: 15, usePointStyle: true }
+                    }
+                }
+            }
+        });
+
+        // Visitors Chart
+        const visitorsCtx = document.getElementById('visitorsChart').getContext('2d');
+        new Chart(visitorsCtx, {
+            type: 'bar',
+            data: {
+                labels: ['10AM', '11AM', '12PM', '1PM', '2PM', '3PM', '4PM', '5PM', '6PM', '7PM', '8PM'],
+                datasets: [{
+                    label: 'Transactions',
+                    data: [120, 180, 250, 220, 190, 210, 280, 320, 290, 240, 180],
+                    backgroundColor: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // Heatmap Chart
+        const heatmapCtx = document.getElementById('heatmapChart').getContext('2d');
+        new Chart(heatmapCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                datasets: [{
+                    label: 'Sales',
+                    data: [65000, 72000, 68000, 81000, 75000, 92000, 88000],
+                    backgroundColor: '#667eea',
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#f0f0f0' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
+
