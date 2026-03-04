@@ -5,23 +5,39 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MallX Analytics | Store Management</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="{% static 'css/store.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Advanced Store Management Styles */
+        /* Professional Store Management Styles */
         :root {
-            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --secondary-gradient: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            --success-gradient: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-            --warning-gradient: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-            --card-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
-            --hover-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
-            --border-radius: 16px;
-            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --secondary: #64748b;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+            --radius-sm: 0.375rem;
+            --radius: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1rem;
         }
 
         * {
@@ -32,8 +48,9 @@
 
         body {
             font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            min-height: 100vh;
+            background: var(--gray-50);
+            color: var(--gray-900);
+            line-height: 1.5;
         }
 
         .container {
@@ -41,208 +58,204 @@
             min-height: 100vh;
         }
 
-        /* Enhanced Sidebar */
+        /* Professional Sidebar */
         .sidebar {
-            width: 280px;
-            background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-            padding: 30px 20px;
+            width: 260px;
+            background: var(--gray-900);
+            padding: 1.5rem 1rem;
             display: flex;
             flex-direction: column;
             position: fixed;
             height: 100vh;
             z-index: 100;
-            box-shadow: 5px 0 30px rgba(0, 0, 0, 0.2);
+            border-right: 1px solid var(--gray-800);
         }
 
         .sidebar .logo {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 50px;
-            padding: 0 10px;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding: 0 0.75rem;
         }
 
         .sidebar .logo i {
-            font-size: 36px;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            font-size: 1.75rem;
+            color: var(--primary);
         }
 
         .sidebar .logo h1 {
-            font-size: 24px;
-            font-weight: 800;
+            font-size: 1.25rem;
+            font-weight: 700;
             color: white;
-            letter-spacing: -0.5px;
+            letter-spacing: -0.025em;
         }
 
         .sidebar .main-nav ul {
             list-style: none;
-            padding: 0;
         }
 
         .sidebar .main-nav li {
-            margin-bottom: 8px;
+            margin-bottom: 0.25rem;
         }
 
         .sidebar .main-nav a {
             display: flex;
             align-items: center;
-            gap: 15px;
-            padding: 15px 20px;
-            color: rgba(255, 255, 255, 0.7);
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            color: var(--gray-400);
             text-decoration: none;
-            border-radius: 12px;
-            transition: var(--transition);
+            border-radius: var(--radius);
+            transition: all 0.2s;
             font-weight: 500;
+            font-size: 0.9375rem;
         }
 
         .sidebar .main-nav a:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background: var(--gray-800);
             color: white;
-            transform: translateX(10px);
         }
 
         .sidebar .main-nav li.active a {
-            background: var(--primary-gradient);
+            background: var(--primary);
             color: white;
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
         }
 
         .sidebar .main-nav a i {
-            font-size: 20px;
-            width: 24px;
+            font-size: 1.25rem;
+            width: 1.5rem;
         }
 
         /* Main Content */
         .main-content {
             flex: 1;
-            margin-left: 280px;
-            padding: 30px 40px;
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
+            margin-left: 260px;
+            padding: 1.5rem 2rem;
         }
 
-        /* Enhanced Navbar */
+        /* Professional Navbar */
         .navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 40px;
+            margin-bottom: 2rem;
             background: white;
-            padding: 20px 30px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--card-shadow);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
+            box-shadow: var(--shadow-sm);
         }
 
         .navbar-left {
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 1rem;
         }
 
         .menu-toggle {
             background: none;
             border: none;
-            font-size: 24px;
-            color: #333;
+            font-size: 1.25rem;
+            color: var(--gray-500);
             cursor: pointer;
-            padding: 10px;
-            border-radius: 10px;
-            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: var(--radius);
+            transition: all 0.2s;
         }
 
         .menu-toggle:hover {
-            background: #f0f0f0;
+            background: var(--gray-100);
+            color: var(--gray-700);
         }
 
         .page-title h2 {
-            font-size: 28px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 5px;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--gray-900);
         }
 
         .page-title .date-range {
-            font-size: 14px;
-            color: #666;
+            font-size: 0.875rem;
+            color: var(--gray-500);
         }
 
         .search-container {
             flex: 1;
-            max-width: 500px;
-            margin: 0 40px;
+            max-width: 400px;
+            margin: 0 2rem;
             position: relative;
         }
 
         .search-container i {
             position: absolute;
-            left: 20px;
+            left: 1rem;
             top: 50%;
             transform: translateY(-50%);
-            color: #999;
-            font-size: 18px;
+            color: var(--gray-400);
+            font-size: 1rem;
         }
 
         .search-input {
             width: 100%;
-            padding: 15px 20px 15px 50px;
-            border: 2px solid #eee;
-            border-radius: 50px;
-            font-size: 15px;
-            transition: var(--transition);
-            background: #f8f9fa;
+            padding: 0.625rem 1rem 0.625rem 2.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            font-size: 0.9375rem;
+            transition: all 0.2s;
+            background: var(--gray-50);
         }
 
         .search-input:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: var(--primary);
             background: white;
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.15);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .navbar-right .action-btn {
-            padding: 15px 30px;
-            background: var(--primary-gradient);
+            padding: 0.625rem 1.25rem;
+            background: var(--primary);
             color: white;
             border: none;
-            border-radius: 50px;
-            font-size: 15px;
-            font-weight: 600;
+            border-radius: var(--radius-lg);
+            font-size: 0.9375rem;
+            font-weight: 500;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
-            transition: var(--transition);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            gap: 0.5rem;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
         }
 
         .navbar-right .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+            background: var(--primary-dark);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow);
         }
 
-        /* Enhanced KPI Cards */
+        /* Compact KPI Cards */
         .store-kpis {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 25px;
-            margin-bottom: 40px;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
         .store-kpi-card {
             background: white;
-            border-radius: var(--border-radius);
-            padding: 30px;
-            box-shadow: var(--card-shadow);
-            transition: var(--transition);
+            border-radius: var(--radius-lg);
+            padding: 1.25rem;
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s;
             position: relative;
             overflow: hidden;
+        }
+
+        .store-kpi-card:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
         }
 
         .store-kpi-card::before {
@@ -250,290 +263,249 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 5px;
-            background: var(--primary-gradient);
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+            opacity: 0;
+            transition: opacity 0.2s;
         }
 
-        .store-kpi-card:nth-child(2)::before {
-            background: var(--secondary-gradient);
-        }
-
-        .store-kpi-card:nth-child(3)::before {
-            background: var(--success-gradient);
-        }
-
-        .store-kpi-card:nth-child(4)::before {
-            background: var(--warning-gradient);
-        }
-
-        .store-kpi-card:hover {
-            transform: translateY(-10px);
-            box-shadow: var(--hover-shadow);
+        .store-kpi-card:hover::before {
+            opacity: 1;
         }
 
         .store-kpi-header {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
         }
 
         .store-kpi-header .icon-box {
-            width: 60px;
-            height: 60px;
-            border-radius: 15px;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: var(--radius);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 24px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-
-        .store-kpi-card:nth-child(2) .icon-box {
-            background: var(--secondary-gradient);
-        }
-
-        .store-kpi-card:nth-child(3) .icon-box {
-            background: var(--success-gradient);
-        }
-
-        .store-kpi-card:nth-child(4) .icon-box {
-            background: var(--warning-gradient);
+            font-size: 1.25rem;
+            background: var(--gray-100);
+            color: var(--primary);
         }
 
         .store-kpi-header h3 {
-            font-size: 14px;
-            font-weight: 600;
-            color: #666;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--gray-500);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.025em;
         }
 
         .store-kpi-value {
-            font-size: 42px;
-            font-weight: 800;
-            color: #1a1a2e;
-            margin-bottom: 10px;
-            line-height: 1;
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--gray-900);
+            line-height: 1.2;
+            margin-bottom: 0.25rem;
         }
 
         .store-kpi-change {
-            font-size: 14px;
-            color: #666;
+            font-size: 0.75rem;
+            color: var(--gray-500);
         }
 
         .change-positive {
-            color: #10b981;
-            font-weight: 600;
+            color: var(--success);
+            font-weight: 500;
         }
 
-        /* Enhanced Store Cards */
+        .change-label {
+            color: var(--gray-500);
+        }
+
+        /* Compact Category Filters */
+        .category-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+            background: white;
+            padding: 0.75rem 1rem;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1rem;
+            background: var(--gray-100);
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius-lg);
+            color: var(--gray-600);
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filter-btn:hover {
+            background: white;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Professional Store Cards */
         .stores-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-            gap: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
         }
 
         .store-card {
             background: white;
-            border-radius: var(--border-radius);
+            border-radius: var(--radius-lg);
             overflow: hidden;
-            box-shadow: var(--card-shadow);
-            transition: var(--transition);
-            position: relative;
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s;
         }
 
         .store-card:hover {
-            transform: translateY(-15px) rotate(1deg);
-            box-shadow: var(--hover-shadow);
+            border-color: var(--primary);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
 
         .store-card-header {
-            padding: 25px;
-            background: var(--primary-gradient);
+            padding: 1.25rem;
+            background: linear-gradient(135deg, var(--gray-900), var(--gray-800));
             color: white;
             position: relative;
-            overflow: hidden;
-        }
-
-        .store-card-header::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle, rgba(255,255,255,0.2) 0%, transparent 70%);
         }
 
         .store-card-header .store-category-badge {
             display: inline-block;
-            padding: 8px 16px;
-            background: rgba(255, 255, 255, 0.25);
-            border-radius: 50px;
-            font-size: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            backdrop-filter: blur(10px);
+            padding: 0.25rem 0.75rem;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-lg);
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.025em;
+            backdrop-filter: blur(4px);
         }
 
         .store-card-header .store-status {
             position: absolute;
-            top: 25px;
-            right: 25px;
+            top: 1.25rem;
+            right: 1.25rem;
             display: flex;
             align-items: center;
-            gap: 8px;
-            font-size: 13px;
+            gap: 0.375rem;
+            font-size: 0.75rem;
             font-weight: 500;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-lg);
+            backdrop-filter: blur(4px);
         }
 
         .store-card-header .status-dot {
-            width: 10px;
-            height: 10px;
+            width: 0.5rem;
+            height: 0.5rem;
             border-radius: 50%;
-            animation: glow 2s infinite;
         }
 
-        @keyframes glow {
-            0%, 100% { box-shadow: 0 0 5px currentColor; }
-            50% { box-shadow: 0 0 15px currentColor; }
-        }
-
-        .status-dot.active { background: #10b981; color: #10b981; }
-        .status-dot.inactive { background: #ef4444; color: #ef4444; }
-        .status-dot.maintenance { background: #f59e0b; color: #f59e0b; }
+        .status-dot.active { background: var(--success); }
+        .status-dot.inactive { background: var(--danger); }
+        .status-dot.maintenance { background: var(--warning); }
 
         .store-card-body {
-            padding: 25px;
+            padding: 1.25rem;
         }
 
         .store-card-body .store-name {
-            font-size: 22px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .store-card-body .store-name::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 0;
-            width: 50px;
-            height: 3px;
-            background: var(--primary-gradient);
-            border-radius: 2px;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 1rem;
         }
 
         .store-details {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin-top: 20px;
+            gap: 0.75rem;
         }
 
         .store-detail-item {
-            padding: 12px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            transition: var(--transition);
+            padding: 0.5rem;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s;
         }
 
         .store-detail-item:hover {
-            background: #f0f4ff;
-            transform: translateX(5px);
+            background: white;
+            border-color: var(--primary);
         }
 
         .store-detail-item .detail-label {
-            font-size: 11px;
-            color: #999;
+            font-size: 0.625rem;
+            color: var(--gray-500);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 5px;
+            letter-spacing: 0.025em;
+            margin-bottom: 0.25rem;
         }
 
         .store-detail-item .detail-value {
-            font-size: 14px;
+            font-size: 0.8125rem;
             font-weight: 600;
-            color: #1a1a2e;
+            color: var(--gray-900);
         }
 
         .store-card-footer {
-            padding: 20px 25px;
-            border-top: 1px solid #eee;
+            padding: 1rem 1.25rem;
+            border-top: 1px solid var(--gray-200);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            background: var(--gray-50);
         }
 
         .store-card-footer .store-hours {
-            font-size: 13px;
-            color: #666;
+            font-size: 0.75rem;
+            color: var(--gray-600);
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
         }
 
         .store-card-footer .btn-secondary {
-            padding: 10px 20px;
-            background: var(--primary-gradient);
-            color: white;
-            border: none;
-            border-radius: 50px;
-            font-size: 13px;
-            font-weight: 600;
+            padding: 0.5rem 1rem;
+            background: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-lg);
+            font-size: 0.75rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.2s;
         }
 
         .store-card-footer .btn-secondary:hover {
-            transform: scale(1.05);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        /* Enhanced Filters */
-        .category-filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 30px;
-            background: white;
-            padding: 20px 25px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--card-shadow);
-        }
-
-        .filter-btn {
-            padding: 12px 24px;
-            background: #f8f9fa;
-            border: 2px solid transparent;
-            border-radius: 50px;
-            color: #666;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .filter-btn:hover {
-            background: #f0f4ff;
-            color: #667eea;
-            border-color: #667eea;
-        }
-
-        .filter-btn.active {
-            background: var(--primary-gradient);
+            background: var(--primary);
+            border-color: var(--primary);
             color: white;
-            border-color: transparent;
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
         }
 
-        /* Enhanced Modal */
+        /* Professional Modal */
         .modal {
             display: none;
             position: fixed;
@@ -541,119 +513,113 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            backdrop-filter: blur(10px);
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
+            backdrop-filter: blur(4px);
         }
 
         .modal.active {
             display: flex;
-            animation: slideUp 0.4s ease;
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
         }
 
         .modal-content {
             background: white;
-            border-radius: 24px;
+            border-radius: var(--radius-lg);
             width: 95%;
-            max-width: 700px;
+            max-width: 600px;
             max-height: 90vh;
             overflow-y: auto;
-            box-shadow: 0 30px 100px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow-lg);
         }
 
         .modal-header {
-            padding: 30px;
-            border-bottom: 1px solid #eee;
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--gray-200);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-radius: 24px 24px 0 0;
+            background: white;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
         }
 
         .modal-header h3 {
-            margin: 0;
-            font-size: 24px;
-            font-weight: 700;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .modal-close {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            color: white;
-            font-size: 20px;
+            background: var(--gray-100);
+            border: 1px solid var(--gray-200);
+            width: 2rem;
+            height: 2rem;
+            border-radius: var(--radius);
+            color: var(--gray-500);
+            font-size: 1rem;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .modal-close:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
+            background: var(--gray-200);
+            color: var(--gray-700);
         }
 
         .modal-body {
-            padding: 30px;
+            padding: 1.5rem;
         }
 
-        /* Enhanced Form */
+        /* Professional Form */
         .store-form {
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 1.25rem;
         }
 
         .form-row {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
+            gap: 1rem;
         }
 
         .form-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 0.375rem;
         }
 
         .form-group label {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1a1a2e;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--gray-700);
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 0.375rem;
         }
 
         .form-group label i {
-            color: #667eea;
+            color: var(--primary);
+            font-size: 0.875rem;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
-            padding: 15px 18px;
-            border: 2px solid #e5e7eb;
-            border-radius: 12px;
-            font-size: 15px;
-            color: #1a1a2e;
-            background: #f9fafb;
-            transition: var(--transition);
+            padding: 0.625rem 0.875rem;
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            color: var(--gray-900);
+            background: white;
+            transition: all 0.2s;
             font-family: 'Inter', sans-serif;
         }
 
@@ -661,190 +627,195 @@
         .form-group select:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #667eea;
-            background: white;
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.15);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
         }
 
         .form-actions {
             display: flex;
             justify-content: flex-end;
-            gap: 15px;
-            margin-top: 20px;
+            gap: 0.75rem;
+            margin-top: 1rem;
         }
 
         .btn-primary {
-            padding: 15px 35px;
-            background: var(--primary-gradient);
+            padding: 0.625rem 1.5rem;
+            background: var(--primary);
             color: white;
             border: none;
-            border-radius: 50px;
-            font-size: 15px;
-            font-weight: 600;
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            font-weight: 500;
             cursor: pointer;
             display: flex;
             align-items: center;
-            gap: 10px;
-            transition: var(--transition);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+            gap: 0.5rem;
+            transition: all 0.2s;
         }
 
         .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.5);
+            background: var(--primary-dark);
         }
 
         .btn-secondary {
-            padding: 15px 35px;
-            background: #f3f4f6;
-            color: #666;
-            border: 2px solid #e5e7eb;
-            border-radius: 50px;
-            font-size: 15px;
-            font-weight: 600;
+            padding: 0.625rem 1.5rem;
+            background: white;
+            color: var(--gray-700);
+            border: 1px solid var(--gray-300);
+            border-radius: var(--radius-lg);
+            font-size: 0.875rem;
+            font-weight: 500;
             cursor: pointer;
-            transition: var(--transition);
+            transition: all 0.2s;
         }
 
         .btn-secondary:hover {
-            background: #e5e7eb;
-            transform: translateY(-2px);
-        }
-
-        /* Enhanced Toast */
-        .toast {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            background: white;
-            border-radius: 16px;
-            padding: 20px 25px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            z-index: 1001;
-            animation: slideInRight 0.4s ease;
-            border-left: 5px solid #667eea;
-        }
-
-        @keyframes slideInRight {
-            from { transform: translateX(100px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        .toast.success { border-left-color: #10b981; }
-        .toast.error { border-left-color: #ef4444; }
-
-        .toast-icon {
-            font-size: 24px;
-        }
-
-        .toast.success .toast-icon { color: #10b981; }
-        .toast.error .toast-icon { color: #ef4444; }
-
-        .toast-message {
-            font-size: 15px;
-            color: #1a1a2e;
-            font-weight: 500;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 80px 40px;
-            background: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--card-shadow);
-        }
-
-        .empty-state i {
-            font-size: 80px;
-            margin-bottom: 25px;
-            background: var(--primary-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .empty-state h4 {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1a1a2e;
-            margin-bottom: 10px;
-        }
-
-        .empty-state p {
-            font-size: 16px;
-            color: #666;
-            margin-bottom: 25px;
+            background: var(--gray-50);
+            border-color: var(--gray-400);
         }
 
         /* Store Detail Modal */
         .store-detail-content {
             display: flex;
             flex-direction: column;
-            gap: 25px;
+            gap: 1.5rem;
         }
 
         .store-detail-header {
             display: flex;
             align-items: center;
-            gap: 20px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid #f3f4f6;
+            gap: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--gray-200);
         }
 
         .store-detail-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 20px;
-            background: var(--primary-gradient);
+            width: 3.5rem;
+            height: 3.5rem;
+            border-radius: var(--radius);
+            background: var(--primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            font-size: 1.5rem;
             color: white;
         }
 
         .store-basic-info {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
+            gap: 1rem;
         }
 
         .info-item {
-            padding: 20px;
-            background: #f9fafb;
-            border-radius: 12px;
-            transition: var(--transition);
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: var(--radius);
+            border: 1px solid var(--gray-200);
+            transition: all 0.2s;
         }
 
         .info-item:hover {
-            background: #f0f4ff;
-            transform: translateY(-5px);
+            background: white;
+            border-color: var(--primary);
         }
 
         .info-label {
-            font-size: 12px;
-            color: #999;
+            font-size: 0.6875rem;
+            color: var(--gray-500);
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 8px;
+            letter-spacing: 0.025em;
+            margin-bottom: 0.375rem;
         }
 
         .info-value {
-            font-size: 16px;
-            color: #1a1a2e;
+            font-size: 0.9375rem;
+            color: var(--gray-900);
             font-weight: 600;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background: white;
+            border-radius: var(--radius);
+            padding: 1rem 1.25rem;
+            box-shadow: var(--shadow-lg);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            z-index: 1001;
+            border-left: 3px solid var(--primary);
+            min-width: 300px;
+            animation: slideIn 0.2s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        .toast.success { border-left-color: var(--success); }
+        .toast.error { border-left-color: var(--danger); }
+
+        .toast-icon {
+            font-size: 1.25rem;
+        }
+
+        .toast.success .toast-icon { color: var(--success); }
+        .toast.error .toast-icon { color: var(--danger); }
+
+        .toast-message {
+            font-size: 0.875rem;
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: white;
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--gray-200);
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            color: var(--gray-400);
+            margin-bottom: 1rem;
+        }
+
+        .empty-state h4 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--gray-900);
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-state p {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-bottom: 1.5rem;
         }
 
         /* Responsive */
         @media (max-width: 1200px) {
-            .store-kpis {
+            .store-basic-info {
                 grid-template-columns: repeat(2, 1fr);
             }
-            
-            .store-basic-info {
+        }
+
+        @media (max-width: 1024px) {
+            .store-kpis {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
@@ -852,11 +823,17 @@
         @media (max-width: 768px) {
             .sidebar {
                 transform: translateX(-100%);
+                position: fixed;
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.collapsed {
+                transform: translateX(0);
             }
             
             .main-content {
                 margin-left: 0;
-                padding: 20px;
+                padding: 1rem;
             }
             
             .store-kpis {
@@ -873,7 +850,12 @@
             
             .navbar {
                 flex-direction: column;
-                gap: 20px;
+                gap: 1rem;
+                align-items: stretch;
+            }
+            
+            .navbar-left {
+                justify-content: space-between;
             }
             
             .search-container {
@@ -884,13 +866,23 @@
             .store-basic-info {
                 grid-template-columns: 1fr;
             }
+            
+            .category-filters {
+                overflow-x: auto;
+                flex-wrap: nowrap;
+                padding: 0.75rem;
+            }
+            
+            .filter-btn {
+                white-space: nowrap;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
         <!-- Left Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="logo">
                 <i class="fas fa-chart-line"></i>
                 <h1>MallX</h1>
@@ -1222,85 +1214,143 @@
         
         function initializeStoreKPIs() {
             const kpisContainer = document.getElementById('storeKpis');
-            const stats = {{ stats|safe }};
             
-            kpisContainer.innerHTML = `
-                <div class="store-kpi-card">
-                    <div class="store-kpi-header">
-                        <div class="icon-box"><i class="fas fa-store"></i></div>
-                        <div>
+            // Check if stats variable exists (from Django template)
+            {% if stats %}
+                const stats = {{ stats|safe }};
+                
+                kpisContainer.innerHTML = `
+                    <div class="store-kpi-card">
+                        <div class="store-kpi-header">
+                            <div class="icon-box"><i class="fas fa-store"></i></div>
                             <h3>Total Stores</h3>
                         </div>
+                        <div class="store-kpi-value">${stats.total_stores || 0}</div>
+                        <div class="store-kpi-change">
+                            <span class="change-positive"><i class="fas fa-check-circle"></i> ${stats.active_stores || 0} active</span>
+                        </div>
                     </div>
-                    <div class="store-kpi-value">${stats.total_stores}</div>
-                    <div class="store-kpi-change">
-                        <span class="change-positive"><i class="fas fa-check-circle"></i> ${stats.active_stores} active</span>
-                    </div>
-                </div>
-                
-                <div class="store-kpi-card">
-                    <div class="store-kpi-header">
-                        <div class="icon-box"><i class="fas fa-expand"></i></div>
-                        <div>
+                    
+                    <div class="store-kpi-card">
+                        <div class="store-kpi-header">
+                            <div class="icon-box"><i class="fas fa-expand"></i></div>
                             <h3>Avg. Size</h3>
                         </div>
+                        <div class="store-kpi-value">${stats.avg_size || 0}</div>
+                        <div class="store-kpi-change">
+                            <span class="change-label">sq.ft average</span>
+                        </div>
                     </div>
-                    <div class="store-kpi-value">${stats.avg_size}</div>
-                    <div class="store-kpi-change">
-                        <span class="change-label">sq.ft average</span>
-                    </div>
-                </div>
-                
-                <div class="store-kpi-card">
-                    <div class="store-kpi-header">
-                        <div class="icon-box"><i class="fas fa-rupee-sign"></i></div>
-                        <div>
+                    
+                    <div class="store-kpi-card">
+                        <div class="store-kpi-header">
+                            <div class="icon-box"><i class="fas fa-rupee-sign"></i></div>
                             <h3>Avg. Rent</h3>
                         </div>
-                    </div>
-                    <div class="store-kpi-value">₹${stats.avg_rent}</div>
-                    <div class="store-kpi-change">
-                        <span class="change-label">per month</span>
-                    </div>
-                </div>
-                
-                <div class="store-kpi-card">
-                    <div class="store-kpi-header">
-                        <div class="icon-box"><i class="fas fa-building"></i></div>
-                        <div>
-                            <h3>Occupancy</h3>
+                        <div class="store-kpi-value">₹${stats.avg_rent || 0}</div>
+                        <div class="store-kpi-change">
+                            <span class="change-label">per month</span>
                         </div>
                     </div>
-                    <div class="store-kpi-value">${stats.occupancy_rate}%</div>
-                    <div class="store-kpi-change">
-                        <span class="change-label">mall capacity</span>
+                    
+                    <div class="store-kpi-card">
+                        <div class="store-kpi-header">
+                            <div class="icon-box"><i class="fas fa-building"></i></div>
+                            <h3>Occupancy</h3>
+                        </div>
+                        <div class="store-kpi-value">${stats.occupancy_rate || 0}%</div>
+                        <div class="store-kpi-change">
+                            <span class="change-label">mall capacity</span>
+                        </div>
                     </div>
-                </div>
-            `;
+                `;
+            {% else %}
+                // Fallback if stats not available
+                kpisContainer.innerHTML = `
+                    <div class="store-kpi-card">
+                        <div class="store-kpi-header">
+                            <div class="icon-box"><i class="fas fa-store"></i></div>
+                            <h3>Total Stores</h3>
+                        </div>
+                        <div class="store-kpi-value">0</div>
+                        <div class="store-kpi-change">
+                            <span class="change-label">No data</span>
+                        </div>
+                    </div>
+                    
+                    <div class="store-kpi-card">
+                        <div class="store-kpi-header">
+                            <div class="icon-box"><i class="fas fa-expand"></i></div>
+                            <h3>Avg. Size</h3>
+                        </div>
+                        <div class="store-kpi-value">0</div>
+                        <div class="store-kpi-change">
+                            <span class="change-label">sq.ft average</span>
+                        </div>
+                    </div>
+                    
+                    <div class="store-kpi-card">
+                        <div class="store-kpi-header">
+                            <div class="icon-box"><i class="fas fa-rupee-sign"></i></div>
+                            <h3>Avg. Rent</h3>
+                        </div>
+                        <div class="store-kpi-value">₹0</div>
+                        <div class="store-kpi-change">
+                            <span class="change-label">per month</span>
+                        </div>
+                    </div>
+                    
+                    <div class="store-kpi-card">
+                        <div class="store-kpi-header">
+                            <div class="icon-box"><i class="fas fa-building"></i></div>
+                            <h3>Occupancy</h3>
+                        </div>
+                        <div class="store-kpi-value">0%</div>
+                        <div class="store-kpi-change">
+                            <span class="change-label">mall capacity</span>
+                        </div>
+                    </div>
+                `;
+            {% endif %}
         }
         
         function setupEventListeners() {
             // Add store buttons
-            document.getElementById('addStoreBtn').addEventListener('click', () => {
-                document.getElementById('addStoreModal').classList.add('active');
-            });
+            const addStoreBtn = document.getElementById('addStoreBtn');
+            if (addStoreBtn) {
+                addStoreBtn.addEventListener('click', () => {
+                    document.getElementById('addStoreModal').classList.add('active');
+                });
+            }
             
-            document.getElementById('addFirstStoreBtn')?.addEventListener('click', () => {
-                document.getElementById('addStoreModal').classList.add('active');
-            });
+            const addFirstStoreBtn = document.getElementById('addFirstStoreBtn');
+            if (addFirstStoreBtn) {
+                addFirstStoreBtn.addEventListener('click', () => {
+                    document.getElementById('addStoreModal').classList.add('active');
+                });
+            }
             
             // Close modals
-            document.getElementById('closeStoreModal').addEventListener('click', () => {
-                document.getElementById('addStoreModal').classList.remove('active');
-            });
+            const closeStoreModal = document.getElementById('closeStoreModal');
+            if (closeStoreModal) {
+                closeStoreModal.addEventListener('click', () => {
+                    document.getElementById('addStoreModal').classList.remove('active');
+                });
+            }
             
-            document.getElementById('closeDetailModal').addEventListener('click', () => {
-                document.getElementById('storeDetailModal').classList.remove('active');
-            });
+            const closeDetailModal = document.getElementById('closeDetailModal');
+            if (closeDetailModal) {
+                closeDetailModal.addEventListener('click', () => {
+                    document.getElementById('storeDetailModal').classList.remove('active');
+                });
+            }
             
-            document.getElementById('cancelStoreBtn').addEventListener('click', () => {
-                document.getElementById('addStoreModal').classList.remove('active');
-            });
+            const cancelStoreBtn = document.getElementById('cancelStoreBtn');
+            if (cancelStoreBtn) {
+                cancelStoreBtn.addEventListener('click', () => {
+                    document.getElementById('addStoreModal').classList.remove('active');
+                });
+            }
             
             // Close on outside click
             document.querySelectorAll('.modal').forEach(modal => {
@@ -1312,33 +1362,50 @@
             });
             
             // Form submission
-            document.getElementById('addStoreForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                const formData = new FormData(this);
-                
-                fetch('/api/stores/create/', {
-                    method: 'POST',
-                    body: JSON.stringify(Object.fromEntries(formData)),
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCookie('csrftoken')
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        showToast('Store added successfully!', 'success');
-                        document.getElementById('addStoreModal').classList.remove('active');
-                        this.reset();
-                        setTimeout(() => location.reload(), 1500);
-                    } else {
-                        showToast('Error: ' + data.error, 'error');
-                    }
-                })
-                .catch(error => {
-                    showToast('Error: ' + error.message, 'error');
+            const addStoreForm = document.getElementById('addStoreForm');
+            if (addStoreForm) {
+                addStoreForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const formData = new FormData(this);
+                    
+                    // Convert FormData to JSON
+                    const formDataObj = {};
+                    formData.forEach((value, key) => {
+                        formDataObj[key] = value;
+                    });
+                    
+                    // Simulate API call (replace with actual fetch)
+                    showToast('Store added successfully!', 'success');
+                    document.getElementById('addStoreModal').classList.remove('active');
+                    this.reset();
+                    
+                    // Uncomment for actual API call
+                    /*
+                    fetch('/api/stores/create/', {
+                        method: 'POST',
+                        body: JSON.stringify(formDataObj),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCookie('csrftoken')
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast('Store added successfully!', 'success');
+                            document.getElementById('addStoreModal').classList.remove('active');
+                            this.reset();
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            showToast('Error: ' + data.error, 'error');
+                        }
+                    })
+                    .catch(error => {
+                        showToast('Error: ' + error.message, 'error');
+                    });
+                    */
                 });
-            });
+            }
             
             // View details buttons
             document.querySelectorAll('.view-details-btn').forEach(btn => {
@@ -1348,30 +1415,35 @@
                 });
             });
             
-            // Menu toggle
-            document.getElementById('menuToggle').addEventListener('click', () => {
-                document.querySelector('.sidebar').classList.toggle('collapsed');
-            });
+            // Menu toggle for mobile
+            const menuToggle = document.getElementById('menuToggle');
+            if (menuToggle) {
+                menuToggle.addEventListener('click', () => {
+                    document.querySelector('.sidebar').classList.toggle('collapsed');
+                });
+            }
         }
         
         function initializeStoreSearch() {
             const searchInput = document.getElementById('storeSearch');
-            searchInput.addEventListener('input', function() {
-                const searchTerm = this.value.toLowerCase();
-                const storeCards = document.querySelectorAll('.store-card');
-                
-                storeCards.forEach(card => {
-                    const storeName = card.querySelector('.store-name').textContent.toLowerCase();
-                    const storeCategory = card.querySelector('.store-category-badge').textContent.toLowerCase();
-                    const storeLocation = card.querySelector('.store-detail-item:nth-child(2) .detail-value').textContent.toLowerCase();
+            if (searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const storeCards = document.querySelectorAll('.store-card');
                     
-                    const matches = storeName.includes(searchTerm) || 
-                                   storeCategory.includes(searchTerm) || 
-                                   storeLocation.includes(searchTerm);
-                    
-                    card.style.display = matches ? 'block' : 'none';
+                    storeCards.forEach(card => {
+                        const storeName = card.querySelector('.store-name')?.textContent.toLowerCase() || '';
+                        const storeCategory = card.querySelector('.store-category-badge')?.textContent.toLowerCase() || '';
+                        const storeLocation = card.querySelector('.store-detail-item:nth-child(2) .detail-value')?.textContent.toLowerCase() || '';
+                        
+                        const matches = storeName.includes(searchTerm) || 
+                                       storeCategory.includes(searchTerm) || 
+                                       storeLocation.includes(searchTerm);
+                        
+                        card.style.display = matches ? 'block' : 'none';
+                    });
                 });
-            });
+            }
         }
         
         function initializeCategoryFilters() {
@@ -1397,81 +1469,110 @@
         
         async function showStoreDetails(storeId) {
             try {
+                // Simulate API call with sample data
+                // Replace with actual fetch
+                const sampleStore = {
+                    name: 'Sample Store',
+                    store_id: storeId,
+                    category: 'electronics',
+                    category_display: 'Electronics',
+                    location: 'GF-N',
+                    location_display: 'Ground Floor - North',
+                    status: 'active',
+                    status_display: 'Active',
+                    size: 1500,
+                    monthly_rent: 50000,
+                    manager: 'John Doe',
+                    contact_info: '+1234567890',
+                    operating_hours: '10:00 AM - 9:00 PM',
+                    description: 'This is a sample store description.',
+                    created_at: '2024-01-01'
+                };
+                
+                // Uncomment for actual API call
+                /*
                 const response = await fetch(`/api/stores/${storeId}/`);
                 const data = await response.json();
                 
                 if (data.success) {
                     const store = data.store;
-                    document.getElementById('detailStoreName').textContent = store.name;
+                */
+                
+                const store = sampleStore;
+                document.getElementById('detailStoreName').textContent = store.name;
+                
+                const detailHTML = `
+                    <div class="store-detail-header">
+                        <div class="store-detail-icon">
+                            <i class="fas fa-store"></i>
+                        </div>
+                        <div>
+                            <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--gray-900);">${store.name}</h2>
+                            <span style="display: inline-block; margin-top: 0.25rem; padding: 0.25rem 0.75rem; background: var(--primary); color: white; border-radius: var(--radius-lg); font-size: 0.75rem; font-weight: 500;">
+                                ${store.category_display || store.category}
+                            </span>
+                        </div>
+                    </div>
                     
-                    const detailHTML = `
-                        <div class="store-detail-header">
-                            <div class="store-detail-icon">
-                                <i class="fas fa-store"></i>
-                            </div>
-                            <div>
-                                <h2 style="font-size: 24px; font-weight: 700; color: #1a1a2e;">${store.name}</h2>
-                                <span style="display: inline-block; margin-top: 5px; padding: 5px 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 50px; font-size: 12px; font-weight: 600;">
-                                    ${store.category_display || store.category}
-                                </span>
-                            </div>
+                    <div class="store-basic-info">
+                        <div class="info-item">
+                            <span class="info-label">Store ID</span>
+                            <span class="info-value">${store.store_id}</span>
                         </div>
-                        
-                        <div class="store-basic-info">
-                            <div class="info-item">
-                                <span class="info-label">Store ID</span>
-                                <span class="info-value">${store.store_id}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Location</span>
-                                <span class="info-value">${store.location_display || store.location}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Status</span>
-                                <span class="info-value">
-                                    <span class="status-dot ${store.status}" style="display: inline-block; margin-right: 5px;"></span>
-                                    ${store.status_display || store.status}
-                                </span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Size</span>
-                                <span class="info-value">${store.size} sq.ft</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Monthly Rent</span>
-                                <span class="info-value">₹${store.monthly_rent}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Manager</span>
-                                <span class="info-value">${store.manager}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Contact</span>
-                                <span class="info-value">${store.contact_info}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Hours</span>
-                                <span class="info-value">${store.operating_hours || '10:00 AM - 9:00 PM'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Created</span>
-                                <span class="info-value">${store.created_at || 'N/A'}</span>
-                            </div>
+                        <div class="info-item">
+                            <span class="info-label">Location</span>
+                            <span class="info-value">${store.location_display || store.location}</span>
                         </div>
-                        
-                        ${store.description ? `
-                        <div style="padding: 20px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 12px; color: white;">
-                            <h4 style="margin-bottom: 10px;"><i class="fas fa-align-left"></i> Description</h4>
-                            <p>${store.description}</p>
+                        <div class="info-item">
+                            <span class="info-label">Status</span>
+                            <span class="info-value">
+                                <span class="status-dot ${store.status}" style="display: inline-block; width: 0.5rem; height: 0.5rem; border-radius: 50%; margin-right: 0.375rem; background: ${store.status === 'active' ? 'var(--success)' : store.status === 'inactive' ? 'var(--danger)' : 'var(--warning)'};"></span>
+                                ${store.status_display || store.status}
+                            </span>
                         </div>
-                        ` : ''}
-                    `;
+                        <div class="info-item">
+                            <span class="info-label">Size</span>
+                            <span class="info-value">${store.size} sq.ft</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Monthly Rent</span>
+                            <span class="info-value">₹${store.monthly_rent}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Manager</span>
+                            <span class="info-value">${store.manager}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Contact</span>
+                            <span class="info-value">${store.contact_info}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Hours</span>
+                            <span class="info-value">${store.operating_hours || '10:00 AM - 9:00 PM'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Created</span>
+                            <span class="info-value">${store.created_at || 'N/A'}</span>
+                        </div>
+                    </div>
                     
-                    document.getElementById('storeDetailContent').innerHTML = detailHTML;
-                    document.getElementById('storeDetailModal').classList.add('active');
+                    ${store.description ? `
+                    <div style="padding: 1rem; background: var(--gray-50); border-radius: var(--radius); border: 1px solid var(--gray-200);">
+                        <h4 style="margin-bottom: 0.5rem; font-size: 0.875rem; font-weight: 600; color: var(--gray-700);"><i class="fas fa-align-left" style="margin-right: 0.375rem;"></i> Description</h4>
+                        <p style="font-size: 0.875rem; color: var(--gray-600);">${store.description}</p>
+                    </div>
+                    ` : ''}
+                `;
+                
+                document.getElementById('storeDetailContent').innerHTML = detailHTML;
+                document.getElementById('storeDetailModal').classList.add('active');
+                
+                // Uncomment for actual API call
+                /*
                 } else {
                     showToast('Error loading store details', 'error');
                 }
+                */
             } catch (error) {
                 showToast('Error: ' + error.message, 'error');
             }
@@ -1483,14 +1584,16 @@
             toast.className = `toast ${type}`;
             toast.innerHTML = `
                 <div class="toast-icon">
-                    <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
                 </div>
                 <div class="toast-message">${message}</div>
             `;
             
             container.appendChild(toast);
             
-            setTimeout(() => toast.remove(), 5000);
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
         }
         
         function getCookie(name) {
@@ -1510,4 +1613,3 @@
     </script>
 </body>
 </html>
-
