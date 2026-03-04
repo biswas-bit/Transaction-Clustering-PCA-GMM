@@ -2,6 +2,9 @@ from django.db import models
 from djongo import models as djongo_models
 
 class Store(models.Model):
+    # Primary Key
+    id = djongo_models.AutoField(primary_key=True)
+    
     # Basic Information
     store_id = djongo_models.CharField(max_length=50, unique=True)
     name = djongo_models.CharField(max_length=200, verbose_name="Store Name")
