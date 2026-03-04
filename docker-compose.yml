@@ -6,9 +6,9 @@ services:
     container_name: mall_mongo_db
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: admin
-      MONGO_INITDB_ROOT_PASSWORD: secretpassword
-      MONGO_INITDB_DATABASE: mall_db
+      MONGO_INITDB_ROOT_USERNAME: ${DB_USER:-admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD:-secretpassword}
+      MONGO_INITDB_DATABASE: ${DB_NAME:-mall_analytics_db}
     ports:
       - "27017:27017"
     volumes:
@@ -20,9 +20,9 @@ services:
     build: .
     container_name: mall_django_app
     restart: always
-    command: python  app/manage.py runserver 0.0.0.0:8000
+    command: python app/manage.py runserver 0.0.0.0:8000
     volumes:
-      - .:/app
+      - .:/code
     ports:
       - "8000:8000"
     depends_on:
@@ -38,3 +38,4 @@ volumes:
 networks:
   mall_network:
     driver: bridge
+

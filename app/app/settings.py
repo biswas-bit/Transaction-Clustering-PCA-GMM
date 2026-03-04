@@ -10,7 +10,11 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
+import os
 from pathlib import Path
+
+# Initialize environment variables
+env = os.environ
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -20,12 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-=j#q4=lpi=$q(^du=1wpkw-)c+f!c@l4o!#wd5gu=9w(ir8x)1'
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-=j#q4=lpi=$q(^du=1wpkw-)c+f!c@l4o!#wd5gu=9w(ir8x)1')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get('DEBUG', 'True') == 'True'
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', 'localhost,127.0.0.1,web,0.0.0.0').split(',')
 
 
 # Application definition
@@ -73,15 +77,13 @@ WSGI_APPLICATION = 'app.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# settings.py
-
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'mall_analytics_db',
+        'NAME': os.environ.get('DB_NAME', 'mall_analytics_db'),
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
-            'host': 'mongodb://admin:secretpassword@db:27017/?authSource=admin',
+            'host': f"mongodb://{os.environ.get('DB_USER', 'admin')}:{os.environ.get('DB_PASSWORD', 'secretpassword')}@{os.environ.get('DB_HOST', 'db')}:{os.environ.get('DB_PORT', '27017')}/?authSource=admin",
         }
     }
 }

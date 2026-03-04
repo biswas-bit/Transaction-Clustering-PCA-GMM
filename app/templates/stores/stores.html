@@ -907,6 +907,11 @@
             const kpisContainer = document.getElementById('storeKpis');
             const stats = {{ stats|safe }};
             
+            if (!stats) {
+                console.error('Stats data not available');
+                return;
+            }
+            
             kpisContainer.innerHTML = `
                 <div class="store-kpi-card">
                     <div class="store-kpi-header">
@@ -1032,7 +1037,7 @@
                 const form = e.target;
                 const formData = new FormData(form);
                 
-                fetch(form.action, {
+                fetch('/api/stores/create/', {
                     method: 'POST',
                     body: JSON.stringify(Object.fromEntries(formData)),
                     headers: {

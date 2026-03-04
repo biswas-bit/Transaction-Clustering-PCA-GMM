@@ -1,12 +1,8 @@
-from django.shortcuts import render, redirect, get_object_or_404
+from django.shortcuts import render
 from django.http import JsonResponse
-from datetime import datetime, timedelta
-import random
-import json
+from django.db.models import Avg
 from django.views.decorators.csrf import csrf_exempt
-from . models import *
-from django.db import models as django_models
-from django.db.models import Avg, Count, Sum, Q
+from .models import Store
 
 def index(request):
     return render(request, 'index.html')
@@ -52,4 +48,66 @@ def customers(request):
 
 def inventory(request):
     return render(request, 'inventory/inventory.html')
+
+def get_store_details(request, store_id):
+    """API endpoint to get store details"""
+    try:
+        store = Store.objects.get(store_id=store_id)
+        return JsonResponse({
+            'success': True,
+            'store': {
+                'id': store.store_id,
+                'name': store.name,
+                'category': store.category,
+                'category_display': store.get_category_display(),
+                'location': store.location,
+                'location_display': store.get_location_display(),
+                'status': store.status,
+                'status_display': store.get_status_display(),
+                'size': store.size,
+                'monthly_rent': str(store.monthly_rent),
+                'manager': store.manager,
+                'contact_info': store.contact_info,
+                'operating_hours': store.operating_hours,
+                'description': store.description,
+                'created_at': store.created_at.strftime('%Y-%m-%d %H:%M') if store.created_at else None,
+            }
+        })
+    except Store.DoesNotExist:
+        return JsonResponse({'success': False, 'error': 'Store not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
+
+@csrf_exempt
+def create_store(request):
+    """API endpoint to create a new store"""
+    if request.method != 'POST':
+        return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
+    
+    try:
+        import json
+        data = json.loads(request.body)
+        
+        store = Store.objects.create(
+            name=data.get('name'),
+            category=data.get('category'),
+            location=data.get('location'),
+            status=data.get('status', 'active'),
+            size=data.get('size'),
+            monthly_rent=data.get('monthly_rent'),
+            manager=data.get('manager'),
+            contact_info=data.get('contact_info'),
+            description=data.get('description', ''),
+            operating_hours=data.get('operating_hours', '10:00 AM - 9:00 PM'),
+        )
+        
+        return JsonResponse({
+            'success': True,
+            'store': {
+                'id': store.store_id,
+                'name': store.name,
+            }
+        })
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
