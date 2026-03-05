@@ -8,6 +8,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import TransactionCreateSerializer, TransactionSerializer
+from django.utils import timezone
 
 # Try to import Decimal128 for MongoDB compatibility
 # This will only be used when running with MongoDB (djongo)
@@ -189,6 +190,38 @@ def create_transaction(request):
         'success': False,
         'error': 'Method not allowed'
     }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
- 
+    
+    
+@api_view(['GET'])
+def get_transactions(request):
+    """API endpoint to get recent transactions"""
+    try:
+        # Get latest 50 transactions
+        transactions = Transaction.objects.all()[:50]
+        serializer = TransactionSerializer(transactions, many=True)
+        
+        # Calculate summary stats
+        today = timezone.now().date()
+        today_transactions = Transaction.objects.filter(transaction_date=today)
+        
+        today_total = today_transactions.aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        today_count = today_transactions.count()
+        avg_transaction = today_transactions.aggregate(Avg('total_amount'))['total_amount__avg'] or 0
+        
+        return Response({
+            'success': True,
+            'transactions': serializer.data,
+            'summary': {
+                'today_total': float(today_total),
+                'today_count': today_count,
+                'avg_transaction': float(avg_transaction)
+            }
+        })
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
             
