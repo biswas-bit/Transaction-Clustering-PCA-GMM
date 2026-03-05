@@ -17,5 +17,7 @@ urlpatterns = [
     # Transaction APIS
     path('api/transactions/create/', views.create_transaction, name='create_transaction'),
     path('api/transactions/', views.get_transactions, name='get_transactions'),
+     path('api/transactions/clear/', views.clear_transactions, name='clear_transactions'),
+    
     
 ]
