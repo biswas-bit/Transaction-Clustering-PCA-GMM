@@ -173,10 +173,22 @@ def create_transaction(request):
                     'transaction':response_serializer.data
                 }, status=status.HTTP_404_BAD_REQUEST)
                 
+            else:
+                return Response({
+                    'success': False,
+                    'errors': serializers.errors
+                }, status=status.HTTP_400_BAD_REQUEST) 
+                
         except Exception as e:
             return Response({
                 'success': False,
                 'error':str(e)
             }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    
+    return Response({
+        'success': False,
+        'error': 'Method not allowed'
+    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+ 
             
             
