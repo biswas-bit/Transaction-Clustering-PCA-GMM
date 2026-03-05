@@ -224,4 +224,22 @@ def get_transactions(request):
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
+
+@api_view(['DELETE'])
+def clear_transactions(request):
+    """ End POint to Clear all transactions """
+    
+    try:
+        count = Transaction.objects.all().delete()[0]
+        return Response({
+            'success': True,
+            'message': f'{count} transactions cleared'
+        })
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error':str(e),
+            
+        }, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
             
