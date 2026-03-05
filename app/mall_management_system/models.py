@@ -218,7 +218,7 @@ class Transaction(models.Model):
             self.total_amount = self.quantity * self.unit_price
         
         # Set ML feature fields based on current time if this is a new transaction
-        if not self.pk:  # Only for new transactions
+        if not self.pk:  
             now = timezone.now()
             self.transaction_datetime = now
             self.transaction_date = now.date()
