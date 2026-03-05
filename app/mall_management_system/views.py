@@ -2,7 +2,12 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.db.models import Avg
 from django.views.decorators.csrf import csrf_exempt
-from .models import Store
+from .models import Store, Transaction
+from django.db.models import Sum, Avg, Count
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from rest_framework import status
+from .serializers import TransactionCreateSerializer, TransactionSerializer
 
 # Try to import Decimal128 for MongoDB compatibility
 # This will only be used when running with MongoDB (djongo)
@@ -150,3 +155,28 @@ def create_store(request):
         print("print executed in last")
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
+
+@csrf_exempt
+@api_view(['POST'])
+def create_transaction(request):
+    """ API endpoint to create a new transaction """
+    if request.method == 'POST':
+        try:
+            serializers = TransactionCreateSerializer(data=request.data)
+            
+            if serializers.is_valid():
+                transaction = serializers.save()
+                
+                response_serializer = TransactionSerializer(transaction)
+                return Response({
+                    'success': True,
+                    'transaction':response_serializer.data
+                }, status=status.HTTP_404_BAD_REQUEST)
+                
+        except Exception as e:
+            return Response({
+                'success': False,
+                'error':str(e)
+            }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+            
+            
