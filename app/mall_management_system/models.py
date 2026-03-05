@@ -1,4 +1,7 @@
 from django.db import models
+from django.utils import timezone
+import uuid
+from django.contrib.auth.models import User
 
 class Store(models.Model):
     # Primary Key
@@ -142,3 +145,106 @@ class Store(models.Model):
     def get_status_display(self):
         """Get the display name for status"""
         return dict(self.STATUS_CHOICES).get(self.status, self.status)
+    
+    
+
+class Transaction(models.Model):
+    """Model for store transactions with ML features"""
+    
+    CATEGORY_CHOICES = [
+        ('electronics', 'Electronics'),
+        ('fashion', 'Fashion'),
+        ('food', 'Food & Beverage'),
+        ('beauty', 'Beauty'),
+        ('sports', 'Sports'),
+        ('home', 'Home & Living'),
+        ('entertainment', 'Entertainment'),
+        ('books', 'Books & Stationery'),
+        ('other', 'Other'),
+    ]
+    
+    # Basic transaction fields
+    transaction_id = models.CharField(max_length=50, unique=True, editable=False)
+    product_name = models.CharField(max_length=200)
+    quantity = models.PositiveIntegerField(default=1)
+    unit_price = models.DecimalField(max_digits=10, decimal_places=2)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES)
+    
+    # Auto-calculated fields
+    total_amount = models.DecimalField(max_digits=12, decimal_places=2, editable=False)
+    
+    # ML Features - Auto-captured time data
+    transaction_time = models.TimeField(auto_now_add=True)
+    transaction_date = models.DateField(auto_now_add=True)
+    transaction_datetime = models.DateTimeField(auto_now_add=True)
+    
+    # ML Feature fields (derived from datetime)
+    hour = models.IntegerField(editable=False)  # 0-23
+    day_of_week = models.IntegerField(editable=False)  # 0=Monday, 6=Sunday
+    day_name = models.CharField(max_length=10, editable=False)  # Monday, Tuesday, etc.
+    month = models.IntegerField(editable=False)  # 1-12
+    month_name = models.CharField(max_length=10, editable=False)  # January, February, etc.
+    year = models.IntegerField(editable=False)
+    week_of_year = models.IntegerField(editable=False)  # 1-53
+    is_weekend = models.BooleanField(default=False, editable=False)
+    
+    
+    store_id =models.ForeignKey(Store, on_delete=models.CASCADE)  
+    customer_id = models.ForeignKey(User, on_delete=models.CASCADE)  
+    
+    # Metadata
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['-created_at']),
+            models.Index(fields=['category']),
+            models.Index(fields=['hour']),
+            models.Index(fields=['day_of_week']),
+            models.Index(fields=['month']),
+        ]
+    
+    def save(self, *args, **kwargs):
+        """Override save to auto-calculate fields"""
+        
+        # Generate transaction ID if not set
+        if not self.transaction_id:
+            self.transaction_id = f"TXN-{uuid.uuid4().hex[:8].upper()}"
+        
+        # Calculate total amount
+        if self.quantity and self.unit_price:
+            self.total_amount = self.quantity * self.unit_price
+        
+        # Set ML feature fields based on current time if this is a new transaction
+        if not self.pk:  # Only for new transactions
+            now = timezone.now()
+            self.transaction_datetime = now
+            self.transaction_date = now.date()
+            self.transaction_time = now.time()
+            
+            # Extract ML features
+            self.hour = now.hour
+            self.day_of_week = now.weekday()  # 0 = Monday
+            self.day_name = now.strftime('%A')
+            self.month = now.month
+            self.month_name = now.strftime('%B')
+            self.year = now.year
+            self.week_of_year = now.isocalendar()[1]
+            self.is_weekend = self.day_of_week >= 5  # 5 = Saturday, 6 = Sunday
+        
+        super().save(*args, **kwargs)
+    
+    def __str__(self):
+        return f"{self.transaction_id} - {self.product_name} - ₹{self.total_amount}"
+
+    @property
+    def formatted_time(self):
+        """Return formatted time string"""
+        return self.transaction_time.strftime('%H:%M:%S')
+    
+    @property
+    def formatted_date(self):
+        """Return formatted date string"""
+        return self.transaction_date.strftime('%d %b %Y')
