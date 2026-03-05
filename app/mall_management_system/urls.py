@@ -10,6 +10,10 @@ urlpatterns = [
     path('sales/', views.sales, name='sales'),
     path('customers/', views.customers, name='customers'),
     path('inventory/', views.inventory, name='inventory'),
+    #api
     path('api/stores/create/', views.create_store, name='create_store'),
     path('api/stores/<str:store_id>/', views.get_store_details, name='store_details'),
+    
+    # Transaction APIS
+    path('api/transactions/create/', views.create_transaction, name='create_transaction'),
 ]
