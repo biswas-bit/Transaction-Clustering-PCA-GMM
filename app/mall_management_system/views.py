@@ -242,4 +242,51 @@ def clear_transactions(request):
             'error':str(e),
             
         }, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+@api_view(['GET'])
+def get_analytics(request):
+    """API endpoint to get transaction analytics for charts"""
+    try:
+        from django.db.models.functions import ExtractHour, ExtractWeekDay
+        
+        # Hourly distribution for today
+        today = timezone.now().date()
+        hourly_data = Transaction.objects.filter(
+            transaction_date=today
+        ).annotate(
+            hour=ExtractHour('transaction_datetime')
+        ).values('hour').annotate(
+            count=Count('id'),
+            total=Sum('total_amount')
+        ).order_by('hour')
+        
+        # Category distribution
+        category_data = Transaction.objects.values('category').annotate(
+            count=Count('id'),
+            total=Sum('total_amount')
+        ).order_by('-total')
+        
+        # Weekly trend
+        from datetime import timedelta
+        last_week = today - timedelta(days=7)
+        weekly_data = Transaction.objects.filter(
+            transaction_date__gte=last_week
+        ).values('transaction_date').annotate(
+            total=Sum('total_amount')
+        ).order_by('transaction_date')
+        
+        return Response({
+            'success': True,
+            'analytics': {
+                'hourly': list(hourly_data),
+                'categories': list(category_data),
+                'weekly': list(weekly_data)
+            }
+        })
+        
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error': str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
