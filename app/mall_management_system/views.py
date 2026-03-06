@@ -9,9 +9,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from .serializers import TransactionCreateSerializer, TransactionSerializer
 from django.utils import timezone
+import json
 
-# Try to import Decimal128 for MongoDB compatibility
-# This will only be used when running with MongoDB (djongo)
 try:
     from bson.decimal128 import Decimal128
     DECIMAL128_AVAILABLE = True
@@ -173,7 +172,7 @@ def create_transaction(request):
                     'error': 'Authentication required'
                 }, status=status.HTTP_401_UNAUTHORIZED)
             
-            # ✅ Set a default store if none provided
+            
             if 'store_id' not in data or not data.get('store_id'):
                 # Get first store or create a default one
                 default_store = Store.objects.first()
@@ -273,34 +272,34 @@ def clear_transactions(request):
 def get_analytics(request):
     """API endpoint to get transaction analytics for charts"""
     try:
-        from django.db.models.functions import ExtractHour, ExtractWeekDay
-        
-        # Hourly distribution for today
+        from django.db.models.functions import ExtractHour
+        from datetime import timedelta
+
         today = timezone.now().date()
+        last_week = today - timedelta(days=7)
+
+        # Hourly distribution for today
         hourly_data = Transaction.objects.filter(
             transaction_date=today
-        ).annotate(
-            hour=ExtractHour('transaction_datetime')
-        ).values('hour').annotate(
+        ).values('hour') .annotate(
             count=Count('id'),
             total=Sum('total_amount')
         ).order_by('hour')
-        
+
         # Category distribution
         category_data = Transaction.objects.values('category').annotate(
             count=Count('id'),
             total=Sum('total_amount')
         ).order_by('-total')
-        
+
         # Weekly trend
-        from datetime import timedelta
-        last_week = today - timedelta(days=7)
         weekly_data = Transaction.objects.filter(
             transaction_date__gte=last_week
         ).values('transaction_date').annotate(
+            count=Count('id'),                  # ✅ added count for richer data
             total=Sum('total_amount')
         ).order_by('transaction_date')
-        
+
         return Response({
             'success': True,
             'analytics': {
@@ -309,10 +308,9 @@ def get_analytics(request):
                 'weekly': list(weekly_data)
             }
         })
-        
+
     except Exception as e:
         return Response({
             'success': False,
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-            
