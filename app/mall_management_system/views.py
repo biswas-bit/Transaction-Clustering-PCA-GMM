@@ -121,6 +121,7 @@ def get_store_details(request, store_id):
     except Exception as e:
         return JsonResponse({'success': False, 'error': str(e)}, status=500)
 
+
 @csrf_exempt
 def create_store(request):
     """API endpoint to create a new store"""
@@ -129,7 +130,6 @@ def create_store(request):
         return JsonResponse({'success': False, 'error': 'Method not allowed'}, status=405)
     
     try:
-        import json
         data = json.loads(request.body)
         
         store = Store.objects.create(
@@ -163,28 +163,55 @@ def create_transaction(request):
     """ API endpoint to create a new transaction """
     if request.method == 'POST':
         try:
-            serializers = TransactionCreateSerializer(data=request.data)
+            # Create mutable copy of request data
+            data = request.data.copy()
             
-            if serializers.is_valid():
-                transaction = serializers.save()
+            # Check authentication
+            if not request.user.is_authenticated:
+                return Response({
+                    'success': False,
+                    'error': 'Authentication required'
+                }, status=status.HTTP_401_UNAUTHORIZED)
+            
+            # ✅ Set a default store if none provided
+            if 'store_id' not in data or not data.get('store_id'):
+                # Get first store or create a default one
+                default_store = Store.objects.first()
+                if default_store:
+                    data['store_id'] = default_store.id
+                else:
+                    return Response({
+                        'success': False,
+                        'error': 'No store available. Please create a store first.'
+                    }, status=status.HTTP_400_BAD_REQUEST)
+            
+            serializer = TransactionCreateSerializer(data=data)
+            
+            if serializer.is_valid():
+                # Pass customer_id during save
+                transaction = serializer.save(customer_id=request.user)
                 
                 response_serializer = TransactionSerializer(transaction)
                 return Response({
                     'success': True,
-                    'transaction':response_serializer.data
-                }, status=status.HTTP_404_BAD_REQUEST)
+                    'transaction': response_serializer.data
+                }, status=status.HTTP_201_CREATED)
                 
             else:
+                print("Serializer errors:", serializer.errors)
                 return Response({
                     'success': False,
-                    'errors': serializers.errors
-                }, status=status.HTTP_400_BAD_REQUEST) 
+                    'errors': serializer.errors
+                }, status=status.HTTP_400_BAD_REQUEST)
                 
         except Exception as e:
+            print("Exception:", str(e))
+            import traceback
+            traceback.print_exc()
             return Response({
                 'success': False,
-                'error':str(e)
-            }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+                'error': str(e)
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
     
     return Response({
         'success': False,
@@ -227,8 +254,7 @@ def get_transactions(request):
 
 @api_view(['DELETE'])
 def clear_transactions(request):
-    """ End POint to Clear all transactions """
-    
+    """ Endpoint to Clear all transactions """
     try:
         count = Transaction.objects.all().delete()[0]
         return Response({
@@ -239,10 +265,10 @@ def clear_transactions(request):
     except Exception as e:
         return Response({
             'success': False,
-            'error':str(e),
-            
-        }, status = status.HTTP_500_INTERNAL_SERVER_ERROR)
+            'error': str(e),
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
+
 @api_view(['GET'])
 def get_analytics(request):
     """API endpoint to get transaction analytics for charts"""
