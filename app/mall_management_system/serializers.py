@@ -7,9 +7,9 @@ class TransactionSerializer(serializers.ModelSerializer):
     
     formatted_time = serializers.ReadOnlyField()
     formatted_date = serializers.ReadOnlyField()
-    store_name = serializers.CharField(source='store.name', read_only=True)
-    customer_username = serializers.CharField(source='customer.username', read_only=True)
-    customer_email = serializers.EmailField(source='customer.email', read_only=True)
+    store_name = serializers.CharField(source='store_id.name', read_only=True)      # ✅ store_id.name
+    customer_username = serializers.CharField(source='customer_id.username', read_only=True)  # ✅ customer_id.username
+    customer_email = serializers.EmailField(source='customer_id.email', read_only=True)       # ✅ customer_id.email
     
     class Meta:
         model = Transaction
@@ -33,9 +33,9 @@ class TransactionSerializer(serializers.ModelSerializer):
             'is_weekend',
             'formatted_time',
             'formatted_date',
-            'store',
+            'store_id',              # ✅ was 'store'
             'store_name',
-            'customer',
+            'customer_id',           # ✅ was 'customer'
             'customer_username',
             'customer_email',
             'created_at',
@@ -59,18 +59,12 @@ class TransactionSerializer(serializers.ModelSerializer):
             'customer_username',
             'customer_email',
         ]
-
+        
 class TransactionCreateSerializer(serializers.ModelSerializer):
     """Serializer for creating transactions"""
     
-    # Accept store ID and customer ID as integers
-    store = serializers.PrimaryKeyRelatedField(
+    store_id = serializers.PrimaryKeyRelatedField(
         queryset=Store.objects.all(),
-        required=False,
-        allow_null=True
-    )
-    customer = serializers.PrimaryKeyRelatedField(
-        queryset=User.objects.all(),
         required=False,
         allow_null=True
     )
@@ -82,9 +76,12 @@ class TransactionCreateSerializer(serializers.ModelSerializer):
             'quantity',
             'unit_price',
             'category',
-            'store',
-            'customer',
+            'store_id',
+            'customer_id', 
         ]
+        extra_kwargs = {
+            'customer_id': {'required': False}  
+        }
     
     def validate_quantity(self, value):
         if value < 1:
