@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        /* Professional Dashboard Styles */
+        /* Your existing CSS remains exactly the same */
         :root {
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
@@ -43,6 +43,7 @@
             --transition: all 0.2s ease;
         }
 
+        /* Rest of your CSS remains exactly the same */
         * {
             margin: 0;
             padding: 0;
@@ -602,6 +603,11 @@
             background: var(--primary-dark);
         }
 
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         .quick-add-btn {
             padding: 0.75rem 1.5rem;
             background: transparent;
@@ -621,6 +627,11 @@
         .quick-add-btn:hover {
             background: var(--primary);
             color: white;
+        }
+
+        .quick-add-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
 
         /* Transactions Table */
@@ -740,6 +751,11 @@
             color: white;
         }
 
+        .clear-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
         /* Charts */
         .charts-row-1,
         .charts-row-2 {
@@ -810,6 +826,15 @@
 
         .refresh-icon:hover {
             transform: rotate(180deg);
+        }
+
+        .refresh-icon.loading {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
 
         .chart-container {
@@ -1025,9 +1050,17 @@
             transform: translateX(0);
         }
 
+        .toast.error {
+            border-left-color: var(--danger);
+        }
+
         .toast-icon {
             font-size: 1.25rem;
             color: var(--success);
+        }
+
+        .toast.error .toast-icon {
+            color: var(--danger);
         }
 
         .toast-content h4 {
@@ -1136,6 +1169,22 @@
         .role {
             color: rgba(255, 255, 255, 0.7);
             font-size: 0.6875rem;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.6s linear infinite;
+            display: inline-block;
+        }
+
+        .spinner.dark {
+            border: 2px solid rgba(0, 0, 0, 0.1);
+            border-top-color: var(--primary);
         }
 
         /* Responsive */
@@ -1348,50 +1397,46 @@
                             <div class="icon-box"><i class="fas fa-wallet"></i></div>
                             <h3>Total Sales</h3>
                         </div>
-                        <div class="kpi-value" id="totalSales">₹12.84L</div>
+                        <div class="kpi-value" id="totalSales">₹0</div>
                         <div class="kpi-change positive">
                             <i class="fas fa-arrow-up"></i>
-                            <span>12.5%</span>
+                            <span>0%</span>
                             <span class="change-label">vs last month</span>
                         </div>
                     </div>
                     
                     <div class="kpi-card">
                         <div class="kpi-header">
-                            <div class="icon-box"><i class="fas fa-users"></i></div>
-                            <h3>Visitors</h3>
+                            <div class="icon-box"><i class="fas fa-shopping-cart"></i></div>
+                            <h3>Transactions</h3>
                         </div>
-                        <div class="kpi-value" id="totalVisitors">45.8K</div>
+                        <div class="kpi-value" id="totalTransactions">0</div>
                         <div class="kpi-change positive">
                             <i class="fas fa-arrow-up"></i>
-                            <span>8.3%</span>
-                            <span class="change-label">vs last month</span>
-                        </div>
-                    </div>
-                    
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="icon-box"><i class="fas fa-percentage"></i></div>
-                            <h3>Conversion</h3>
-                        </div>
-                        <div class="kpi-value" id="conversionRate">4.8%</div>
-                        <div class="kpi-change negative">
-                            <i class="fas fa-arrow-down"></i>
-                            <span>1.2%</span>
-                            <span class="change-label">vs last month</span>
+                            <span>0</span>
+                            <span class="change-label">today</span>
                         </div>
                     </div>
                     
                     <div class="kpi-card">
                         <div class="kpi-header">
                             <div class="icon-box"><i class="fas fa-chart-line"></i></div>
-                            <h3>Profit Margin</h3>
+                            <h3>Avg. Transaction</h3>
                         </div>
-                        <div class="kpi-value" id="profitMargin">24.6%</div>
-                        <div class="kpi-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>3.1%</span>
-                            <span class="change-label">vs last month</span>
+                        <div class="kpi-value" id="avgTransactionValue">₹0</div>
+                        <div class="kpi-change">
+                            <span class="change-label">per transaction</span>
+                        </div>
+                    </div>
+                    
+                    <div class="kpi-card">
+                        <div class="kpi-header">
+                            <div class="icon-box"><i class="fas fa-tags"></i></div>
+                            <h3>Categories</h3>
+                        </div>
+                        <div class="kpi-value" id="totalCategories">0</div>
+                        <div class="kpi-change">
+                            <span class="change-label">active</span>
                         </div>
                     </div>
                 </section>
@@ -1414,6 +1459,7 @@
                             </div>
                             
                             <form id="transactionForm" class="transaction-form">
+                                {% csrf_token %}
                                 <div class="form-group">
                                     <label for="productName">
                                         <i class="fas fa-tag"></i> Product Name
@@ -1474,7 +1520,7 @@
                                     <div class="total-amount" id="totalPreview">₹0</div>
                                 </div>
                                 
-                                <button type="submit" class="submit-btn">
+                                <button type="submit" class="submit-btn" id="submitTransactionBtn">
                                     <i class="fas fa-plus-circle"></i> Add Transaction
                                 </button>
                                 
@@ -1544,11 +1590,7 @@
                             <div class="chart-legend">
                                 <div class="legend-item">
                                     <span class="legend-color current-week"></span>
-                                    <span>Current</span>
-                                </div>
-                                <div class="legend-item">
-                                    <span class="legend-color last-week"></span>
-                                    <span>Last</span>
+                                    <span>This Week</span>
                                 </div>
                             </div>
                         </div>
@@ -1599,34 +1641,15 @@
                         <table class="transactions-table">
                             <thead>
                                 <tr>
-                                    <th>Customer</th>
-                                    <th>Store</th>
+                                    <th>Product</th>
+                                    <th>Category</th>
                                     <th>Amount</th>
                                     <th>Time</th>
-                                    <th>Status</th>
                                 </tr>
                             </thead>
-                            <tbody>
+                            <tbody id="recentTransactionsTable">
                                 <tr>
-                                    <td>Rahul Sharma</td>
-                                    <td>ElectroHub</td>
-                                    <td>₹25,000</td>
-                                    <td>10:30 AM</td>
-                                    <td><span style="color: var(--success);">Completed</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Priya Patel</td>
-                                    <td>Fashion Zone</td>
-                                    <td>₹8,500</td>
-                                    <td>10:15 AM</td>
-                                    <td><span style="color: var(--success);">Completed</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Amit Kumar</td>
-                                    <td>Food Court</td>
-                                    <td>₹1,200</td>
-                                    <td>09:45 AM</td>
-                                    <td><span style="color: var(--success);">Completed</span></td>
+                                    <td colspan="4" style="text-align: center; color: var(--gray-400);">Loading transactions...</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -1681,30 +1704,53 @@
         </div>
     </div>
     
-    <!-- Toast -->
-    <div class="toast" id="successToast">
-        <div class="toast-icon">
-            <i class="fas fa-check-circle"></i>
-        </div>
-        <div class="toast-content">
-            <h4>Transaction Added!</h4>
-            <p>Successfully added to database</p>
-        </div>
-        <button class="toast-close" onclick="document.getElementById('successToast').classList.remove('show')">
-            <i class="fas fa-times"></i>
-        </button>
-    </div>
-    
-    <script>
-        // Update date display
-        const now = new Date();
-        document.getElementById('currentDay').textContent = now.getDate();
-        document.getElementById('currentMonth').textContent = now.toLocaleString('default', { month: 'long' });
-        document.getElementById('currentYear').textContent = now.getFullYear();
-        document.getElementById('currentWeekday').textContent = now.toLocaleString('default', { weekday: 'long' });
-        document.getElementById('dateRange').textContent = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+    <!-- Toast Container -->
+    <div id="toastContainer"></div>
 
-        // Update time
+    <script>
+        // ============================================================
+        // API Integration for Transactions
+        // ============================================================
+        
+        // API Endpoints (using Django URL tags)
+        const API = {
+            create: "{% url 'mall_management_system:create_transaction' %}",
+            list: "{% url 'mall_management_system:get_transactions' %}",
+            clear: "{% url 'mall_management_system:clear_transactions' %}",
+            analytics: "{% url 'mall_management_system:get_analytics' %}"
+        };
+
+        // CSRF Token
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+        // Chart instances
+        let salesChart, categoryChart, hourlyChart, dailyChart;
+
+        // ============================================================
+        // Initialize on Page Load
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDateTime();
+            initializeEventListeners();
+            loadTransactions();
+            loadAnalytics();
+        });
+
+        // ============================================================
+        // Date & Time Functions
+        // ============================================================
+        function initializeDateTime() {
+            const now = new Date();
+            document.getElementById('currentDay').textContent = now.getDate();
+            document.getElementById('currentMonth').textContent = now.toLocaleString('default', { month: 'long' });
+            document.getElementById('currentYear').textContent = now.getFullYear();
+            document.getElementById('currentWeekday').textContent = now.toLocaleString('default', { weekday: 'long' });
+            document.getElementById('dateRange').textContent = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+            
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
+
         function updateTime() {
             const now = new Date();
             const timeString = now.toLocaleTimeString('en-US', { 
@@ -1720,168 +1766,550 @@
             document.getElementById('autoDay').textContent = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][now.getDay()];
             document.getElementById('autoMonth').textContent = now.getMonth() + 1;
         }
+
+        // ============================================================
+        // Event Listeners
+        // ============================================================
+        function initializeEventListeners() {
+            // Transaction form submission
+            document.getElementById('transactionForm').addEventListener('submit', handleTransactionSubmit);
+            
+            // Quick add sample
+            document.getElementById('quickAddBtn').addEventListener('click', quickAddSample);
+            
+            // Clear transactions
+            document.getElementById('clearTransactionsBtn').addEventListener('click', clearTransactions);
+            
+            // Total preview
+            document.getElementById('quantity').addEventListener('input', updateTotalPreview);
+            document.getElementById('unitPrice').addEventListener('input', updateTotalPreview);
+            
+            // Refresh categories
+            document.getElementById('refreshCategories').addEventListener('click', function() {
+                this.classList.add('loading');
+                loadAnalytics().finally(() => {
+                    setTimeout(() => this.classList.remove('loading'), 500);
+                });
+            });
+            
+            // Notification panel
+            document.getElementById('notificationBtn').addEventListener('click', () => {
+                document.getElementById('notificationPanel').classList.add('active');
+            });
+            
+            document.getElementById('closeNotifications').addEventListener('click', () => {
+                document.getElementById('notificationPanel').classList.remove('active');
+            });
+            
+            // Menu toggle for mobile
+            document.getElementById('menuToggle').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('collapsed');
+            });
+            
+            // Date range change
+            document.getElementById('dateRangeSelect').addEventListener('change', function() {
+                loadAnalytics();
+            });
+        }
+
+        // ============================================================
+        // Total Preview
+        // ============================================================
+        function updateTotalPreview() {
+            const qty = parseFloat(document.getElementById('quantity').value) || 0;
+            const price = parseFloat(document.getElementById('unitPrice').value) || 0;
+            const total = qty * price;
+            document.getElementById('totalPreview').textContent = '₹' + total.toLocaleString('en-IN', {
+                maximumFractionDigits: 2,
+                minimumFractionDigits: 2
+            });
+        }
+
+        // ============================================================
+        // Transaction CRUD Operations
+        // ============================================================
         
-        updateTime();
-        setInterval(updateTime, 1000);
-
-        // Total preview
-        const quantityInput = document.getElementById('quantity');
-        const unitPriceInput = document.getElementById('unitPrice');
-        const totalPreview = document.getElementById('totalPreview');
-
-        function updateTotal() {
-            const qty = parseFloat(quantityInput.value) || 0;
-            const price = parseFloat(unitPriceInput.value) || 0;
-            totalPreview.textContent = '₹' + (qty * price).toLocaleString('en-IN');
-        }
-
-        quantityInput.addEventListener('input', updateTotal);
-        unitPriceInput.addEventListener('input', updateTotal);
-
-        // Notification panel
-        document.getElementById('notificationBtn').addEventListener('click', () => {
-            document.getElementById('notificationPanel').classList.add('active');
-        });
-
-        document.getElementById('closeNotifications').addEventListener('click', () => {
-            document.getElementById('notificationPanel').classList.remove('active');
-        });
-
-        // Menu toggle for mobile
-        document.getElementById('menuToggle').addEventListener('click', () => {
-            document.getElementById('sidebar').classList.toggle('collapsed');
-        });
-
-        // Show toast function
-        function showToast() {
-            document.getElementById('successToast').classList.add('show');
-            setTimeout(() => {
-                document.getElementById('successToast').classList.remove('show');
-            }, 3000);
-        }
-
-        // Initialize charts
-        // Sales Chart
-        const salesCtx = document.getElementById('salesChart').getContext('2d');
-        new Chart(salesCtx, {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Current Week',
-                    data: [45000, 52000, 48000, 61000, 55000, 72000, 68000],
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 3
-                }, {
-                    label: 'Last Week',
-                    data: [38000, 45000, 42000, 52000, 48000, 58000, 54000],
-                    borderColor: '#9ca3af',
-                    backgroundColor: 'transparent',
-                    borderDash: [4, 4],
-                    tension: 0.4,
-                    pointRadius: 2
-                }]
+        // Create Transaction
+        // In your index.html, update the form submission
+async function handleTransactionSubmit(e) {
+    e.preventDefault();
+    
+    const submitBtn = document.getElementById('submitTransactionBtn');
+    const originalText = submitBtn.innerHTML;
+    
+    submitBtn.innerHTML = '<span class="spinner"></span> Adding...';
+    submitBtn.disabled = true;
+    
+    const formData = {
+        product_name: document.getElementById('productName').value,
+        quantity: parseInt(document.getElementById('quantity').value),
+        unit_price: parseFloat(document.getElementById('unitPrice').value),
+        category: document.getElementById('category').value,
+        store_id: null  // Optional for now
+        // No customer_id - will be set by backend
+    };
+    
+    try {
+        const response = await fetch(API.create, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken
             },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: '#f3f4f6' },
-                        ticks: { callback: value => '₹' + (value/1000) + 'k' }
-                    },
-                    x: { grid: { display: false } }
+            body: JSON.stringify(formData),
+            credentials: 'same-origin'  // Important: sends cookies/session
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast('Transaction added successfully!', 'success');
+            document.getElementById('transactionForm').reset();
+            document.getElementById('quantity').value = '1';
+            updateTotalPreview();
+            
+            await loadTransactions();
+            await loadAnalytics();
+        } else {
+            showToast('Error: ' + (data.errors ? JSON.stringify(data.errors) : data.error), 'error');
+        }
+    } catch (error) {
+        showToast('Error: ' + error.message, 'error');
+        console.error('Create transaction error:', error);
+    } finally {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    }
+}
+        // Load Transactions
+        async function loadTransactions() {
+            try {
+                const response = await fetch(API.list);
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateTransactionsTable(data.transactions);
+                    updateSummary(data.summary);
                 }
+            } catch (error) {
+                console.error('Load transactions error:', error);
+                showToast('Failed to load transactions', 'error');
             }
-        });
+        }
 
-        // Category Chart
-        const sourceCtx = document.getElementById('sourceChart').getContext('2d');
-        new Chart(sourceCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Electronics', 'Fashion', 'Food', 'Beauty', 'Sports'],
-                datasets: [{
-                    data: [35, 25, 18, 12, 10],
-                    backgroundColor: ['#2563eb', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: { 
-                            boxWidth: 8,
-                            padding: 10,
-                            font: { size: 11 }
+        // Update Transactions Table
+        function updateTransactionsTable(transactions) {
+            const tbody = document.getElementById('liveTransactionsTable');
+            const recentTbody = document.getElementById('recentTransactionsTable');
+            
+            if (!transactions || transactions.length === 0) {
+                // Live transactions empty state
+                tbody.innerHTML = `
+                    <tr class="empty-row">
+                        <td colspan="5">
+                            <div class="empty-message">
+                                <i class="fas fa-shopping-cart"></i>
+                                <p>No transactions yet</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                
+                // Recent transactions empty state
+                recentTbody.innerHTML = `
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--gray-400); padding: 2rem;">
+                            No transactions yet
+                        </td>
+                    </tr>
+                `;
+                
+                document.getElementById('transactionCount').textContent = '0';
+                return;
+            }
+            
+            // Live transactions (latest 5)
+            let liveHtml = '';
+            const recentTransactions = transactions.slice(0, 5);
+            
+            recentTransactions.forEach(t => {
+                const time = t.formatted_time || new Date(t.transaction_time).toLocaleTimeString();
+                liveHtml += `
+                    <tr>
+                        <td>${time}</td>
+                        <td>${t.product_name}</td>
+                        <td>${t.category}</td>
+                        <td>${t.quantity}</td>
+                        <td>₹${parseFloat(t.total_amount).toLocaleString('en-IN')}</td>
+                    </tr>
+                `;
+            });
+            
+            tbody.innerHTML = liveHtml;
+            document.getElementById('transactionCount').textContent = transactions.length;
+            
+            // Recent transactions table
+            let recentHtml = '';
+            transactions.slice(0, 5).forEach(t => {
+                const time = t.formatted_time || new Date(t.transaction_time).toLocaleTimeString();
+                recentHtml += `
+                    <tr>
+                        <td>${t.product_name}</td>
+                        <td>${t.category}</td>
+                        <td>₹${parseFloat(t.total_amount).toLocaleString('en-IN')}</td>
+                        <td>${time}</td>
+                    </tr>
+                `;
+            });
+            
+            recentTbody.innerHTML = recentHtml;
+        }
+
+        // Update Summary
+        function updateSummary(summary) {
+            if (summary) {
+                document.getElementById('todayTotal').textContent = '₹' + (summary.today_total || 0).toLocaleString('en-IN');
+                document.getElementById('avgTransaction').textContent = '₹' + (summary.avg_transaction || 0).toLocaleString('en-IN');
+                
+                // Update KPI cards
+                document.getElementById('totalSales').textContent = '₹' + (summary.today_total || 0).toLocaleString('en-IN', {
+                    notation: 'compact',
+                    compactDisplay: 'short'
+                });
+                document.getElementById('totalTransactions').textContent = summary.today_count || 0;
+                document.getElementById('avgTransactionValue').textContent = '₹' + (summary.avg_transaction || 0).toLocaleString('en-IN');
+            }
+        }
+
+        // Clear Transactions
+        async function clearTransactions() {
+            if (!confirm('Are you sure you want to clear all transactions? This action cannot be undone.')) {
+                return;
+            }
+            
+            const clearBtn = document.getElementById('clearTransactionsBtn');
+            const originalText = clearBtn.innerHTML;
+            
+            clearBtn.innerHTML = '<span class="spinner"></span> Clearing...';
+            clearBtn.disabled = true;
+            
+            try {
+                const response = await fetch(API.clear, {
+                    method: 'DELETE',
+                    headers: {
+                        'X-CSRFToken': csrftoken
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    showToast(data.message, 'success');
+                    await loadTransactions();
+                    await loadAnalytics();
+                } else {
+                    showToast('Error: ' + data.error, 'error');
+                }
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+                console.error('Clear transactions error:', error);
+            } finally {
+                clearBtn.innerHTML = originalText;
+                clearBtn.disabled = false;
+            }
+        }
+
+        // ============================================================
+        // Analytics
+        // ============================================================
+        async function loadAnalytics() {
+            try {
+                const response = await fetch(API.analytics);
+                const data = await response.json();
+                
+                if (data.success) {
+                    updateCharts(data.analytics);
+                    updateKPIs(data.analytics);
+                }
+            } catch (error) {
+                console.error('Load analytics error:', error);
+            }
+        }
+
+        function updateCharts(analytics) {
+            // Weekly Sales Chart
+            if (analytics.weekly && analytics.weekly.length > 0) {
+                const weeklyLabels = analytics.weekly.map(d => {
+                    const date = new Date(d.transaction_date);
+                    return date.toLocaleDateString('en-US', { weekday: 'short' });
+                });
+                const weeklyData = analytics.weekly.map(d => d.total);
+                
+                updateWeeklyChart(weeklyLabels, weeklyData);
+            }
+            
+            // Category Chart
+            if (analytics.categories && analytics.categories.length > 0) {
+                const categoryLabels = analytics.categories.map(c => c.category);
+                const categoryData = analytics.categories.map(c => c.total);
+                const categoryColors = {
+                    'electronics': '#2563eb',
+                    'fashion': '#f59e0b',
+                    'food': '#10b981',
+                    'beauty': '#ef4444',
+                    'sports': '#8b5cf6'
+                };
+                const colors = categoryLabels.map(cat => categoryColors[cat] || '#64748b');
+                
+                updateCategoryChart(categoryLabels, categoryData, colors);
+                document.getElementById('totalCategories').textContent = categoryLabels.length;
+            }
+            
+            // Hourly Chart
+            if (analytics.hourly && analytics.hourly.length > 0) {
+                const hourlyLabels = analytics.hourly.map(h => `${h.hour}:00`);
+                const hourlyData = analytics.hourly.map(h => h.count);
+                
+                updateHourlyChart(hourlyLabels, hourlyData);
+            }
+            
+            // Daily Chart
+            if (analytics.weekly && analytics.weekly.length > 0) {
+                const dailyLabels = analytics.weekly.map(d => {
+                    const date = new Date(d.transaction_date);
+                    return date.toLocaleDateString('en-US', { weekday: 'short' });
+                });
+                const dailyData = analytics.weekly.map(d => d.total);
+                
+                updateDailyChart(dailyLabels, dailyData);
+            }
+        }
+
+        function updateKPIs(analytics) {
+            // Update KPI cards with analytics data
+            if (analytics.categories) {
+                document.getElementById('totalCategories').textContent = analytics.categories.length;
+            }
+        }
+
+        // ============================================================
+        // Chart Update Functions
+        // ============================================================
+        function updateWeeklyChart(labels, data) {
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            
+            if (salesChart) {
+                salesChart.destroy();
+            }
+            
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'This Week',
+                        data: data,
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f3f4f6' },
+                            ticks: { callback: value => '₹' + (value/1000) + 'k' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function updateCategoryChart(labels, data, colors) {
+            const ctx = document.getElementById('sourceChart').getContext('2d');
+            
+            if (categoryChart) {
+                categoryChart.destroy();
+            }
+            
+            categoryChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { 
+                                boxWidth: 8,
+                                padding: 10,
+                                font: { size: 11 }
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+        }
 
-        // Hourly Chart
-        const visitorsCtx = document.getElementById('visitorsChart').getContext('2d');
-        new Chart(visitorsCtx, {
-            type: 'bar',
-            data: {
-                labels: ['10AM', '12PM', '2PM', '4PM', '6PM', '8PM'],
-                datasets: [{
-                    data: [120, 250, 190, 280, 290, 180],
-                    backgroundColor: '#2563eb',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { color: '#f3f4f6' } 
-                    },
-                    x: { grid: { display: false } }
+        function updateHourlyChart(labels, data) {
+            const ctx = document.getElementById('visitorsChart').getContext('2d');
+            
+            if (hourlyChart) {
+                hourlyChart.destroy();
+            }
+            
+            hourlyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: '#2563eb',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: '#f3f4f6' },
+                            ticks: { stepSize: 1 }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        function updateDailyChart(labels, data) {
+            const ctx = document.getElementById('heatmapChart').getContext('2d');
+            
+            if (dailyChart) {
+                dailyChart.destroy();
+            }
+            
+            dailyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: '#2563eb',
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: '#f3f4f6' },
+                            ticks: { callback: value => '₹' + (value/1000) + 'k' }
+                        },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+        }
+
+        // ============================================================
+        // Quick Add Sample
+        // ============================================================
+        function quickAddSample() {
+            const samples = [
+                { product: 'Wireless Headphones', category: 'electronics', price: 2999 },
+                { product: 'Cotton T-Shirt', category: 'fashion', price: 799 },
+                { product: 'Cappuccino', category: 'food', price: 250 },
+                { product: 'Face Cream', category: 'beauty', price: 599 },
+                { product: 'Yoga Mat', category: 'sports', price: 1299 }
+            ];
+            
+            const sample = samples[Math.floor(Math.random() * samples.length)];
+            
+            document.getElementById('productName').value = sample.product;
+            document.getElementById('category').value = sample.category;
+            document.getElementById('unitPrice').value = sample.price;
+            document.getElementById('quantity').value = Math.floor(Math.random() * 3) + 1;
+            
+            updateTotalPreview();
+        }
+
+        // ============================================================
+        // Toast Notification
+        // ============================================================
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
+            
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="fas fa-${icon}"></i>
+                </div>
+                <div class="toast-content">
+                    <h4>${type === 'success' ? 'Success!' : 'Error!'}</h4>
+                    <p>${message}</p>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.classList.remove('show');
+                    setTimeout(() => toast.remove(), 300);
+                }
+            }, 5000);
+        }
+
+        // ============================================================
+        // Helper Functions
+        // ============================================================
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
                 }
             }
-        });
-
-        // Daily Chart
-        const heatmapCtx = document.getElementById('heatmapChart').getContext('2d');
-        new Chart(heatmapCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    data: [65000, 72000, 68000, 81000, 75000, 92000, 88000],
-                    backgroundColor: '#2563eb',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: { legend: { display: false } },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { color: '#f3f4f6' },
-                        ticks: { callback: value => '₹' + (value/1000) + 'k' }
-                    },
-                    x: { grid: { display: false } }
-                }
-            }
-        });
+            return cookieValue;
+        }
     </script>
 </body>
 </html>
