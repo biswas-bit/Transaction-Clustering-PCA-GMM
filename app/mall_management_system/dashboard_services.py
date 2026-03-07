@@ -57,3 +57,10 @@ class DashBoard:
         current = self.get_total_sales()
         previous = self.get_prev_month_sales()
         return ((current - previous) / previous * 100) if previous > 0 else 0
+    
+    def get_visitors_change_percentage(self):
+        """Calculate visitors change percentage vs previous month"""
+        current = self.get_total_visitors()
+        previous = self.get_prev_month_visitors()
+        return ((current - previous) / previous * 100) if previous > 0 else 0
+    
