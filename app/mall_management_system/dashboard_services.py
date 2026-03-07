@@ -64,3 +64,19 @@ class DashBoard:
         previous = self.get_prev_month_visitors()
         return ((current - previous) / previous * 100) if previous > 0 else 0
     
+    def get_all_kpis(self):
+        """Get all KPI data in one dictionary"""
+        total_sales = self.get_total_sales()
+        total_visitors = self.get_total_visitors()
+        
+        return {
+            'total_sales': total_sales,
+            'total_sales_formatted': self._format_currency(total_sales),
+            'total_visitors': total_visitors,
+            'total_visitors_formatted': self._format_number(total_visitors),
+            'total_transactions': self.get_total_transactions(),
+            'conversion_rate': round(self.get_conversion_rate(), 1),
+            'profit_margin': 24.6,  # This could come from a settings or calculation
+            'sales_change': round(self.get_sales_change_percentage(), 1),
+            'visitors_change': round(self.get_visitors_change_percentage(), 1),
+        }
