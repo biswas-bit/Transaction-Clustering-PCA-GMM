@@ -51,3 +51,9 @@ class DashBoard:
         return Transaction.objects.filter(
             transaction_date__range=[self.prev_month_start, self.prev_month_end]
         ).aggregate(Sum('quantity'))['quantity__sum'] or 0
+        
+    def get_sales_change_percentage(self):
+        """Calculate sales change percentage vs previous month"""
+        current = self.get_total_sales()
+        previous = self.get_prev_month_sales()
+        return ((current - previous) / previous * 100) if previous > 0 else 0
