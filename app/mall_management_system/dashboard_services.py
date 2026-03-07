@@ -13,3 +13,11 @@ class DashBoard:
         self.prev_month_start = self.last_month - timedelta(days=30)
         self.prev_month_end = self.last_month - timedelta(days=1)
         
+    # KPI Methods
+    
+    def get_total_sales(self):
+        """Get total sales for last 30 days"""
+        return Transaction.objects.filter(
+            transaction_date__gte=self.last_month
+        ).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+    
