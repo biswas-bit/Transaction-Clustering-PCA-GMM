@@ -34,4 +34,10 @@ class DashBoard:
             transaction_date__gte=self.last_month
         ).count()
         
+    def get_conversion_rate(self):
+        """Calculate conversion rate (transactions/visitors * 100)"""
+        visitors = self.get_total_visitors()
+        transactions = self.get_total_transactions()
+        return (transactions / visitors * 100) if visitors > 0 else 0
+    
         
