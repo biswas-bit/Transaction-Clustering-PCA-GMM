@@ -235,7 +235,8 @@ class Transaction(models.Model):
             self.is_weekend = self.day_of_week >= 5  # 5 = Saturday, 6 = Sunday
         
         super().save(*args, **kwargs)
-    
+        
+        
     def __str__(self):
         return f"{self.transaction_id} - {self.product_name} - ₹{self.total_amount}"
 
