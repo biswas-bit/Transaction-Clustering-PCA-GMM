@@ -40,4 +40,11 @@ class DashBoard:
         transactions = self.get_total_transactions()
         return (transactions / visitors * 100) if visitors > 0 else 0
     
+    def get_prev_month_sales(self):
+        """Get sales for previous month"""
+        return Transaction.objects.filter(
+            transaction_date__range=[self.prev_month_start, self.prev_month_end]
+        ).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
+        
+    
         
