@@ -11,7 +11,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Professional Dashboard Styles */
+        /* Professional Dashboard Styles - Keep your existing CSS */
         :root {
             --primary: #2563eb;
             --primary-dark: #1d4ed8;
@@ -880,13 +880,13 @@
             
             <nav class="main-nav">
                 <ul>
-                    <li class="active">
+                    <li>
                         <a href="{% url 'mall_management_system:index' %}">
                             <i class="fas fa-home"></i>
                             <span>Home</span>
                         </a>
                     </li>
-                    <li>
+                    <li class="active">
                         <a href="{% url 'mall_management_system:dashboard' %}">
                             <i class="fas fa-th-large"></i>
                             <span>Dashboard</span>
@@ -941,13 +941,13 @@
             <div class="calendar-widget">
                 <h3><i class="fas fa-calendar-alt"></i> Today</h3>
                 <div class="date-display">
-                    <div class="day" id="currentDay">06</div>
+                    <div class="day">{{ current_day }}</div>
                     <div class="month-year">
-                        <div class="month" id="currentMonth">March</div>
-                        <div class="year" id="currentYear">2026</div>
+                        <div class="month">{{ current_month }}</div>
+                        <div class="year">{{ current_year }}</div>
                     </div>
                 </div>
-                <div class="weekday" id="currentWeekday">Friday</div>
+                <div class="weekday">{{ current_weekday }}</div>
             </div>
             
             <div class="sidebar-footer">
@@ -973,7 +973,7 @@
                     </button>
                     <div class="page-title">
                         <h2>Analytics Dashboard</h2>
-                        <p class="date-range" id="dateRange">March 2026</p>
+                        <p class="date-range">{{ date_range }}</p>
                     </div>
                 </div>
                 
@@ -1014,17 +1014,17 @@
             
             <!-- Dashboard Content -->
             <div class="dashboard-content">
-                <!-- KPI Cards -->
+                <!-- KPI Cards - Using data from DashboardService -->
                 <section class="kpi-section">
                     <div class="kpi-card">
                         <div class="kpi-header">
                             <i class="fas fa-wallet"></i>
                             <h3>Total Sales</h3>
                         </div>
-                        <div class="kpi-value">₹12.84L</div>
-                        <div class="kpi-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>12.5%</span>
+                        <div class="kpi-value">{{ kpis_data.total_sales }}</div>
+                        <div class="kpi-change {{ kpis_data.sales_change_direction }}">
+                            <i class="fas fa-arrow-{% if kpis_data.sales_change >= 0 %}up{% else %}down{% endif %}"></i>
+                            <span>{{ kpis_data.sales_change|floatformat:1 }}%</span>
                             <span class="change-label">vs last month</span>
                         </div>
                     </div>
@@ -1034,10 +1034,10 @@
                             <i class="fas fa-users"></i>
                             <h3>Total Visitors</h3>
                         </div>
-                        <div class="kpi-value">45.8K</div>
-                        <div class="kpi-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>8.3%</span>
+                        <div class="kpi-value">{{ kpis_data.total_visitors }}</div>
+                        <div class="kpi-change {{ kpis_data.visitors_change_direction }}">
+                            <i class="fas fa-arrow-{% if kpis_data.visitors_change >= 0 %}up{% else %}down{% endif %}"></i>
+                            <span>{{ kpis_data.visitors_change|floatformat:1 }}%</span>
                             <span class="change-label">vs last month</span>
                         </div>
                     </div>
@@ -1047,11 +1047,9 @@
                             <i class="fas fa-percentage"></i>
                             <h3>Conversion Rate</h3>
                         </div>
-                        <div class="kpi-value">4.8%</div>
-                        <div class="kpi-change negative">
-                            <i class="fas fa-arrow-down"></i>
-                            <span>1.2%</span>
-                            <span class="change-label">vs last month</span>
+                        <div class="kpi-value">{{ kpis_data.conversion_rate }}%</div>
+                        <div class="kpi-change">
+                            <span class="change-label">last 30 days</span>
                         </div>
                     </div>
                     
@@ -1060,7 +1058,7 @@
                             <i class="fas fa-chart-line"></i>
                             <h3>Profit Margin</h3>
                         </div>
-                        <div class="kpi-value">24.6%</div>
+                        <div class="kpi-value">{{ kpis_data.profit_margin }}%</div>
                         <div class="kpi-change positive">
                             <i class="fas fa-arrow-up"></i>
                             <span>3.1%</span>
@@ -1140,41 +1138,21 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    {% for transaction in recent_transactions %}
                                     <tr>
-                                        <td>Rahul Sharma</td>
-                                        <td>ElectroHub</td>
-                                        <td>₹25,000</td>
-                                        <td>10:30 AM</td>
-                                        <td><span class="status-badge completed">Completed</span></td>
+                                        <td>{{ transaction.customer_name }}</td>
+                                        <td>{{ transaction.store_name }}</td>
+                                        <td>{{ transaction.amount_formatted }}</td>
+                                        <td>{{ transaction.time }}</td>
+                                        <td><span class="status-badge {{ transaction.status }}">{{ transaction.status|title }}</span></td>
                                     </tr>
+                                    {% empty %}
                                     <tr>
-                                        <td>Priya Patel</td>
-                                        <td>Fashion Zone</td>
-                                        <td>₹8,500</td>
-                                        <td>10:15 AM</td>
-                                        <td><span class="status-badge completed">Completed</span></td>
+                                        <td colspan="5" style="text-align: center; padding: 2rem; color: var(--gray-400);">
+                                            No recent transactions
+                                        </td>
                                     </tr>
-                                    <tr>
-                                        <td>Amit Kumar</td>
-                                        <td>Food Court</td>
-                                        <td>₹1,200</td>
-                                        <td>09:45 AM</td>
-                                        <td><span class="status-badge completed">Completed</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Neha Gupta</td>
-                                        <td>Beauty Hub</td>
-                                        <td>₹3,500</td>
-                                        <td>09:15 AM</td>
-                                        <td><span class="status-badge pending">Pending</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Vikram Singh</td>
-                                        <td>Sports Zone</td>
-                                        <td>₹5,999</td>
-                                        <td>08:50 AM</td>
-                                        <td><span class="status-badge completed">Completed</span></td>
-                                    </tr>
+                                    {% endfor %}
                                 </tbody>
                             </table>
                         </div>
@@ -1240,17 +1218,14 @@
     </div>
 
     <script>
-        // Update date display
+        // Update date display (client-side fallback)
         function updateDate() {
+            // This is just a fallback - Django template already sets these
             const now = new Date();
-            document.getElementById('currentDay').textContent = now.getDate();
-            document.getElementById('currentMonth').textContent = now.toLocaleString('default', { month: 'long' });
-            document.getElementById('currentYear').textContent = now.getFullYear();
-            document.getElementById('currentWeekday').textContent = now.toLocaleString('default', { weekday: 'long' });
-            
-            const month = now.toLocaleString('default', { month: 'long' });
-            const year = now.getFullYear();
-            document.getElementById('dateRange').textContent = `${month} ${year}`;
+            document.getElementById('currentDay').textContent = document.getElementById('currentDay').textContent || now.getDate();
+            document.getElementById('currentMonth').textContent = document.getElementById('currentMonth').textContent || now.toLocaleString('default', { month: 'long' });
+            document.getElementById('currentYear').textContent = document.getElementById('currentYear').textContent || now.getFullYear();
+            document.getElementById('currentWeekday').textContent = document.getElementById('currentWeekday').textContent || now.toLocaleString('default', { weekday: 'long' });
         }
         
         updateDate();
@@ -1279,134 +1254,136 @@
             }
         });
 
-        // Initialize Charts
-        // Sales Chart
-        const salesCtx = document.getElementById('salesChart').getContext('2d');
-        new Chart(salesCtx, {
-            type: 'line',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Current Week',
-                    data: [45000, 52000, 48000, 61000, 55000, 72000, 68000],
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                    pointRadius: 3
-                }, {
-                    label: 'Last Week',
-                    data: [38000, 45000, 42000, 52000, 48000, 58000, 54000],
-                    borderColor: '#9ca3af',
-                    backgroundColor: 'transparent',
-                    borderDash: [4, 4],
-                    tension: 0.4,
-                    pointRadius: 2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
+        // Initialize Charts with data from your service
+        document.addEventListener('DOMContentLoaded', function() {
+            // Sales Chart
+            const salesCtx = document.getElementById('salesChart').getContext('2d');
+            new Chart(salesCtx, {
+                type: 'line',
+                data: {
+                    labels: {{ weekly_labels|safe }},
+                    datasets: [{
+                        label: 'Current Week',
+                        data: {{ weekly_current_data|safe }},
+                        borderColor: '#2563eb',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 3
+                    }, {
+                        label: 'Last Week',
+                        data: {{ weekly_last_week_data|safe }},
+                        borderColor: '#9ca3af',
+                        backgroundColor: 'transparent',
+                        borderDash: [4, 4],
+                        tension: 0.4,
+                        pointRadius: 2
+                    }]
                 },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        grid: { color: '#f3f4f6' },
-                        ticks: { callback: value => '₹' + (value/1000) + 'k' }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
                     },
-                    x: { grid: { display: false } }
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: '#f3f4f6' },
+                            ticks: { callback: value => '₹' + (value/1000) + 'k' }
+                        },
+                        x: { grid: { display: false } }
+                    }
                 }
-            }
-        });
+            });
 
-        // Source Chart (Doughnut)
-        const sourceCtx = document.getElementById('sourceChart').getContext('2d');
-        new Chart(sourceCtx, {
-            type: 'doughnut',
-            data: {
-                labels: ['Direct', 'Social Media', 'Online Ads', 'Referrals', 'Others'],
-                datasets: [{
-                    data: [35, 25, 20, 12, 8],
-                    backgroundColor: ['#2563eb', '#f59e0b', '#10b981', '#ef4444', '#8b5cf6'],
-                    borderWidth: 0
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                        labels: { 
-                            boxWidth: 8,
-                            padding: 10,
-                            font: { size: 11 }
+            // Category Chart (Source of Purchases)
+            const sourceCtx = document.getElementById('sourceChart').getContext('2d');
+            new Chart(sourceCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: {{ category_labels|safe }},
+                    datasets: [{
+                        data: {{ category_data|safe }},
+                        backgroundColor: {{ category_colors|safe }},
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: { 
+                                boxWidth: 8,
+                                padding: 10,
+                                font: { size: 11 }
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
 
-        // Visitors Chart (Bar)
-        const visitorsCtx = document.getElementById('visitorsChart').getContext('2d');
-        new Chart(visitorsCtx, {
-            type: 'bar',
-            data: {
-                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
-                datasets: [{
-                    label: 'Visitors',
-                    data: [3200, 3800, 3500, 4200, 4800, 6500, 5800],
-                    backgroundColor: '#2563eb',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
+            // Visitors Chart
+            const visitorsCtx = document.getElementById('visitorsChart').getContext('2d');
+            new Chart(visitorsCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ visitor_labels|safe }},
+                    datasets: [{
+                        label: 'Visitors',
+                        data: {{ visitor_data|safe }},
+                        backgroundColor: '#2563eb',
+                        borderRadius: 4
+                    }]
                 },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { color: '#f3f4f6' },
-                        ticks: { callback: value => value/1000 + 'k' }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
                     },
-                    x: { grid: { display: false } }
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: '#f3f4f6' },
+                            ticks: { callback: value => value + ' visitors' }
+                        },
+                        x: { grid: { display: false } }
+                    }
                 }
-            }
-        });
+            });
 
-        // Heatmap Chart (Bar - representing sales heatmap)
-        const heatmapCtx = document.getElementById('heatmapChart').getContext('2d');
-        new Chart(heatmapCtx, {
-            type: 'bar',
-            data: {
-                labels: ['10AM', '12PM', '2PM', '4PM', '6PM', '8PM'],
-                datasets: [{
-                    label: 'Sales',
-                    data: [25000, 42000, 38000, 55000, 48000, 32000],
-                    backgroundColor: '#2563eb',
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
+            // Heatmap Chart
+            const heatmapCtx = document.getElementById('heatmapChart').getContext('2d');
+            new Chart(heatmapCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ heatmap_labels|safe }},
+                    datasets: [{
+                        label: 'Sales',
+                        data: {{ heatmap_data|safe }},
+                        backgroundColor: '#2563eb',
+                        borderRadius: 4
+                    }]
                 },
-                scales: {
-                    y: { 
-                        beginAtZero: true, 
-                        grid: { color: '#f3f4f6' },
-                        ticks: { callback: value => '₹' + (value/1000) + 'k' }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
                     },
-                    x: { grid: { display: false } }
+                    scales: {
+                        y: { 
+                            beginAtZero: true, 
+                            grid: { color: '#f3f4f6' },
+                            ticks: { callback: value => '₹' + (value/1000) + 'k' }
+                        },
+                        x: { grid: { display: false } }
+                    }
                 }
-            }
+            });
         });
     </script>
 </body>
