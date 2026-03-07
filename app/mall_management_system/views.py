@@ -43,7 +43,44 @@ def index(request):
     return render(request, 'index.html')
 
 def dashboard(request):
-    return render(request, 'dashboard/dashboard.html')
+    """Dashboard view with all real data"""
+    
+    # Initialize the dashboard service
+    service = DashboardService()
+    
+    # Get all KPIs
+    kpis_data = service.get_all_kpis()
+    
+    # Get all chart data
+    chart_data = service.get_all_chart_data()
+    
+    # Get recent transactions
+    recent_transactions = service.get_recent_transactions(limit=5)
+    
+    # Safe defaults for all chart data
+    context = {
+        'kpis_data': kpis_data,
+        'recent_transactions': recent_transactions,
+        'current_day': service.now.day,
+        'current_month': service.now.strftime('%B'),
+        'current_year': service.now.year,
+        'current_weekday': service.now.strftime('%A'),
+        'date_range': f"{service.now.strftime('%B')} {service.now.year}",
+        
+        # Chart data with safe defaults
+        'weekly_labels': chart_data.get('weekly_labels', ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']),
+        'weekly_current_data': chart_data.get('weekly_current_data', [0, 0, 0, 0, 0, 0, 0]),
+        'weekly_last_week_data': chart_data.get('weekly_last_week_data', [0, 0, 0, 0, 0, 0, 0]),
+        'category_labels': chart_data.get('category_labels', []),
+        'category_data': chart_data.get('category_data', []),
+        'category_colors': chart_data.get('category_colors', []),
+        'visitor_labels': chart_data.get('visitor_labels', ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']),
+        'visitor_data': chart_data.get('visitor_data', [0, 0, 0, 0, 0, 0, 0]),
+        'heatmap_labels': chart_data.get('heatmap_labels', ['10AM', '12PM', '2PM', '4PM', '6PM', '8PM']),
+        'heatmap_data': chart_data.get('heatmap_data', [0, 0, 0, 0, 0, 0]),
+    }
+    
+    return render(request, 'dashboard/dashboard.html', context)
 
 def stores(request):
     """Main stores view"""
