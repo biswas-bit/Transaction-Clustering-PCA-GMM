@@ -27,4 +27,11 @@ class DashBoard:
             transaction_date__gte=self.last_month
         ).aggregate(Sum('quantity'))['quantity__sum'] or 0
         
+    
+    def get_total_transactions(self):
+        """Get total transaction count for last 30 days"""
+        return Transaction.objects.filter(
+            transaction_date__gte=self.last_month
+        ).count()
+        
         
