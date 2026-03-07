@@ -21,3 +21,10 @@ class DashBoard:
             transaction_date__gte=self.last_month
         ).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
     
+    def get_total_visitors(self):
+        """Get total visitors (quantity sum) for last 30 days"""
+        return Transaction.objects.filter(
+            transaction_date__gte=self.last_month
+        ).aggregate(Sum('quantity'))['quantity__sum'] or 0
+        
+        
