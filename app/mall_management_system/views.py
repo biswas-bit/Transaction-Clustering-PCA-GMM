@@ -143,6 +143,7 @@ def sales(request):
 def customers(request):
     """Customers view with date context"""
     service = DashboardService()
+    
     context = {
         'current_day': service.now.day,
         'current_month': service.now.strftime('%B'),
@@ -150,6 +151,7 @@ def customers(request):
         'current_weekday': service.now.strftime('%A'),
         'date_range': f"{service.now.strftime('%B')} {service.now.year}",
     }
+    print(context)
     return render(request, 'Customers/customers.html', context)
 
 def inventory(request):
