@@ -154,15 +154,15 @@
             <div class="icon-box"><i class="fas fa-store"></i></div>
             <h3>Total Stores</h3>
         </div>
-        <div class="store-kpi-value" id="totalStores">{{ stores|length|default:"0" }}</div>
-        <div class="store-kpi-change"><span class="change-positive" id="activeStores">0 active</span></div>
+        <div class="store-kpi-value" id="totalStores">{{ stats.total_stores|default:"0" }}</div>
+        <div class="store-kpi-change"><span class="change-positive" id="activeStores">{{ stats.active_stores|default:"0" }} active</span></div>
     </div>
     <div class="store-kpi-card">
         <div class="store-kpi-header">
             <div class="icon-box"><i class="fas fa-expand"></i></div>
             <h3>Avg. Size</h3>
         </div>
-        <div class="store-kpi-value" id="avgSize">0</div>
+        <div class="store-kpi-value" id="avgSize">{{ stats.avg_size|default:"0" }} sq.ft</div>
         <div class="store-kpi-change"><span class="change-label">sq.ft average</span></div>
     </div>
     <div class="store-kpi-card">
@@ -170,7 +170,7 @@
             <div class="icon-box"><i class="fas fa-rupee-sign"></i></div>
             <h3>Avg. Rent</h3>
         </div>
-        <div class="store-kpi-value" id="avgRent">₹0</div>
+        <div class="store-kpi-value" id="avgRent">₹{{ stats.avg_rent|default:"0" }}</div>
         <div class="store-kpi-change"><span class="change-label">per month</span></div>
     </div>
     <div class="store-kpi-card">
@@ -178,7 +178,7 @@
             <div class="icon-box"><i class="fas fa-building"></i></div>
             <h3>Occupancy</h3>
         </div>
-        <div class="store-kpi-value" id="occupancyRate">0%</div>
+        <div class="store-kpi-value" id="occupancyRate">{{ stats.occupancy_rate|default:"0" }}%</div>
         <div class="store-kpi-change"><span class="change-label">mall capacity</span></div>
     </div>
 </section>
