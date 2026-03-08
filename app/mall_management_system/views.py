@@ -40,7 +40,20 @@ def convert_decimal128(value):
     return value
 
 def index(request):
-    return render(request, 'index.html')
+    """Home/Index view with transaction entry and real-time data"""
+    from django.utils import timezone
+    
+    service = DashboardService()
+    
+    context = {
+        'current_day': service.now.day,
+        'current_month': service.now.strftime('%B'),
+        'current_year': service.now.year,
+        'current_weekday': service.now.strftime('%A'),
+        'date_range': f"{service.now.strftime('%B')} {service.now.year}",
+    }
+    
+    return render(request, 'index.html', context)
 
 def dashboard(request):
     """Dashboard view with all real data"""
@@ -77,6 +90,7 @@ def dashboard(request):
 
 def stores(request):
     """Main stores view"""
+    service = DashboardService()
     stores_list = Store.objects.all()
     total_stores = stores_list.count()
     # Get real statistics
@@ -103,20 +117,52 @@ def stores(request):
             'avg_size': round(avg_size, 2) if avg_size else 0,
             'avg_rent': round(avg_rent, 2) if avg_rent else 0,
             'occupancy_rate': round((total_stores / 60) * 100, 1) if total_stores > 0 else 0  # Assuming 60 max capacity
-        }
+        },
+        'current_day': service.now.day,
+        'current_month': service.now.strftime('%B'),
+        'current_year': service.now.year,
+        'current_weekday': service.now.strftime('%A'),
+        'date_range': f"{service.now.strftime('%B')} {service.now.year}",
     }
     
     
     return render(request, 'stores/stores.html', context)
 
 def sales(request):
-    return render(request, 'sales/sales.html')
+    """Sales view with date context"""
+    service = DashboardService()
+    context = {
+        'current_day': service.now.day,
+        'current_month': service.now.strftime('%B'),
+        'current_year': service.now.year,
+        'current_weekday': service.now.strftime('%A'),
+        'date_range': f"{service.now.strftime('%B')} {service.now.year}",
+    }
+    return render(request, 'sales/sales.html', context)
 
 def customers(request):
-    return render(request, 'Customers/customers.html')
+    """Customers view with date context"""
+    service = DashboardService()
+    context = {
+        'current_day': service.now.day,
+        'current_month': service.now.strftime('%B'),
+        'current_year': service.now.year,
+        'current_weekday': service.now.strftime('%A'),
+        'date_range': f"{service.now.strftime('%B')} {service.now.year}",
+    }
+    return render(request, 'Customers/customers.html', context)
 
 def inventory(request):
-    return render(request, 'inventory/inventory.html')
+    """Inventory view with date context"""
+    service = DashboardService()
+    context = {
+        'current_day': service.now.day,
+        'current_month': service.now.strftime('%B'),
+        'current_year': service.now.year,
+        'current_weekday': service.now.strftime('%A'),
+        'date_range': f"{service.now.strftime('%B')} {service.now.year}",
+    }
+    return render(request, 'inventory/inventory.html', context)
 
 def get_store_details(request, store_id):
     """API endpoint to get store details"""
