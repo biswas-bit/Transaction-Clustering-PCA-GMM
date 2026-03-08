@@ -1,1706 +1,257 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MallX Analytics | Store Management</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        /* Professional Store Management Styles */
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-            --radius-sm: 0.375rem;
-            --radius: 0.5rem;
-            --radius-md: 0.75rem;
-            --radius-lg: 1rem;
-            --transition: all 0.2s ease;
-        }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--gray-50);
-            color: var(--gray-900);
-            line-height: 1.5;
-        }
-
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* Professional Sidebar */
-        .sidebar {
-            width: 260px;
-            background: var(--gray-900);
-            padding: 1.5rem 1rem;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            height: 100vh;
-            z-index: 100;
-            border-right: 1px solid var(--gray-800);
-        }
-
-        .sidebar .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
-            padding: 0 0.75rem;
-        }
-
-        .sidebar .logo i {
-            font-size: 1.75rem;
-            color: var(--primary);
-        }
-
-        .sidebar .logo h1 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: white;
-            letter-spacing: -0.025em;
-        }
-
-        .sidebar .main-nav ul {
-            list-style: none;
-        }
-
-        .sidebar .main-nav li {
-            margin-bottom: 0.25rem;
-        }
-
-        .sidebar .main-nav a {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            color: var(--gray-400);
-            text-decoration: none;
-            border-radius: var(--radius);
-            transition: var(--transition);
-            font-weight: 500;
-            font-size: 0.9375rem;
-        }
-
-        .sidebar .main-nav a:hover {
-            background: var(--gray-800);
-            color: white;
-        }
-
-        .sidebar .main-nav li.active a {
-            background: var(--primary);
-            color: white;
-        }
-
-        .sidebar .main-nav a i {
-            font-size: 1.25rem;
-            width: 1.5rem;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 260px;
-            padding: 1.5rem 2rem;
-        }
-
-        /* Professional Navbar */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            background: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--gray-200);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .navbar-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 1.25rem;
-            color: var(--gray-500);
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: var(--radius);
-            transition: var(--transition);
-        }
-
-        .menu-toggle:hover {
-            background: var(--gray-100);
-            color: var(--gray-700);
-        }
-
-        .page-title h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .page-title .date-range {
-            font-size: 0.875rem;
-            color: var(--gray-500);
-        }
-
-        .search-container {
-            flex: 1;
-            max-width: 400px;
-            margin: 0 2rem;
-            position: relative;
-        }
-
-        .search-container i {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-400);
-            font-size: 1rem;
-        }
-
-        .search-input {
-            width: 100%;
-            padding: 0.625rem 1rem 0.625rem 2.5rem;
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-lg);
-            font-size: 0.9375rem;
-            transition: var(--transition);
-            background: var(--gray-50);
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .navbar-right .action-btn {
-            padding: 0.625rem 1.25rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius-lg);
-            font-size: 0.9375rem;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: var(--transition);
-            box-shadow: var(--shadow-sm);
-        }
-
-        .navbar-right .action-btn:hover {
-            background: var(--primary-dark);
-            transform: translateY(-1px);
-            box-shadow: var(--shadow);
-        }
-
-        /* Compact KPI Cards */
-        .store-kpis {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .store-kpi-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            border: 1px solid var(--gray-200);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .store-kpi-card:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-md);
-        }
-
-        .store-kpi-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--primary);
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .store-kpi-card:hover::before {
-            opacity: 1;
-        }
-
-        .store-kpi-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .store-kpi-header .icon-box {
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            background: var(--gray-100);
-            color: var(--primary);
-        }
-
-        .store-kpi-header h3 {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--gray-500);
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-
-        .store-kpi-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--gray-900);
-            line-height: 1.2;
-            margin-bottom: 0.25rem;
-        }
-
-        .store-kpi-change {
-            font-size: 0.75rem;
-            color: var(--gray-500);
-        }
-
-        .change-positive {
-            color: var(--success);
-            font-weight: 500;
-        }
-
-        /* Category Filters */
-        .category-filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-            background: white;
-            padding: 0.75rem 1rem;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--gray-200);
-        }
-
-        .filter-btn {
-            padding: 0.5rem 1rem;
-            background: var(--gray-100);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-lg);
-            color: var(--gray-600);
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .filter-btn:hover {
-            background: white;
-            border-color: var(--primary);
-            color: var(--primary);
-        }
-
-        .filter-btn.active {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        /* Store Cards Grid */
-        .stores-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .store-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            border: 1px solid var(--gray-200);
-            transition: var(--transition);
-        }
-
-        .store-card:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-md);
-            transform: translateY(-2px);
-        }
-
-        .store-card-header {
-            padding: 1.25rem;
-            background: linear-gradient(135deg, var(--gray-900), var(--gray-800));
-            color: white;
-            position: relative;
-        }
-
-        .store-card-header .store-category-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: var(--radius-lg);
-            font-size: 0.75rem;
-            font-weight: 500;
-            letter-spacing: 0.025em;
-            backdrop-filter: blur(4px);
-        }
-
-        .store-card-header .store-status {
-            position: absolute;
-            top: 1.25rem;
-            right: 1.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-            font-size: 0.75rem;
-            font-weight: 500;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 0.25rem 0.75rem;
-            border-radius: var(--radius-lg);
-            backdrop-filter: blur(4px);
-        }
-
-        .store-card-header .status-dot {
-            width: 0.5rem;
-            height: 0.5rem;
-            border-radius: 50%;
-        }
-
-        .status-dot.active { background: var(--success); }
-        .status-dot.inactive { background: var(--danger); }
-        .status-dot.maintenance { background: var(--warning); }
-
-        .store-card-body {
-            padding: 1.25rem;
-        }
-
-        .store-card-body .store-name {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--gray-900);
-            margin-bottom: 1rem;
-        }
-
-        .store-details {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.75rem;
-        }
-
-        .store-detail-item {
-            padding: 0.5rem;
-            background: var(--gray-50);
-            border-radius: var(--radius);
-            border: 1px solid var(--gray-200);
-            transition: var(--transition);
-        }
-
-        .store-detail-item:hover {
-            background: white;
-            border-color: var(--primary);
-        }
-
-        .store-detail-item .detail-label {
-            font-size: 0.625rem;
-            color: var(--gray-500);
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            margin-bottom: 0.25rem;
-        }
-
-        .store-detail-item .detail-value {
-            font-size: 0.8125rem;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .store-card-footer {
-            padding: 1rem 1.25rem;
-            border-top: 1px solid var(--gray-200);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--gray-50);
-        }
-
-        .store-card-footer .store-hours {
-            font-size: 0.75rem;
-            color: var(--gray-600);
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-        }
-
-        .store-card-footer .btn-secondary {
-            padding: 0.5rem 1rem;
-            background: white;
-            color: var(--gray-700);
-            border: 1px solid var(--gray-300);
-            border-radius: var(--radius-lg);
-            font-size: 0.75rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .store-card-footer .btn-secondary:hover {
-            background: var(--primary);
-            border-color: var(--primary);
-            color: white;
-        }
-
-        /* Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(4px);
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: var(--radius-lg);
-            width: 95%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: var(--shadow-lg);
-        }
-
-        .modal-header {
-            padding: 1.5rem;
-            border-bottom: 1px solid var(--gray-200);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: white;
-            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .modal-header h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--gray-900);
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .modal-close {
-            background: var(--gray-100);
-            border: 1px solid var(--gray-200);
-            width: 2rem;
-            height: 2rem;
-            border-radius: var(--radius);
-            color: var(--gray-500);
-            font-size: 1rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-close:hover {
-            background: var(--gray-200);
-            color: var(--gray-700);
-        }
-
-        .modal-body {
-            padding: 1.5rem;
-        }
-
-        /* Form */
-        .store-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.375rem;
-        }
-
-        .form-group label {
-            font-size: 0.8125rem;
-            font-weight: 500;
-            color: var(--gray-700);
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-        }
-
-        .form-group label i {
-            color: var(--primary);
-            font-size: 0.875rem;
-        }
-
-        .form-group input,
-        .form-group select,
-        .form-group textarea {
-            padding: 0.625rem 0.875rem;
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius);
-            font-size: 0.875rem;
-            color: var(--gray-900);
-            background: white;
-            transition: var(--transition);
-            font-family: 'Inter', sans-serif;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 0.75rem;
-            margin-top: 1rem;
-        }
-
-        .btn-primary {
-            padding: 0.625rem 1.5rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius-lg);
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: var(--transition);
-        }
-
-        .btn-primary:hover {
-            background: var(--primary-dark);
-        }
-
-        .btn-primary:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .btn-secondary {
-            padding: 0.625rem 1.5rem;
-            background: white;
-            color: var(--gray-700);
-            border: 1px solid var(--gray-300);
-            border-radius: var(--radius-lg);
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .btn-secondary:hover {
-            background: var(--gray-50);
-            border-color: var(--gray-400);
-        }
-
-        /* Store Detail */
-        .store-detail-content {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-        }
-
-        .store-detail-header {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        .store-detail-icon {
-            width: 3.5rem;
-            height: 3.5rem;
-            border-radius: var(--radius);
-            background: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .store-basic-info {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1rem;
-        }
-
-        .info-item {
-            padding: 1rem;
-            background: var(--gray-50);
-            border-radius: var(--radius);
-            border: 1px solid var(--gray-200);
-            transition: var(--transition);
-        }
-
-        .info-item:hover {
-            background: white;
-            border-color: var(--primary);
-        }
-
-        .info-label {
-            font-size: 0.6875rem;
-            color: var(--gray-500);
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            margin-bottom: 0.375rem;
-        }
-
-        .info-value {
-            font-size: 0.9375rem;
-            color: var(--gray-900);
-            font-weight: 600;
-        }
-
-        .description-box {
-            padding: 1rem;
-            background: var(--gray-50);
-            border-radius: var(--radius);
-            border: 1px solid var(--gray-200);
-        }
-
-        .description-box h4 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--gray-700);
-            margin-bottom: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-        }
-
-        .description-box p {
-            font-size: 0.875rem;
-            color: var(--gray-600);
-            line-height: 1.6;
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            background: white;
-            border-radius: var(--radius);
-            padding: 1rem 1.25rem;
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            z-index: 1001;
-            border-left: 3px solid var(--success);
-            min-width: 300px;
-            animation: slideIn 0.2s ease;
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
-        .toast.error {
-            border-left-color: var(--danger);
-        }
-
-        .toast-icon {
-            font-size: 1.25rem;
-        }
-
-        .toast.success .toast-icon {
-            color: var(--success);
-        }
-
-        .toast.error .toast-icon {
-            color: var(--danger);
-        }
-
-        .toast-message {
-            font-size: 0.875rem;
-            color: var(--gray-700);
-            font-weight: 500;
-            flex: 1;
-        }
-
-        .toast-close {
-            background: none;
-            border: none;
-            color: var(--gray-400);
-            cursor: pointer;
-            font-size: 0.875rem;
-            padding: 0.25rem;
-        }
-
-        .toast-close:hover {
-            color: var(--gray-600);
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            width: 1rem;
-            height: 1rem;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.6s linear infinite;
-            display: inline-block;
-        }
-
-        .spinner.dark {
-            border: 2px solid rgba(0, 0, 0, 0.1);
-            border-top-color: var(--primary);
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 3rem 2rem;
-            background: white;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--gray-200);
-            grid-column: 1 / -1;
-        }
-
-        .empty-state i {
-            font-size: 3rem;
-            color: var(--gray-400);
-            margin-bottom: 1rem;
-        }
-
-        .empty-state h4 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--gray-900);
-            margin-bottom: 0.5rem;
-        }
-
-        .empty-state p {
-            font-size: 0.875rem;
-            color: var(--gray-500);
-            margin-bottom: 1.5rem;
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .store-basic-info {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .store-kpis {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-                transition: transform 0.3s ease;
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-            
-            .store-kpis {
-                grid-template-columns: 1fr;
-            }
-            
-            .stores-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .navbar {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: stretch;
-            }
-            
-            .navbar-left {
-                justify-content: space-between;
-            }
-            
-            .search-container {
-                margin: 0;
-                max-width: 100%;
-            }
-            
-            .store-basic-info {
-                grid-template-columns: 1fr;
-            }
-            
-            .category-filters {
-                overflow-x: auto;
-                flex-wrap: nowrap;
-                padding: 0.75rem;
-            }
-            
-            .filter-btn {
-                white-space: nowrap;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Left Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="logo">
-                <i class="fas fa-chart-line"></i>
-                <h1>MallX</h1>
-            </div>
-            
-            <nav class="main-nav">
-                <ul>
-                    <li>
-                        <a href="{% url 'mall_management_system:index' %}">
-                            <i class="fas fa-home"></i>
-                            <span>Home</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'mall_management_system:dashboard' %}">
-                            <i class="fas fa-th-large"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li class="active">
-                        <a href="{% url 'mall_management_system:stores' %}">
-                            <i class="fas fa-store"></i>
-                            <span>Stores</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'mall_management_system:sales' %}">
-                            <i class="fas fa-shopping-bag"></i>
-                            <span>Sales</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'mall_management_system:customers' %}">
-                            <i class="fas fa-users"></i>
-                            <span>Customers</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'mall_management_system:inventory' %}">
-                            <i class="fas fa-boxes"></i>
-                            <span>Inventory</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-        </aside>
-        
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Top Navbar -->
-            <header class="navbar">
-                <div class="navbar-left">
-                    <button class="menu-toggle" id="menuToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="page-title">
-                        <h2>Store Management</h2>
-                        <p class="date-range">Manage all your mall stores in one place</p>
-                    </div>
-                </div>
-                
-                <div class="search-container">
-                    <i class="fas fa-search"></i>
-                    <input type="text" class="search-input" id="storeSearch" placeholder="Search stores by name, category, or location...">
-                </div>
-                
-                <div class="navbar-right">
-                    <button class="action-btn" id="addStoreBtn">
-                        <i class="fas fa-plus-circle"></i> Add Store
-                    </button>
-                </div>
-            </header>
-            
-            <!-- Store KPIs -->
-            <section class="store-kpis" id="storeKpis">
-                <div class="store-kpi-card">
-                    <div class="store-kpi-header">
-                        <div class="icon-box"><i class="fas fa-store"></i></div>
-                        <h3>Total Stores</h3>
-                    </div>
-                    <div class="store-kpi-value" id="totalStores">0</div>
-                    <div class="store-kpi-change">
-                        <span class="change-positive" id="activeStores">0 active</span>
-                    </div>
-                </div>
-                
-                <div class="store-kpi-card">
-                    <div class="store-kpi-header">
-                        <div class="icon-box"><i class="fas fa-expand"></i></div>
-                        <h3>Avg. Size</h3>
-                    </div>
-                    <div class="store-kpi-value" id="avgSize">0</div>
-                    <div class="store-kpi-change">
-                        <span class="change-label">sq.ft average</span>
-                    </div>
-                </div>
-                
-                <div class="store-kpi-card">
-                    <div class="store-kpi-header">
-                        <div class="icon-box"><i class="fas fa-rupee-sign"></i></div>
-                        <h3>Avg. Rent</h3>
-                    </div>
-                    <div class="store-kpi-value" id="avgRent">₹0</div>
-                    <div class="store-kpi-change">
-                        <span class="change-label">per month</span>
-                    </div>
-                </div>
-                
-                <div class="store-kpi-card">
-                    <div class="store-kpi-header">
-                        <div class="icon-box"><i class="fas fa-building"></i></div>
-                        <h3>Occupancy</h3>
-                    </div>
-                    <div class="store-kpi-value" id="occupancyRate">0%</div>
-                    <div class="store-kpi-change">
-                        <span class="change-label">mall capacity</span>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Category Filters -->
-            <section class="category-filters">
-                <button class="filter-btn active" data-category="all">
-                    <i class="fas fa-store"></i> All Stores
-                </button>
-                <button class="filter-btn" data-category="electronics">
-                    <i class="fas fa-laptop"></i> Electronics
-                </button>
-                <button class="filter-btn" data-category="fashion">
-                    <i class="fas fa-tshirt"></i> Fashion
-                </button>
-                <button class="filter-btn" data-category="food">
-                    <i class="fas fa-utensils"></i> Food & Beverage
-                </button>
-                <button class="filter-btn" data-category="beauty">
-                    <i class="fas fa-spa"></i> Beauty
-                </button>
-                <button class="filter-btn" data-category="entertainment">
-                    <i class="fas fa-film"></i> Entertainment
-                </button>
-            </section>
-            
-            <!-- Stores Grid -->
-            <section class="stores-display">
-                <div class="stores-grid" id="storesGrid">
-                    {% if stores %}
-                        {% for store in stores %}
-                        <div class="store-card" data-store-id="{{ store.store_id }}" data-category="{{ store.category }}">
-                            <div class="store-card-header">
-                                <span class="store-category-badge">
-                                    {{ store.get_category_display }}
-                                </span>
-                                <span class="store-status">
-                                    <span class="status-dot {{ store.status }}"></span>
-                                    <span>{{ store.get_status_display }}</span>
-                                </span>
-                            </div>
-                            <div class="store-card-body">
-                                <h3 class="store-name">{{ store.name }}</h3>
-                                <div class="store-details">
-                                    <div class="store-detail-item">
-                                        <span class="detail-label">Store ID</span>
-                                        <span class="detail-value">{{ store.store_id }}</span>
-                                    </div>
-                                    <div class="store-detail-item">
-                                        <span class="detail-label">Location</span>
-                                        <span class="detail-value">{{ store.get_location_display }}</span>
-                                    </div>
-                                    <div class="store-detail-item">
-                                        <span class="detail-label">Size</span>
-                                        <span class="detail-value">{{ store.size }} sq.ft</span>
-                                    </div>
-                                    <div class="store-detail-item">
-                                        <span class="detail-label">Monthly Rent</span>
-                                        <span class="detail-value">₹{{ store.monthly_rent }}</span>
-                                    </div>
-                                    <div class="store-detail-item">
-                                        <span class="detail-label">Manager</span>
-                                        <span class="detail-value">{{ store.manager }}</span>
-                                    </div>
-                                    <div class="store-detail-item">
-                                        <span class="detail-label">Contact</span>
-                                        <span class="detail-value">{{ store.contact_info }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="store-card-footer">
-                                <div class="store-hours">
-                                    <i class="fas fa-clock"></i> {{ store.operating_hours }}
-                                </div>
-                                <button class="btn-secondary view-details-btn" data-store-id="{{ store.store_id }}">
-                                    View Details
-                                </button>
-                            </div>
-                        </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state" id="emptyState">
-                            <i class="fas fa-store-slash"></i>
-                            <h4>No Stores Yet</h4>
-                            <p>Start building your mall by adding your first store</p>
-                            <button class="btn-primary" id="addFirstStoreBtn">
-                                <i class="fas fa-plus-circle"></i> Add First Store
-                            </button>
-                        </div>
-                    {% endif %}
-                </div>
-            </section>
-        </main>
-    </div>
-    
-    <!-- Add Store Modal -->
-    <div class="modal" id="addStoreModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-store"></i> Add New Store</h3>
-                <button class="modal-close" id="closeStoreModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="addStoreForm" class="store-form">
-                    {% csrf_token %}
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="storeName">
-                                <i class="fas fa-signature"></i> Store Name *
-                            </label>
-                            <input type="text" id="storeName" name="name" placeholder="Enter store name" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="storeCategory">
-                                <i class="fas fa-tags"></i> Category *
-                            </label>
-                            <select id="storeCategory" name="category" required>
-                                <option value="">Select Category</option>
-                                <option value="electronics">Electronics</option>
-                                <option value="fashion">Fashion & Apparel</option>
-                                <option value="food">Food & Beverage</option>
-                                <option value="entertainment">Entertainment</option>
-                                <option value="beauty">Beauty & Cosmetics</option>
-                                <option value="home">Home & Living</option>
-                                <option value="sports">Sports & Fitness</option>
-                                <option value="books">Books & Stationery</option>
-                                <option value="jewelry">Jewelry & Accessories</option>
-                                <option value="other">Other</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="storeLocation">
-                                <i class="fas fa-map-marker-alt"></i> Location *
-                            </label>
-                            <select id="storeLocation" name="location" required>
-                                <option value="">Select Location</option>
-                                <option value="GF-N">Ground Floor - North</option>
-                                <option value="GF-S">Ground Floor - South</option>
-                                <option value="GF-E">Ground Floor - East</option>
-                                <option value="GF-W">Ground Floor - West</option>
-                                <option value="1F-N">First Floor - North</option>
-                                <option value="1F-S">First Floor - South</option>
-                                <option value="1F-E">First Floor - East</option>
-                                <option value="1F-W">First Floor - West</option>
-                                <option value="2F-N">Second Floor - North</option>
-                                <option value="2F-S">Second Floor - South</option>
-                                <option value="2F-E">Second Floor - East</option>
-                                <option value="2F-W">Second Floor - West</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="storeStatus">
-                                <i class="fas fa-circle"></i> Status *
-                            </label>
-                            <select id="storeStatus" name="status" required>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
-                                <option value="maintenance">Under Maintenance</option>
-                            </select>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="storeSize">
-                                <i class="fas fa-arrows-alt"></i> Size (sq. ft.) *
-                            </label>
-                            <input type="number" id="storeSize" name="size" placeholder="e.g., 1500" min="100" max="10000" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="monthlyRent">
-                                <i class="fas fa-rupee-sign"></i> Monthly Rent (₹) *
-                            </label>
-                            <input type="number" id="monthlyRent" name="monthly_rent" placeholder="e.g., 50000" min="1000" step="1000" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="storeManager">
-                                <i class="fas fa-user-tie"></i> Store Manager *
-                            </label>
-                            <input type="text" id="storeManager" name="manager" placeholder="Manager's name" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="storeContact">
-                                <i class="fas fa-phone"></i> Contact *
-                            </label>
-                            <input type="text" id="storeContact" name="contact_info" placeholder="Phone or email" required>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="storeDescription">
-                            <i class="fas fa-align-left"></i> Description
-                        </label>
-                        <textarea id="storeDescription" name="description" rows="3" placeholder="Brief description..."></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="storeHours">
-                            <i class="fas fa-clock"></i> Operating Hours
-                        </label>
-                        <input type="text" id="storeHours" name="operating_hours" placeholder="e.g., 10:00 AM - 9:00 PM" value="10:00 AM - 9:00 PM">
-                    </div>
-                    
-                    <div class="form-actions">
-                        <button type="button" class="btn-secondary" id="cancelStoreBtn">Cancel</button>
-                        <button type="submit" class="btn-primary" id="submitStoreBtn">
-                            <i class="fas fa-plus-circle"></i> Add Store
-                        </button>
-                    </div>
-                </form>
-            </div>
+{% block title %}MallX Analytics | Stores{% endblock %}
+
+{% block extra_css %}
+<style>
+    .store-kpis {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    .store-kpi-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+        border: 1px solid var(--gray-200);
+    }
+    .store-kpi-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+    .store-kpi-header .icon-box {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: var(--gray-100);
+        color: var(--primary);
+    }
+    .store-kpi-header h3 { font-size: 0.875rem; color: var(--gray-500); }
+    .store-kpi-value { font-size: 1.75rem; font-weight: 700; }
+    .store-kpi-change { font-size: 0.75rem; color: var(--gray-500); margin-top: 0.5rem; }
+    .change-positive { color: var(--success); font-weight: 500; }
+    .category-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 1.5rem;
+        background: white;
+        padding: 0.75rem 1rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+    }
+    .filter-btn {
+        padding: 0.5rem 1rem;
+        background: var(--gray-100);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        color: var(--gray-600);
+        font-size: 0.875rem;
+        cursor: pointer;
+    }
+    .filter-btn:hover, .filter-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+    .stores-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 1.5rem;
+    }
+    .store-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        border: 1px solid var(--gray-200);
+        transition: var(--transition);
+    }
+    .store-card:hover { border-color: var(--primary); box-shadow: var(--shadow-md); }
+    .store-card-header {
+        padding: 1.25rem;
+        background: linear-gradient(135deg, var(--gray-900), var(--gray-800));
+        color: white;
+    }
+    .store-card-header .store-category-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background: rgba(255,255,255,0.15);
+        border-radius: var(--radius-lg);
+        font-size: 0.75rem;
+    }
+    .store-card-header .store-status {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.75rem;
+    }
+    .status-dot { width: 0.5rem; height: 0.5rem; border-radius: 50%; }
+    .status-dot.active { background: var(--success); }
+    .status-dot.inactive { background: var(--danger); }
+    .status-dot.maintenance { background: var(--warning); }
+    .store-card-body { padding: 1.25rem; }
+    .store-card-body .store-name { font-size: 1.125rem; font-weight: 600; margin-bottom: 1rem; }
+    .store-details { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+    .store-detail-item { padding: 0.5rem; background: var(--gray-50); border-radius: var(--radius); }
+    .store-detail-item .detail-label { font-size: 0.625rem; color: var(--gray-500); text-transform: uppercase; }
+    .store-detail-item .detail-value { font-size: 0.8125rem; font-weight: 600; }
+    .store-card-footer {
+        padding: 1rem 1.25rem;
+        border-top: 1px solid var(--gray-200);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: var(--gray-50);
+    }
+    .store-card-footer .store-hours { font-size: 0.75rem; color: var(--gray-600); }
+    .store-card-footer .btn-secondary {
+        padding: 0.5rem 1rem;
+        background: white;
+        color: var(--gray-700);
+        border: 1px solid var(--gray-300);
+        border-radius: var(--radius-lg);
+        font-size: 0.75rem;
+        cursor: pointer;
+    }
+    .store-card-footer .btn-secondary:hover { background: var(--primary); color: white; }
+    .empty-state {
+        text-align: center;
+        padding: 3rem 2rem;
+        background: white;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+        grid-column: 1 / -1;
+    }
+    .empty-state i { font-size: 3rem; color: var(--gray-400); margin-bottom: 1rem; }
+    .empty-state h4 { font-size: 1.125rem; margin-bottom: 0.5rem; }
+    .empty-state p { font-size: 0.875rem; color: var(--gray-500); margin-bottom: 1.5rem; }
+    .calendar-widget {
+        background: var(--primary);
+        border-radius: var(--radius);
+        padding: 1rem;
+        color: white;
+        margin-top: auto;
+    }
+    .calendar-widget h3 { font-size: 0.75rem; margin-bottom: 1rem; }
+    @media (max-width: 1200px) { .store-kpis { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 768px) { .store-kpis { grid-template-columns: 1fr; } .stores-grid { grid-template-columns: 1fr; } }
+</style>
+{% endblock %}
+
+{% block page_title %}Store Management{% endblock %}
+{% block page_subtitle %}Manage all your mall stores in one place{% endblock %}
+
+{% block content %}
+<section class="store-kpis" id="storeKpis">
+    <div class="store-kpi-card">
+        <div class="store-kpi-header">
+            <div class="icon-box"><i class="fas fa-store"></i></div>
+            <h3>Total Stores</h3>
         </div>
+        <div class="store-kpi-value" id="totalStores">{{ stores|length|default:"0" }}</div>
+        <div class="store-kpi-change"><span class="change-positive" id="activeStores">0 active</span></div>
     </div>
-    
-    <!-- Store Detail Modal -->
-    <div class="modal" id="storeDetailModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 id="detailStoreName">Store Details</h3>
-                <button class="modal-close" id="closeDetailModal">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <div class="store-detail-content" id="storeDetailContent">
-                    <div style="text-align: center; padding: 2rem;">
-                        <div class="spinner dark" style="margin: 0 auto 1rem;"></div>
-                        <p style="color: var(--gray-500);">Loading store details...</p>
+    <div class="store-kpi-card">
+        <div class="store-kpi-header">
+            <div class="icon-box"><i class="fas fa-expand"></i></div>
+            <h3>Avg. Size</h3>
+        </div>
+        <div class="store-kpi-value" id="avgSize">0</div>
+        <div class="store-kpi-change"><span class="change-label">sq.ft average</span></div>
+    </div>
+    <div class="store-kpi-card">
+        <div class="store-kpi-header">
+            <div class="icon-box"><i class="fas fa-rupee-sign"></i></div>
+            <h3>Avg. Rent</h3>
+        </div>
+        <div class="store-kpi-value" id="avgRent">₹0</div>
+        <div class="store-kpi-change"><span class="change-label">per month</span></div>
+    </div>
+    <div class="store-kpi-card">
+        <div class="store-kpi-header">
+            <div class="icon-box"><i class="fas fa-building"></i></div>
+            <h3>Occupancy</h3>
+        </div>
+        <div class="store-kpi-value" id="occupancyRate">0%</div>
+        <div class="store-kpi-change"><span class="change-label">mall capacity</span></div>
+    </div>
+</section>
+
+<section class="category-filters">
+    <button class="filter-btn active" data-category="all"><i class="fas fa-store"></i> All Stores</button>
+    <button class="filter-btn" data-category="electronics"><i class="fas fa-laptop"></i> Electronics</button>
+    <button class="filter-btn" data-category="fashion"><i class="fas fa-tshirt"></i> Fashion</button>
+    <button class="filter-btn" data-category="food"><i class="fas fa-utensils"></i> Food & Beverage</button>
+    <button class="filter-btn" data-category="beauty"><i class="fas fa-spa"></i> Beauty</button>
+    <button class="filter-btn" data-category="entertainment"><i class="fas fa-film"></i> Entertainment</button>
+</section>
+
+<section class="stores-display">
+    <div class="stores-grid" id="storesGrid">
+        {% if stores %}
+            {% for store in stores %}
+            <div class="store-card" data-store-id="{{ store.store_id }}" data-category="{{ store.category }}">
+                <div class="store-card-header" style="position:relative;">
+                    <span class="store-category-badge">{{ store.get_category_display }}</span>
+                    <span class="store-status">
+                        <span class="status-dot {{ store.status }}"></span>
+                        <span>{{ store.get_status_display }}</span>
+                    </span>
+                </div>
+                <div class="store-card-body">
+                    <h3 class="store-name">{{ store.name }}</h3>
+                    <div class="store-details">
+                        <div class="store-detail-item">
+                            <span class="detail-label">Store ID</span>
+                            <span class="detail-value">{{ store.store_id }}</span>
+                        </div>
+                        <div class="store-detail-item">
+                            <span class="detail-label">Location</span>
+                            <span class="detail-value">{{ store.get_location_display }}</span>
+                        </div>
+                        <div class="store-detail-item">
+                            <span class="detail-label">Size</span>
+                            <span class="detail-value">{{ store.size }} sq.ft</span>
+                        </div>
+                        <div class="store-detail-item">
+                            <span class="detail-label">Monthly Rent</span>
+                            <span class="detail-value">₹{{ store.monthly_rent }}</span>
+                        </div>
+                        <div class="store-detail-item">
+                            <span class="detail-label">Manager</span>
+                            <span class="detail-value">{{ store.manager }}</span>
+                        </div>
+                        <div class="store-detail-item">
+                            <span class="detail-label">Contact</span>
+                            <span class="detail-value">{{ store.contact_info }}</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Toast Container -->
-    <div id="toastContainer"></div>
-
-    <script>
-        // Store Management with API Integration
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeEventListeners();
-            calculateKPIs();
-            initializeSearch();
-            initializeFilters();
-        });
-
-        // Event Listeners
-        function initializeEventListeners() {
-            // Add store buttons
-            document.getElementById('addStoreBtn').addEventListener('click', () => {
-                openModal('addStoreModal');
-            });
-            
-            const addFirstStoreBtn = document.getElementById('addFirstStoreBtn');
-            if (addFirstStoreBtn) {
-                addFirstStoreBtn.addEventListener('click', () => {
-                    openModal('addStoreModal');
-                });
-            }
-            
-            // Close modal buttons
-            document.getElementById('closeStoreModal').addEventListener('click', () => {
-                closeModal('addStoreModal');
-            });
-            
-            document.getElementById('closeDetailModal').addEventListener('click', () => {
-                closeModal('storeDetailModal');
-            });
-            
-            document.getElementById('cancelStoreBtn').addEventListener('click', () => {
-                closeModal('addStoreModal');
-            });
-            
-            // Close on outside click
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.addEventListener('click', (e) => {
-                    if (e.target === modal) {
-                        modal.classList.remove('active');
-                    }
-                });
-            });
-            
-            // Form submission
-            document.getElementById('addStoreForm').addEventListener('submit', handleStoreSubmit);
-            
-            // View details buttons (delegation for dynamically added buttons)
-            document.addEventListener('click', (e) => {
-                if (e.target.classList.contains('view-details-btn') || e.target.closest('.view-details-btn')) {
-                    const btn = e.target.closest('.view-details-btn');
-                    const storeId = btn.dataset.storeId;
-                    showStoreDetails(storeId);
-                }
-            });
-            
-            // Menu toggle for mobile
-            document.getElementById('menuToggle').addEventListener('click', () => {
-                document.getElementById('sidebar').classList.toggle('active');
-            });
-        }
-
-        // Handle Store Form Submission
-        async function handleStoreSubmit(e) {
-            e.preventDefault();
-            
-            const form = e.target;
-            const submitBtn = document.getElementById('submitStoreBtn');
-            const originalText = submitBtn.innerHTML;
-            
-            // Show loading state
-            submitBtn.innerHTML = '<span class="spinner"></span> Adding...';
-            submitBtn.disabled = true;
-            
-            // Get form data
-            const formData = {
-                name: document.getElementById('storeName').value,
-                category: document.getElementById('storeCategory').value,
-                location: document.getElementById('storeLocation').value,
-                status: document.getElementById('storeStatus').value,
-                size: parseInt(document.getElementById('storeSize').value),
-                monthly_rent: parseInt(document.getElementById('monthlyRent').value),
-                manager: document.getElementById('storeManager').value,
-                contact_info: document.getElementById('storeContact').value,
-                description: document.getElementById('storeDescription').value,
-                operating_hours: document.getElementById('storeHours').value
-            };
-            
-            // Get CSRF token
-            const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-            
-            // Use Django URL template tag to generate the correct URL
-            const createUrl = "{% url 'mall_management_system:create_store' %}";
-            
-            try {
-                const response = await fetch(createUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': csrftoken
-                    },
-                    body: JSON.stringify(formData)
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showToast('Store added successfully!', 'success');
-                    closeModal('addStoreModal');
-                    form.reset();
-                    
-                    // Reload the page after a short delay to show the new store
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 1500);
-                } else {
-                    showToast('Error: ' + data.error, 'error');
-                }
-            } catch (error) {
-                showToast('Error: ' + error.message, 'error');
-                console.error('API Error:', error);
-            } finally {
-                // Restore button state
-                submitBtn.innerHTML = originalText;
-                submitBtn.disabled = false;
-            }
-        }
-
-        // Show Store Details
-        async function showStoreDetails(storeId) {
-            openModal('storeDetailModal');
-            
-            const contentDiv = document.getElementById('storeDetailContent');
-            contentDiv.innerHTML = '<div style="text-align: center; padding: 2rem;"><div class="spinner dark" style="margin: 0 auto 1rem;"></div><p style="color: var(--gray-500);">Loading store details...</p></div>';
-            
-            // Use Django URL template tag with store_id parameter
-            const detailUrl = "{% url 'mall_management_system:store_details' store_id=0 %}".replace('0', storeId);
-            
-            try {
-                const response = await fetch(detailUrl);
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    const store = data.store;
-                    document.getElementById('detailStoreName').textContent = store.name;
-                    
-                    const statusColor = {
-                        'active': 'var(--success)',
-                        'inactive': 'var(--danger)',
-                        'maintenance': 'var(--warning)'
-                    }[store.status] || 'var(--gray-500)';
-                    
-                    contentDiv.innerHTML = `
-                        <div class="store-detail-header">
-                            <div class="store-detail-icon">
-                                <i class="fas fa-store"></i>
-                            </div>
-                            <div>
-                                <h2 style="font-size: 1.25rem; font-weight: 600; color: var(--gray-900);">${store.name}</h2>
-                                <span style="display: inline-block; margin-top: 0.25rem; padding: 0.25rem 0.75rem; background: var(--primary); color: white; border-radius: var(--radius-lg); font-size: 0.75rem; font-weight: 500;">
-                                    ${store.category_display || store.category}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="store-basic-info">
-                            <div class="info-item">
-                                <span class="info-label">Store ID</span>
-                                <span class="info-value">${store.id || store.store_id}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Location</span>
-                                <span class="info-value">${store.location_display || store.location}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Status</span>
-                                <span class="info-value">
-                                    <span style="display: inline-block; width: 0.5rem; height: 0.5rem; border-radius: 50%; margin-right: 0.375rem; background: ${statusColor};"></span>
-                                    ${store.status_display || store.status}
-                                </span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Size</span>
-                                <span class="info-value">${store.size} sq.ft</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Monthly Rent</span>
-                                <span class="info-value">₹${store.monthly_rent}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Manager</span>
-                                <span class="info-value">${store.manager}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Contact</span>
-                                <span class="info-value">${store.contact_info}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Hours</span>
-                                <span class="info-value">${store.operating_hours || '10:00 AM - 9:00 PM'}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Created</span>
-                                <span class="info-value">${store.created_at ? new Date(store.created_at).toLocaleDateString() : 'N/A'}</span>
-                            </div>
-                        </div>
-                        
-                        ${store.description ? `
-                        <div class="description-box">
-                            <h4><i class="fas fa-align-left"></i> Description</h4>
-                            <p>${store.description}</p>
-                        </div>
-                        ` : ''}
-                    `;
-                } else {
-                    showToast('Error loading store details', 'error');
-                    closeModal('storeDetailModal');
-                }
-            } catch (error) {
-                showToast('Error: ' + error.message, 'error');
-                console.error('API Error:', error);
-                closeModal('storeDetailModal');
-            }
-        }
-
-        // Calculate KPIs from existing stores
-        function calculateKPIs() {
-            const storeCards = document.querySelectorAll('.store-card');
-            if (storeCards.length === 0) {
-                document.getElementById('totalStores').textContent = '0';
-                document.getElementById('activeStores').textContent = '0 active';
-                document.getElementById('avgSize').textContent = '0';
-                document.getElementById('avgRent').textContent = '₹0';
-                document.getElementById('occupancyRate').textContent = '0%';
-                return;
-            }
-            
-            const totalStores = storeCards.length;
-            let activeStores = 0;
-            let totalSize = 0;
-            let totalRent = 0;
-            
-            storeCards.forEach(card => {
-                // Check status
-                const status = card.querySelector('.status-dot')?.classList[1];
-                if (status === 'active') activeStores++;
-                
-                // Get size
-                const sizeElement = card.querySelector('.store-detail-item:nth-child(3) .detail-value');
-                if (sizeElement) {
-                    const size = parseInt(sizeElement.textContent);
-                    if (!isNaN(size)) totalSize += size;
-                }
-                
-                // Get rent
-                const rentElement = card.querySelector('.store-detail-item:nth-child(4) .detail-value');
-                if (rentElement) {
-                    const rent = parseInt(rentElement.textContent.replace('₹', '').replace(',', ''));
-                    if (!isNaN(rent)) totalRent += rent;
-                }
-            });
-            
-            document.getElementById('totalStores').textContent = totalStores;
-            document.getElementById('activeStores').textContent = activeStores + ' active';
-            document.getElementById('avgSize').textContent = Math.round(totalSize / totalStores) || 0;
-            document.getElementById('avgRent').textContent = '₹' + (Math.round(totalRent / totalStores) || 0).toLocaleString();
-            document.getElementById('occupancyRate').textContent = Math.round((activeStores / totalStores) * 100) + '%';
-        }
-
-        // Search functionality
-        function initializeSearch() {
-            const searchInput = document.getElementById('storeSearch');
-            if (searchInput) {
-                searchInput.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
-                    const storeCards = document.querySelectorAll('.store-card');
-                    
-                    storeCards.forEach(card => {
-                        const storeName = card.querySelector('.store-name')?.textContent.toLowerCase() || '';
-                        const storeCategory = card.querySelector('.store-category-badge')?.textContent.toLowerCase() || '';
-                        const storeLocation = card.querySelector('.store-detail-item:nth-child(2) .detail-value')?.textContent.toLowerCase() || '';
-                        
-                        const matches = storeName.includes(searchTerm) || 
-                                       storeCategory.includes(searchTerm) || 
-                                       storeLocation.includes(searchTerm);
-                        
-                        card.style.display = matches ? 'block' : 'none';
-                    });
-                    
-                    // Show/hide empty state
-                    const visibleCards = Array.from(storeCards).filter(card => card.style.display !== 'none');
-                    const emptyState = document.getElementById('emptyState');
-                    if (emptyState) {
-                        emptyState.style.display = visibleCards.length === 0 ? 'block' : 'none';
-                    }
-                });
-            }
-        }
-
-        // Category filters
-        function initializeFilters() {
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    const category = this.dataset.category;
-                    const storeCards = document.querySelectorAll('.store-card');
-                    let visibleCount = 0;
-                    
-                    if (category === 'all') {
-                        storeCards.forEach(card => {
-                            card.style.display = 'block';
-                            visibleCount++;
-                        });
-                    } else {
-                        storeCards.forEach(card => {
-                            const cardCategory = card.dataset.category;
-                            if (cardCategory === category) {
-                                card.style.display = 'block';
-                                visibleCount++;
-                            } else {
-                                card.style.display = 'none';
-                            }
-                        });
-                    }
-                    
-                    // Show/hide empty state
-                    const emptyState = document.getElementById('emptyState');
-                    if (emptyState) {
-                        emptyState.style.display = visibleCount === 0 ? 'block' : 'none';
-                    }
-                });
-            });
-        }
-
-        // Modal helpers
-        function openModal(modalId) {
-            document.getElementById(modalId).classList.add('active');
-            document.body.style.overflow = 'hidden';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-            document.body.style.overflow = '';
-        }
-
-        // Toast notification
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
-            
-            toast.innerHTML = `
-                <div class="toast-icon">
-                    <i class="fas fa-${icon}"></i>
+                <div class="store-card-footer">
+                    <div class="store-hours"><i class="fas fa-clock"></i> {{ store.operating_hours }}</div>
+                    <button class="btn-secondary view-details-btn" data-store-id="{{ store.store_id }}">View Details</button>
                 </div>
-                <div class="toast-message">${message}</div>
-                <button class="toast-close" onclick="this.parentElement.remove()">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            
-            container.appendChild(toast);
-            
-            // Auto remove after 5 seconds
-            setTimeout(() => {
-                if (toast.parentElement) {
-                    toast.remove();
-                }
-            }, 5000);
-        }
-    </script>
-</body>
-</html>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state" id="emptyState">
+                <i class="fas fa-store-slash"></i>
+                <h4>No Stores Yet</h4>
+                <p>Start building your mall by adding your first store</p>
+                <button class="btn-primary" id="addFirstStoreBtn"><i class="fas fa-plus-circle"></i> Add First Store</button>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'javascripts/stores.js' %}"></script>
+{% endblock %}
+
