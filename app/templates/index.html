@@ -1,2315 +1,1481 @@
+{% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MallX Analytics | Dashboard</title>
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        /* Your existing CSS remains exactly the same */
-        :root {
-            --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --secondary: #64748b;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --gray-50: #f9fafb;
-            --gray-100: #f3f4f6;
-            --gray-200: #e5e7eb;
-            --gray-300: #d1d5db;
-            --gray-400: #9ca3af;
-            --gray-500: #6b7280;
-            --gray-600: #4b5563;
-            --gray-700: #374151;
-            --gray-800: #1f2937;
-            --gray-900: #111827;
-            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-            --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
-            --shadow-md: 0 10px 15px -3px rgb(0 0 0 / 0.1);
-            --shadow-lg: 0 20px 25px -5px rgb(0 0 0 / 0.1);
-            --radius-sm: 0.375rem;
-            --radius: 0.5rem;
-            --radius-md: 0.75rem;
-            --radius-lg: 1rem;
-            --transition: all 0.2s ease;
-        }
 
-        /* Rest of your CSS remains exactly the same */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+{% block title %}MallX Analytics | Home{% endblock %}
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: var(--gray-50);
-            color: var(--gray-900);
-            line-height: 1.5;
-        }
+{% block extra_css %}
+<style>
+    /* KPI Cards */
+    .kpi-section {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
 
-        .container {
-            display: flex;
-            min-height: 100vh;
-        }
+    .kpi-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+        border: 1px solid var(--gray-200);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
 
-        /* Professional Sidebar */
-        .sidebar {
-            width: 260px;
-            background: var(--gray-900);
-            padding: 1.5rem 1rem;
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            height: 100vh;
-            z-index: 100;
-            border-right: 1px solid var(--gray-800);
-        }
+    .kpi-card:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-md);
+    }
 
-        .sidebar .logo {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
-            padding: 0 0.75rem;
-        }
+    .kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--primary);
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
 
-        .sidebar .logo i {
-            font-size: 1.75rem;
-            color: var(--primary);
-        }
+    .kpi-card:hover::before {
+        opacity: 1;
+    }
 
-        .sidebar .logo h1 {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: white;
-            letter-spacing: -0.025em;
-        }
+    .kpi-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
 
-        .sidebar .main-nav ul {
-            list-style: none;
-        }
+    .kpi-header .icon-box {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: var(--radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        background: var(--gray-100);
+        color: var(--primary);
+    }
 
-        .sidebar .main-nav li {
-            margin-bottom: 0.25rem;
-        }
+    .kpi-header h3 {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+    }
 
-        .sidebar .main-nav a {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem 1rem;
-            color: var(--gray-400);
-            text-decoration: none;
-            border-radius: var(--radius);
-            transition: var(--transition);
-            font-weight: 500;
-            font-size: 0.9375rem;
-        }
+    .kpi-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: var(--gray-900);
+        line-height: 1.2;
+        margin-bottom: 0.5rem;
+    }
 
-        .sidebar .main-nav a:hover {
-            background: var(--gray-800);
-            color: white;
-        }
+    .kpi-change {
+        font-size: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
 
-        .sidebar .main-nav li.active a {
-            background: var(--primary);
-            color: white;
-        }
+    .kpi-change.positive {
+        color: var(--success);
+    }
 
-        .sidebar .main-nav a i {
-            font-size: 1.25rem;
-            width: 1.5rem;
-        }
+    .kpi-change.negative {
+        color: var(--danger);
+    }
 
-        .sidebar .main-nav .new-badge {
-            background: var(--primary);
-            color: white;
-            font-size: 0.625rem;
-            padding: 0.125rem 0.375rem;
-            border-radius: var(--radius-lg);
-            margin-left: auto;
-        }
+    .change-label {
+        color: var(--gray-500);
+    }
 
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: 260px;
-            padding: 1.5rem 2rem;
-        }
+    /* Transaction Entry Section */
+    .transaction-entry-section {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 1px solid var(--gray-200);
+    }
 
-        /* Professional Navbar */
-        .navbar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            background: white;
-            padding: 0.75rem 1.5rem;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--gray-200);
-            box-shadow: var(--shadow-sm);
-        }
+    .section-header {
+        margin-bottom: 1.5rem;
+    }
 
-        .navbar-left {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+    .section-header h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--gray-900);
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
 
-        .menu-toggle {
-            background: none;
-            border: none;
-            font-size: 1.25rem;
-            color: var(--gray-500);
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: var(--radius);
-            transition: var(--transition);
-        }
+    .section-header h3 i {
+        color: var(--primary);
+    }
 
-        .menu-toggle:hover {
-            background: var(--gray-100);
-            color: var(--gray-700);
-        }
+    .section-subtitle {
+        color: var(--gray-500);
+        font-size: 0.875rem;
+    }
 
-        .page-title h2 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
+    .transaction-entry-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 1.5rem;
+    }
 
-        .page-title .date-range {
-            font-size: 0.875rem;
-            color: var(--gray-500);
-        }
+    .transaction-form-card,
+    .transactions-table-card {
+        background: var(--gray-50);
+        border-radius: var(--radius);
+        padding: 1.25rem;
+        border: 1px solid var(--gray-200);
+    }
 
-        .search-container {
-            flex: 1;
-            max-width: 400px;
-            margin: 0 2rem;
-            position: relative;
-        }
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.25rem;
+    }
 
-        .search-container i {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-400);
-            font-size: 1rem;
-        }
+    .card-header h4 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gray-900);
+    }
 
-        .search-input {
-            width: 100%;
-            padding: 0.625rem 1rem 0.625rem 2.5rem;
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-lg);
-            font-size: 0.9375rem;
-            transition: var(--transition);
-            background: var(--gray-50);
-        }
+    .current-time {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        color: var(--primary);
+        font-size: 0.875rem;
+        font-weight: 500;
+        background: white;
+        padding: 0.375rem 0.75rem;
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--gray-200);
+    }
 
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary);
-            background: white;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
+    .transaction-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
 
-        .navbar-right {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.375rem;
+    }
 
-        .date-selector {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.5rem 1rem;
-            background: var(--gray-50);
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--gray-200);
-        }
+    .form-group label {
+        font-size: 0.8125rem;
+        font-weight: 500;
+        color: var(--gray-700);
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
 
-        .date-selector i {
-            color: var(--primary);
-            font-size: 0.875rem;
-        }
+    .form-group label i {
+        color: var(--primary);
+        font-size: 0.875rem;
+    }
 
-        .date-selector select {
-            border: none;
-            background: transparent;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--gray-700);
-            cursor: pointer;
-            outline: none;
-        }
+    .form-group input,
+    .form-group select {
+        padding: 0.625rem 0.875rem;
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius);
+        font-size: 0.875rem;
+        transition: var(--transition);
+        background: white;
+    }
 
-        .notification-btn {
-            position: relative;
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: var(--radius-lg);
-            background: var(--gray-50);
-            border: 1px solid var(--gray-200);
-            cursor: pointer;
-            transition: var(--transition);
-            font-size: 1rem;
-            color: var(--gray-600);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    .form-group input:focus,
+    .form-group select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
 
-        .notification-btn:hover {
-            background: white;
-            border-color: var(--primary);
-            color: var(--primary);
-        }
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
 
-        .notification-badge {
-            position: absolute;
-            top: -0.25rem;
-            right: -0.25rem;
-            background: var(--danger);
-            color: white;
-            font-size: 0.625rem;
-            width: 1.25rem;
-            height: 1.25rem;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px solid white;
-        }
+    .auto-data-info {
+        background: var(--primary);
+        border-radius: var(--radius);
+        padding: 1rem;
+        color: white;
+    }
 
-        .profile-dropdown .profile-icon {
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: var(--radius-lg);
-            background: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            color: white;
-            cursor: pointer;
-            transition: var(--transition);
-        }
+    .auto-data-info h5 {
+        font-size: 0.8125rem;
+        margin-bottom: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        opacity: 0.9;
+    }
 
-        .profile-dropdown .profile-icon:hover {
-            background: var(--primary-dark);
-            transform: scale(1.05);
-        }
+    .features-list {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.5rem;
+    }
 
-        /* Compact KPI Cards */
+    .feature {
+        background: rgba(255, 255, 255, 0.15);
+        border-radius: var(--radius-sm);
+        padding: 0.5rem;
+        text-align: center;
+    }
+
+    .feature-name {
+        font-size: 0.625rem;
+        opacity: 0.8;
+        display: block;
+        margin-bottom: 0.25rem;
+    }
+
+    .feature-value {
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .total-preview {
+        background: white;
+        padding: 1rem;
+        border-radius: var(--radius);
+        text-align: center;
+        border: 1px solid var(--gray-200);
+    }
+
+    .total-amount {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .submit-btn {
+        padding: 0.75rem 1.5rem;
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: var(--radius-lg);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .submit-btn:hover {
+        background: var(--primary-dark);
+    }
+
+    .submit-btn:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+    }
+
+    .quick-add-btn {
+        padding: 0.75rem 1.5rem;
+        background: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+        border-radius: var(--radius-lg);
+        font-size: 0.875rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .quick-add-btn:hover {
+        background: var(--primary);
+        color: white;
+    }
+
+    /* Transactions Table */
+    .transactions-count {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .count-badge {
+        background: var(--primary);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--radius-lg);
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+
+    .table-container {
+        max-height: 300px;
+        overflow-y: auto;
+        border-radius: var(--radius);
+        border: 1px solid var(--gray-200);
+        background: white;
+    }
+
+    .live-transactions-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.8125rem;
+    }
+
+    .live-transactions-table th {
+        background: var(--gray-50);
+        padding: 0.75rem;
+        text-align: left;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        position: sticky;
+        top: 0;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .live-transactions-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--gray-100);
+        color: var(--gray-700);
+    }
+
+    .empty-row td {
+        text-align: center;
+        padding: 2rem;
+        color: var(--gray-400);
+    }
+
+    .empty-message {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .empty-message i {
+        font-size: 2rem;
+        color: var(--gray-300);
+    }
+
+    .table-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+    }
+
+    .summary-stats {
+        display: flex;
+        gap: 1.5rem;
+    }
+
+    .stat {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-label {
+        font-size: 0.6875rem;
+        color: var(--gray-500);
+    }
+
+    .stat-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gray-900);
+    }
+
+    .clear-btn {
+        padding: 0.5rem 1rem;
+        background: var(--gray-100);
+        color: var(--gray-600);
+        border: 1px solid var(--gray-200);
+        border-radius: var(--radius-lg);
+        font-size: 0.75rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+    }
+
+    .clear-btn:hover {
+        background: var(--danger);
+        border-color: var(--danger);
+        color: white;
+    }
+
+    /* Charts */
+    .charts-row-1,
+    .charts-row-2 {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+        border: 1px solid var(--gray-200);
+        transition: var(--transition);
+    }
+
+    .chart-card:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-md);
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .chart-header h3 {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--gray-900);
+    }
+
+    .chart-legend {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        font-size: 0.75rem;
+        color: var(--gray-600);
+    }
+
+    .legend-color {
+        width: 0.75rem;
+        height: 0.75rem;
+        border-radius: var(--radius-sm);
+    }
+
+    .legend-color.current-week {
+        background: var(--primary);
+    }
+
+    .legend-color.last-week {
+        background: var(--gray-300);
+    }
+
+    .refresh-icon {
+        color: var(--primary);
+        cursor: pointer;
+        transition: var(--transition);
+    }
+
+    .refresh-icon:hover {
+        transform: rotate(180deg);
+    }
+
+    .refresh-icon.loading {
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .chart-container {
+        height: 200px;
+    }
+
+    /* Transactions Section */
+    .transactions-section {
+        margin-top: 1.5rem;
+    }
+
+    .transactions-card {
+        background: white;
+        border-radius: var(--radius-lg);
+        padding: 1.25rem;
+        border: 1px solid var(--gray-200);
+    }
+
+    .transactions-card .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .transactions-card .card-header h3 {
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: var(--gray-900);
+    }
+
+    .view-all {
+        color: var(--primary);
+        text-decoration: none;
+        font-size: 0.8125rem;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        transition: var(--transition);
+    }
+
+    .view-all:hover {
+        gap: 0.5rem;
+    }
+
+    .transactions-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .transactions-table th {
+        background: var(--gray-50);
+        padding: 0.75rem;
+        text-align: left;
+        font-size: 0.6875rem;
+        font-weight: 600;
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        border-bottom: 1px solid var(--gray-200);
+    }
+
+    .transactions-table td {
+        padding: 0.75rem;
+        border-bottom: 1px solid var(--gray-100);
+        font-size: 0.875rem;
+        color: var(--gray-700);
+    }
+
+    /* Calendar Widget */
+    .calendar-widget {
+        background: var(--primary);
+        border-radius: var(--radius);
+        padding: 1rem;
+        color: white;
+        margin-top: auto;
+        margin-bottom: 1rem;
+    }
+
+    .calendar-widget h3 {
+        font-size: 0.75rem;
+        font-weight: 500;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        opacity: 0.9;
+    }
+
+    .date-display {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .date-display .day {
+        font-size: 2rem;
+        font-weight: 700;
+        line-height: 1;
+    }
+
+    .month-year .month {
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+
+    .month-year .year {
+        font-size: 0.75rem;
+        opacity: 0.8;
+    }
+
+    .weekday {
+        font-size: 0.75rem;
+        opacity: 0.9;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
         .kpi-section {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 2rem;
+            grid-template-columns: repeat(2, 1fr);
         }
-
-        .kpi-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            border: 1px solid var(--gray-200);
-            transition: var(--transition);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .kpi-card:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-md);
-        }
-
-        .kpi-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: var(--primary);
-            opacity: 0;
-            transition: opacity 0.2s;
-        }
-
-        .kpi-card:hover::before {
-            opacity: 1;
-        }
-
-        .kpi-header {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 1rem;
-        }
-
-        .kpi-header .icon-box {
-            width: 2.5rem;
-            height: 2.5rem;
-            border-radius: var(--radius);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            background: var(--gray-100);
-            color: var(--primary);
-        }
-
-        .kpi-header h3 {
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--gray-500);
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-        }
-
-        .kpi-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            color: var(--gray-900);
-            line-height: 1.2;
-            margin-bottom: 0.5rem;
-        }
-
-        .kpi-change {
-            font-size: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-        }
-
-        .kpi-change.positive {
-            color: var(--success);
-        }
-
-        .kpi-change.negative {
-            color: var(--danger);
-        }
-
-        .change-label {
-            color: var(--gray-500);
-        }
-
-        /* Transaction Entry Section */
-        .transaction-entry-section {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.5rem;
-            margin-bottom: 2rem;
-            border: 1px solid var(--gray-200);
-        }
-
-        .section-header {
-            margin-bottom: 1.5rem;
-        }
-
-        .section-header h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--gray-900);
-            margin-bottom: 0.25rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .section-header h3 i {
-            color: var(--primary);
-        }
-
-        .section-subtitle {
-            color: var(--gray-500);
-            font-size: 0.875rem;
-        }
-
+        
         .transaction-entry-grid {
-            display: grid;
-            grid-template-columns: 1fr 1.5fr;
-            gap: 1.5rem;
+            grid-template-columns: 1fr;
         }
-
-        .transaction-form-card,
-        .transactions-table-card {
-            background: var(--gray-50);
-            border-radius: var(--radius);
-            padding: 1.25rem;
-            border: 1px solid var(--gray-200);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.25rem;
-        }
-
-        .card-header h4 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .current-time {
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-            color: var(--primary);
-            font-size: 0.875rem;
-            font-weight: 500;
-            background: white;
-            padding: 0.375rem 0.75rem;
-            border-radius: var(--radius-lg);
-            border: 1px solid var(--gray-200);
-        }
-
-        .transaction-form {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.375rem;
-        }
-
-        .form-group label {
-            font-size: 0.8125rem;
-            font-weight: 500;
-            color: var(--gray-700);
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-        }
-
-        .form-group label i {
-            color: var(--primary);
-            font-size: 0.875rem;
-        }
-
-        .form-group input,
-        .form-group select {
-            padding: 0.625rem 0.875rem;
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius);
-            font-size: 0.875rem;
-            transition: var(--transition);
-            background: white;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.75rem;
-        }
-
-        .auto-data-info {
-            background: var(--primary);
-            border-radius: var(--radius);
-            padding: 1rem;
-            color: white;
-        }
-
-        .auto-data-info h5 {
-            font-size: 0.8125rem;
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-            opacity: 0.9;
-        }
-
-        .features-list {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.5rem;
-        }
-
-        .feature {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: var(--radius-sm);
-            padding: 0.5rem;
-            text-align: center;
-        }
-
-        .feature-name {
-            font-size: 0.625rem;
-            opacity: 0.8;
-            display: block;
-            margin-bottom: 0.25rem;
-        }
-
-        .feature-value {
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .total-preview {
-            background: white;
-            padding: 1rem;
-            border-radius: var(--radius);
-            text-align: center;
-            border: 1px solid var(--gray-200);
-        }
-
-        .total-amount {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .submit-btn {
-            padding: 0.75rem 1.5rem;
-            background: var(--primary);
-            color: white;
-            border: none;
-            border-radius: var(--radius-lg);
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .submit-btn:hover {
-            background: var(--primary-dark);
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        .quick-add-btn {
-            padding: 0.75rem 1.5rem;
-            background: transparent;
-            color: var(--primary);
-            border: 1px solid var(--primary);
-            border-radius: var(--radius-lg);
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-        }
-
-        .quick-add-btn:hover {
-            background: var(--primary);
-            color: white;
-        }
-
-        .quick-add-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        /* Transactions Table */
-        .transactions-count {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .count-badge {
-            background: var(--primary);
-            color: white;
-            padding: 0.25rem 0.75rem;
-            border-radius: var(--radius-lg);
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        .table-container {
-            max-height: 300px;
-            overflow-y: auto;
-            border-radius: var(--radius);
-            border: 1px solid var(--gray-200);
-            background: white;
-        }
-
-        .live-transactions-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.8125rem;
-        }
-
-        .live-transactions-table th {
-            background: var(--gray-50);
-            padding: 0.75rem;
-            text-align: left;
-            font-size: 0.6875rem;
-            font-weight: 600;
-            color: var(--gray-500);
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            position: sticky;
-            top: 0;
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        .live-transactions-table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--gray-100);
-            color: var(--gray-700);
-        }
-
-        .empty-row td {
-            text-align: center;
-            padding: 2rem;
-            color: var(--gray-400);
-        }
-
-        .empty-message {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .empty-message i {
-            font-size: 2rem;
-            color: var(--gray-300);
-        }
-
-        .table-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 1rem;
-        }
-
-        .summary-stats {
-            display: flex;
-            gap: 1.5rem;
-        }
-
-        .stat {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .stat-label {
-            font-size: 0.6875rem;
-            color: var(--gray-500);
-        }
-
-        .stat-value {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .clear-btn {
-            padding: 0.5rem 1rem;
-            background: var(--gray-100);
-            color: var(--gray-600);
-            border: 1px solid var(--gray-200);
-            border-radius: var(--radius-lg);
-            font-size: 0.75rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-        }
-
-        .clear-btn:hover {
-            background: var(--danger);
-            border-color: var(--danger);
-            color: white;
-        }
-
-        .clear-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-
-        /* Charts */
+        
         .charts-row-1,
         .charts-row-2 {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
+            grid-template-columns: 1fr;
         }
+    }
 
-        .chart-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            border: 1px solid var(--gray-200);
-            transition: var(--transition);
+    @media (max-width: 768px) {
+        .kpi-section {
+            grid-template-columns: 1fr;
         }
-
-        .chart-card:hover {
-            border-color: var(--primary);
-            box-shadow: var(--shadow-md);
-        }
-
-        .chart-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .chart-header h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .chart-legend {
-            display: flex;
-            gap: 1rem;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-            font-size: 0.75rem;
-            color: var(--gray-600);
-        }
-
-        .legend-color {
-            width: 0.75rem;
-            height: 0.75rem;
-            border-radius: var(--radius-sm);
-        }
-
-        .legend-color.current-week {
-            background: var(--primary);
-        }
-
-        .legend-color.last-week {
-            background: var(--gray-300);
-        }
-
-        .refresh-icon {
-            color: var(--primary);
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .refresh-icon:hover {
-            transform: rotate(180deg);
-        }
-
-        .refresh-icon.loading {
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .chart-container {
-            height: 200px;
-        }
-
-        /* Transactions Section */
-        .transactions-section {
-            margin-top: 1.5rem;
-        }
-
-        .transactions-card {
-            background: white;
-            border-radius: var(--radius-lg);
-            padding: 1.25rem;
-            border: 1px solid var(--gray-200);
-        }
-
-        .transactions-card .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .transactions-card .card-header h3 {
-            font-size: 1.125rem;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .view-all {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 0.8125rem;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-            transition: var(--transition);
-        }
-
-        .view-all:hover {
-            gap: 0.5rem;
-        }
-
-        .transactions-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        .transactions-table th {
-            background: var(--gray-50);
-            padding: 0.75rem;
-            text-align: left;
-            font-size: 0.6875rem;
-            font-weight: 600;
-            color: var(--gray-500);
-            text-transform: uppercase;
-            letter-spacing: 0.025em;
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        .transactions-table td {
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--gray-100);
-            font-size: 0.875rem;
-            color: var(--gray-700);
-        }
-
-        /* Notification Panel */
-        .notification-panel {
-            position: fixed;
-            top: 0;
-            right: -320px;
-            width: 320px;
-            height: 100vh;
-            background: white;
-            border-left: 1px solid var(--gray-200);
-            z-index: 1000;
-            transition: var(--transition);
-            box-shadow: var(--shadow-lg);
-        }
-
-        .notification-panel.active {
-            right: 0;
-        }
-
-        .notification-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.25rem;
-            border-bottom: 1px solid var(--gray-200);
-        }
-
-        .notification-header h3 {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .close-notifications {
-            background: var(--gray-100);
-            border: 1px solid var(--gray-200);
-            width: 2rem;
-            height: 2rem;
-            border-radius: var(--radius);
-            color: var(--gray-500);
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .close-notifications:hover {
-            background: var(--gray-200);
-            color: var(--gray-700);
-        }
-
-        .notification-list {
-            padding: 1rem;
-            height: calc(100vh - 130px);
-            overflow-y: auto;
-        }
-
-        .notification-item {
-            display: flex;
-            gap: 0.75rem;
-            padding: 0.875rem;
-            border-radius: var(--radius);
-            margin-bottom: 0.5rem;
-            transition: var(--transition);
-            border: 1px solid transparent;
-        }
-
-        .notification-item:hover {
-            background: var(--gray-50);
-            border-color: var(--gray-200);
-        }
-
-        .notification-item.unread {
-            background: var(--gray-50);
-            border-color: var(--gray-200);
-        }
-
-        .notification-icon {
-            width: 2rem;
-            height: 2rem;
-            border-radius: var(--radius);
-            background: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.875rem;
-            flex-shrink: 0;
-        }
-
-        .notification-content h4 {
-            font-size: 0.8125rem;
-            font-weight: 600;
-            color: var(--gray-900);
-            margin-bottom: 0.25rem;
-        }
-
-        .notification-content p {
-            font-size: 0.75rem;
-            color: var(--gray-500);
-            margin-bottom: 0.375rem;
-        }
-
-        .notification-time {
-            font-size: 0.625rem;
-            color: var(--gray-400);
-        }
-
-        .notification-footer {
-            padding: 1rem;
-            border-top: 1px solid var(--gray-200);
-            text-align: center;
-        }
-
-        .mark-all-read {
-            color: var(--primary);
-            text-decoration: none;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-
-        /* Toast */
-        .toast {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            background: white;
-            border-radius: var(--radius);
-            padding: 1rem 1.25rem;
-            box-shadow: var(--shadow-lg);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            z-index: 1001;
-            transform: translateX(400px);
-            transition: var(--transition);
-            border-left: 3px solid var(--success);
-            min-width: 300px;
-        }
-
-        .toast.show {
-            transform: translateX(0);
-        }
-
-        .toast.error {
-            border-left-color: var(--danger);
-        }
-
-        .toast-icon {
-            font-size: 1.25rem;
-            color: var(--success);
-        }
-
-        .toast.error .toast-icon {
-            color: var(--danger);
-        }
-
-        .toast-content h4 {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--gray-900);
-        }
-
-        .toast-content p {
-            font-size: 0.75rem;
-            color: var(--gray-500);
-        }
-
-        .toast-close {
-            background: none;
-            border: none;
-            color: var(--gray-400);
-            cursor: pointer;
-            margin-left: auto;
-            font-size: 0.875rem;
-            padding: 0.25rem;
-        }
-
-        .toast-close:hover {
-            color: var(--gray-600);
-        }
-
-        /* Calendar Widget */
-        .calendar-widget {
-            background: var(--primary);
-            border-radius: var(--radius);
-            padding: 1rem;
-            color: white;
-            margin-top: auto;
-            margin-bottom: 1rem;
-        }
-
-        .calendar-widget h3 {
-            font-size: 0.75rem;
-            font-weight: 500;
-            margin-bottom: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 0.375rem;
-            opacity: 0.9;
-        }
-
-        .date-display {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .date-display .day {
-            font-size: 2rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        .month-year .month {
-            font-size: 0.875rem;
-            font-weight: 500;
-        }
-
-        .month-year .year {
-            font-size: 0.75rem;
-            opacity: 0.8;
-        }
-
-        .weekday {
-            font-size: 0.75rem;
-            opacity: 0.9;
-        }
-
-        /* Sidebar Footer */
-        .sidebar-footer {
-            margin-top: auto;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            padding: 0.75rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: var(--radius);
-        }
-
-        .avatar i {
-            font-size: 1.5rem;
-            color: white;
-        }
-
-        .user-details {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .username {
-            color: white;
-            font-weight: 500;
-            font-size: 0.8125rem;
-        }
-
-        .role {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.6875rem;
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            width: 1rem;
-            height: 1rem;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 0.6s linear infinite;
-            display: inline-block;
-        }
-
-        .spinner.dark {
-            border: 2px solid rgba(0, 0, 0, 0.1);
-            border-top-color: var(--primary);
-        }
-
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .kpi-section {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .transaction-entry-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .charts-row-1,
-            .charts-row-2 {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                transform: translateX(-100%);
-                position: fixed;
-                transition: transform 0.3s ease;
-            }
-            
-            .sidebar.collapsed {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .kpi-section {
-                grid-template-columns: 1fr;
-            }
-            
-            .navbar {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: stretch;
-            }
-            
-            .navbar-left {
-                justify-content: space-between;
-            }
-            
-            .search-container {
-                margin: 0;
-                max-width: 100%;
-            }
-            
-            .navbar-right {
-                flex-wrap: wrap;
-                justify-content: flex-start;
-            }
-            
-            .form-row {
-                grid-template-columns: 1fr;
-            }
-        }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <!-- Left Sidebar -->
-        <aside class="sidebar" id="sidebar">
-            <div class="logo">
-                <i class="fas fa-chart-line"></i>
-                <h1>MallX</h1>
-            </div>
-            
-            <nav class="main-nav">
-                <ul>
-                    <li class="active">
-                        <a href="{% url 'mall_management_system:index' %}">
-                            <i class="fas fa-home"></i>
-                            <span>Home</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'mall_management_system:dashboard' %}">
-                            <i class="fas fa-th-large"></i>
-                            <span>Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'mall_management_system:stores' %}">
-                            <i class="fas fa-store"></i>
-                            <span>Stores</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'mall_management_system:sales' %}">
-                            <i class="fas fa-shopping-bag"></i>
-                            <span>Sales</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'mall_management_system:customers' %}">
-                            <i class="fas fa-users"></i>
-                            <span>Customers</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="{% url 'mall_management_system:inventory' %}">
-                            <i class="fas fa-boxes"></i>
-                            <span>Inventory</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Reports</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-cog"></i>
-                            <span>Settings</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" id="transactionTab">
-                            <i class="fas fa-cash-register"></i>
-                            <span>Transaction Entry</span>
-                            <span class="new-badge">New</span>
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-            
-            <div class="calendar-widget">
-                <h3><i class="fas fa-calendar-alt"></i> Today</h3>
-                <div class="date-display">
-                    <div class="day" id="currentDay">04</div>
-                    <div class="month-year">
-                        <div class="month" id="currentMonth">March</div>
-                        <div class="year" id="currentYear">2026</div>
-                    </div>
-                </div>
-                <div class="weekday" id="currentWeekday">Tuesday</div>
-            </div>
-            
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="avatar">
-                        <i class="fas fa-user-circle"></i>
-                    </div>
-                    <div class="user-details">
-                        <span class="username">Admin User</span>
-                        <span class="role">Mall Manager</span>
-                    </div>
-                </div>
-            </div>
-        </aside>
         
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Top Navbar -->
-            <header class="navbar">
-                <div class="navbar-left">
-                    <button class="menu-toggle" id="menuToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div class="page-title">
-                        <h2>Analytics Dashboard</h2>
-                        <p class="date-range" id="dateRange">March 2026</p>
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block page_title %}Analytics Dashboard{% endblock %}
+{% block page_subtitle %}March 2026{% endblock %}
+{% block notification_count %}3{% endblock %}
+
+{% block sidebar_widget_container %}
+<div class="calendar-widget">
+    <h3><i class="fas fa-calendar-alt"></i> Today</h3>
+    <div class="date-display">
+        <div class="day" id="currentDay">{{ current_day|default:"04" }}</div>
+        <div class="month-year">
+            <div class="month" id="currentMonth">{{ current_month|default:"March" }}</div>
+            <div class="year" id="currentYear">{{ current_year|default:"2026" }}</div>
+        </div>
+    </div>
+    <div class="weekday" id="currentWeekday">{{ current_weekday|default:"Tuesday" }}</div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Dashboard Content -->
+<div class="dashboard-content">
+    <!-- Compact KPI Cards -->
+    <section class="kpi-section">
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="icon-box"><i class="fas fa-wallet"></i></div>
+                <h3>Total Sales</h3>
+            </div>
+            <div class="kpi-value" id="totalSales">₹0</div>
+            <div class="kpi-change positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>0%</span>
+                <span class="change-label">vs last month</span>
+            </div>
+        </div>
+        
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="icon-box"><i class="fas fa-shopping-cart"></i></div>
+                <h3>Transactions</h3>
+            </div>
+            <div class="kpi-value" id="totalTransactions">0</div>
+            <div class="kpi-change positive">
+                <i class="fas fa-arrow-up"></i>
+                <span>0</span>
+                <span class="change-label">today</span>
+            </div>
+        </div>
+        
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="icon-box"><i class="fas fa-chart-line"></i></div>
+                <h3>Avg. Transaction</h3>
+            </div>
+            <div class="kpi-value" id="avgTransactionValue">₹0</div>
+            <div class="kpi-change">
+                <span class="change-label">per transaction</span>
+            </div>
+        </div>
+        
+        <div class="kpi-card">
+            <div class="kpi-header">
+                <div class="icon-box"><i class="fas fa-tags"></i></div>
+                <h3>Categories</h3>
+            </div>
+            <div class="kpi-value" id="totalCategories">0</div>
+            <div class="kpi-change">
+                <span class="change-label">active</span>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Transaction Entry Section -->
+    <section class="transaction-entry-section">
+        <div class="section-header">
+            <h3><i class="fas fa-cash-register"></i> Transaction Entry</h3>
+            <p class="section-subtitle">Add new transactions with auto-captured ML features</p>
+        </div>
+        
+        <div class="transaction-entry-grid">
+            <!-- Transaction Form -->
+            <div class="transaction-form-card">
+                <div class="card-header">
+                    <h4>New Transaction</h4>
+                    <div class="current-time">
+                        <i class="fas fa-clock"></i> <span id="timeDisplay">--:--:--</span>
                     </div>
                 </div>
                 
-                <div class="search-container">
-                    <i class="fas fa-search"></i>
-                    <input type="text" class="search-input" placeholder="Search stores, reports, analytics...">
-                </div>
-                
-                <div class="navbar-right">
-                    <div class="date-selector">
-                        <i class="fas fa-calendar"></i>
-                        <select id="dateRangeSelect">
-                            <option>Last 7 days</option>
-                            <option selected>Last 30 days</option>
-                            <option>Last quarter</option>
-                            <option>Last year</option>
+                <form id="transactionForm" class="transaction-form">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="productName">
+                            <i class="fas fa-tag"></i> Product Name
+                        </label>
+                        <input type="text" id="productName" placeholder="e.g., Headphones, T-shirt, Coffee" required>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="quantity">
+                                <i class="fas fa-boxes"></i> Qty
+                            </label>
+                            <input type="number" id="quantity" min="1" value="1" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="unitPrice">
+                                <i class="fas fa-rupee-sign"></i> Price (₹)
+                            </label>
+                            <input type="number" id="unitPrice" min="1" step="0.01" placeholder="0.00" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="category">
+                            <i class="fas fa-store"></i> Category
+                        </label>
+                        <select id="category" required>
+                            <option value="">Select Category</option>
+                            <option value="electronics">Electronics</option>
+                            <option value="fashion">Fashion</option>
+                            <option value="food">Food & Beverage</option>
+                            <option value="beauty">Beauty</option>
+                            <option value="sports">Sports</option>
                         </select>
                     </div>
                     
-                    <button class="notification-btn" id="notificationBtn">
-                        <i class="fas fa-bell"></i>
-                        <span class="notification-badge">3</span>
+                    <div class="auto-data-info">
+                        <h5><i class="fas fa-robot"></i> ML Features</h5>
+                        <div class="features-list">
+                            <div class="feature">
+                                <span class="feature-name">Hour</span>
+                                <span class="feature-value" id="autoHour">--</span>
+                            </div>
+                            <div class="feature">
+                                <span class="feature-name">Day</span>
+                                <span class="feature-value" id="autoDay">--</span>
+                            </div>
+                            <div class="feature">
+                                <span class="feature-name">Month</span>
+                                <span class="feature-value" id="autoMonth">--</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="total-preview">
+                        <span>Total:</span>
+                        <div class="total-amount" id="totalPreview">₹0</div>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submitTransactionBtn">
+                        <i class="fas fa-plus-circle"></i> Add Transaction
                     </button>
                     
-                    <div class="profile-dropdown">
-                        <div class="profile-icon">
-                            <i class="fas fa-user"></i>
-                        </div>
-                    </div>
-                </div>
-            </header>
+                    <button type="button" class="quick-add-btn" id="quickAddBtn">
+                        <i class="fas fa-bolt"></i> Quick Add Sample
+                    </button>
+                </form>
+            </div>
             
-            <!-- Dashboard Content -->
-            <div class="dashboard-content">
-                <!-- Compact KPI Cards -->
-                <section class="kpi-section">
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="icon-box"><i class="fas fa-wallet"></i></div>
-                            <h3>Total Sales</h3>
-                        </div>
-                        <div class="kpi-value" id="totalSales">₹0</div>
-                        <div class="kpi-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>0%</span>
-                            <span class="change-label">vs last month</span>
-                        </div>
+            <!-- Live Transactions -->
+            <div class="transactions-table-card">
+                <div class="card-header">
+                    <h4>Live Transactions</h4>
+                    <div class="transactions-count">
+                        <span class="count-badge" id="transactionCount">0</span>
                     </div>
-                    
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="icon-box"><i class="fas fa-shopping-cart"></i></div>
-                            <h3>Transactions</h3>
-                        </div>
-                        <div class="kpi-value" id="totalTransactions">0</div>
-                        <div class="kpi-change positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>0</span>
-                            <span class="change-label">today</span>
-                        </div>
-                    </div>
-                    
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="icon-box"><i class="fas fa-chart-line"></i></div>
-                            <h3>Avg. Transaction</h3>
-                        </div>
-                        <div class="kpi-value" id="avgTransactionValue">₹0</div>
-                        <div class="kpi-change">
-                            <span class="change-label">per transaction</span>
-                        </div>
-                    </div>
-                    
-                    <div class="kpi-card">
-                        <div class="kpi-header">
-                            <div class="icon-box"><i class="fas fa-tags"></i></div>
-                            <h3>Categories</h3>
-                        </div>
-                        <div class="kpi-value" id="totalCategories">0</div>
-                        <div class="kpi-change">
-                            <span class="change-label">active</span>
-                        </div>
-                    </div>
-                </section>
+                </div>
                 
-                <!-- Transaction Entry Section -->
-                <section class="transaction-entry-section">
-                    <div class="section-header">
-                        <h3><i class="fas fa-cash-register"></i> Transaction Entry</h3>
-                        <p class="section-subtitle">Add new transactions with auto-captured ML features</p>
-                    </div>
-                    
-                    <div class="transaction-entry-grid">
-                        <!-- Transaction Form -->
-                        <div class="transaction-form-card">
-                            <div class="card-header">
-                                <h4>New Transaction</h4>
-                                <div class="current-time">
-                                    <i class="fas fa-clock"></i> <span id="timeDisplay">--:--:--</span>
-                                </div>
-                            </div>
-                            
-                            <form id="transactionForm" class="transaction-form">
-                                {% csrf_token %}
-                                <div class="form-group">
-                                    <label for="productName">
-                                        <i class="fas fa-tag"></i> Product Name
-                                    </label>
-                                    <input type="text" id="productName" placeholder="e.g., Headphones, T-shirt, Coffee" required>
-                                </div>
-                                
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label for="quantity">
-                                            <i class="fas fa-boxes"></i> Qty
-                                        </label>
-                                        <input type="number" id="quantity" min="1" value="1" required>
+                <div class="table-container">
+                    <table class="live-transactions-table">
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Qty</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="liveTransactionsTable">
+                            <tr class="empty-row">
+                                <td colspan="5">
+                                    <div class="empty-message">
+                                        <i class="fas fa-shopping-cart"></i>
+                                        <p>No transactions yet</p>
                                     </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="unitPrice">
-                                            <i class="fas fa-rupee-sign"></i> Price (₹)
-                                        </label>
-                                        <input type="number" id="unitPrice" min="1" step="0.01" placeholder="0.00" required>
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="category">
-                                        <i class="fas fa-store"></i> Category
-                                    </label>
-                                    <select id="category" required>
-                                        <option value="">Select Category</option>
-                                        <option value="electronics">Electronics</option>
-                                        <option value="fashion">Fashion</option>
-                                        <option value="food">Food & Beverage</option>
-                                        <option value="beauty">Beauty</option>
-                                        <option value="sports">Sports</option>
-                                    </select>
-                                </div>
-                                
-                                <div class="auto-data-info">
-                                    <h5><i class="fas fa-robot"></i> ML Features</h5>
-                                    <div class="features-list">
-                                        <div class="feature">
-                                            <span class="feature-name">Hour</span>
-                                            <span class="feature-value" id="autoHour">--</span>
-                                        </div>
-                                        <div class="feature">
-                                            <span class="feature-name">Day</span>
-                                            <span class="feature-value" id="autoDay">--</span>
-                                        </div>
-                                        <div class="feature">
-                                            <span class="feature-name">Month</span>
-                                            <span class="feature-value" id="autoMonth">--</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                
-                                <div class="total-preview">
-                                    <span>Total:</span>
-                                    <div class="total-amount" id="totalPreview">₹0</div>
-                                </div>
-                                
-                                <button type="submit" class="submit-btn" id="submitTransactionBtn">
-                                    <i class="fas fa-plus-circle"></i> Add Transaction
-                                </button>
-                                
-                                <button type="button" class="quick-add-btn" id="quickAddBtn">
-                                    <i class="fas fa-bolt"></i> Quick Add Sample
-                                </button>
-                            </form>
-                        </div>
-                        
-                        <!-- Live Transactions -->
-                        <div class="transactions-table-card">
-                            <div class="card-header">
-                                <h4>Live Transactions</h4>
-                                <div class="transactions-count">
-                                    <span class="count-badge" id="transactionCount">0</span>
-                                </div>
-                            </div>
-                            
-                            <div class="table-container">
-                                <table class="live-transactions-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Time</th>
-                                            <th>Product</th>
-                                            <th>Category</th>
-                                            <th>Qty</th>
-                                            <th>Total</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="liveTransactionsTable">
-                                        <tr class="empty-row">
-                                            <td colspan="5">
-                                                <div class="empty-message">
-                                                    <i class="fas fa-shopping-cart"></i>
-                                                    <p>No transactions yet</p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            
-                            <div class="table-footer">
-                                <div class="summary-stats">
-                                    <div class="stat">
-                                        <span class="stat-label">Today's Total</span>
-                                        <span class="stat-value" id="todayTotal">₹0</span>
-                                    </div>
-                                    <div class="stat">
-                                        <span class="stat-label">Avg</span>
-                                        <span class="stat-value" id="avgTransaction">₹0</span>
-                                    </div>
-                                </div>
-                                <button class="clear-btn" id="clearTransactionsBtn">
-                                    <i class="fas fa-trash"></i> Clear
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 
-                <!-- Charts Row 1 -->
-                <section class="charts-row-1">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Weekly Sales</h3>
-                            <div class="chart-legend">
-                                <div class="legend-item">
-                                    <span class="legend-color current-week"></span>
-                                    <span>This Week</span>
-                                </div>
-                            </div>
+                <div class="table-footer">
+                    <div class="summary-stats">
+                        <div class="stat">
+                            <span class="stat-label">Today's Total</span>
+                            <span class="stat-value" id="todayTotal">₹0</span>
                         </div>
-                        <div class="chart-container">
-                            <canvas id="salesChart"></canvas>
+                        <div class="stat">
+                            <span class="stat-label">Avg</span>
+                            <span class="stat-value" id="avgTransaction">₹0</span>
                         </div>
                     </div>
-                    
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Categories</h3>
-                            <i class="fas fa-sync-alt refresh-icon" id="refreshCategories"></i>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="sourceChart"></canvas>
-                        </div>
-                    </div>
-                </section>
-                
-                <!-- Charts Row 2 -->
-                <section class="charts-row-2">
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Hourly Volume</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="visitorsChart"></canvas>
-                        </div>
-                    </div>
-                    
-                    <div class="chart-card">
-                        <div class="chart-header">
-                            <h3>Daily Sales</h3>
-                        </div>
-                        <div class="chart-container">
-                            <canvas id="heatmapChart"></canvas>
-                        </div>
-                    </div>
-                </section>
-                
-                <!-- Recent Transactions -->
-                <section class="transactions-section">
-                    <div class="transactions-card">
-                        <div class="card-header">
-                            <h3>Recent Transactions</h3>
-                            <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
-                        </div>
-                        <table class="transactions-table">
-                            <thead>
-                                <tr>
-                                    <th>Product</th>
-                                    <th>Category</th>
-                                    <th>Amount</th>
-                                    <th>Time</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recentTransactionsTable">
-                                <tr>
-                                    <td colspan="4" style="text-align: center; color: var(--gray-400);">Loading transactions...</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </section>
+                    <button class="clear-btn" id="clearTransactionsBtn">
+                        <i class="fas fa-trash"></i> Clear
+                    </button>
+                </div>
             </div>
-        </main>
-    </div>
+        </div>
+    </section>
     
-    <!-- Notification Panel -->
-    <div class="notification-panel" id="notificationPanel">
-        <div class="notification-header">
-            <h3>Notifications</h3>
-            <button class="close-notifications" id="closeNotifications">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-        <div class="notification-list">
-            <div class="notification-item unread">
-                <div class="notification-icon">
-                    <i class="fas fa-exclamation-circle"></i>
-                </div>
-                <div class="notification-content">
-                    <h4>High footfall alert</h4>
-                    <p>Food court area +40% traffic</p>
-                    <span class="notification-time">10 min ago</span>
+    <!-- Charts Row 1 -->
+    <section class="charts-row-1">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Weekly Sales</h3>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-color current-week"></span>
+                        <span>This Week</span>
+                    </div>
                 </div>
             </div>
-            <div class="notification-item unread">
-                <div class="notification-icon">
-                    <i class="fas fa-shopping-bag"></i>
-                </div>
-                <div class="notification-content">
-                    <h4>Record sales at Electronics</h4>
-                    <p>₹2.5L in last 4 hours</p>
-                    <span class="notification-time">1 hour ago</span>
-                </div>
-            </div>
-            <div class="notification-item">
-                <div class="notification-icon">
-                    <i class="fas fa-tools"></i>
-                </div>
-                <div class="notification-content">
-                    <h4>Maintenance scheduled</h4>
-                    <p>West wing escalator - 11 PM</p>
-                    <span class="notification-time">3 hours ago</span>
-                </div>
+            <div class="chart-container">
+                <canvas id="salesChart"></canvas>
             </div>
         </div>
-        <div class="notification-footer">
-            <a href="#" class="mark-all-read">Mark all as read</a>
-        </div>
-    </div>
-    
-    <!-- Toast Container -->
-    <div id="toastContainer"></div>
-
-    <script>
-        // ============================================================
-        // API Integration for Transactions
-        // ============================================================
         
-        // API Endpoints (using Django URL tags)
-        const API = {
-            create: "{% url 'mall_management_system:create_transaction' %}",
-            list: "{% url 'mall_management_system:get_transactions' %}",
-            clear: "{% url 'mall_management_system:clear_transactions' %}",
-            analytics: "{% url 'mall_management_system:get_analytics' %}"
-        };
-
-        // CSRF Token
-        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
-
-        // Chart instances
-        let salesChart, categoryChart, hourlyChart, dailyChart;
-
-        // ============================================================
-        // Initialize on Page Load
-        // ============================================================
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeDateTime();
-            initializeEventListeners();
-            loadTransactions();
-            loadAnalytics();
-        });
-
-        // ============================================================
-        // Date & Time Functions
-        // ============================================================
-        function initializeDateTime() {
-            const now = new Date();
-            document.getElementById('currentDay').textContent = now.getDate();
-            document.getElementById('currentMonth').textContent = now.toLocaleString('default', { month: 'long' });
-            document.getElementById('currentYear').textContent = now.getFullYear();
-            document.getElementById('currentWeekday').textContent = now.toLocaleString('default', { weekday: 'long' });
-            document.getElementById('dateRange').textContent = now.toLocaleString('default', { month: 'long', year: 'numeric' });
-            
-            updateTime();
-            setInterval(updateTime, 1000);
-        }
-
-        function updateTime() {
-            const now = new Date();
-            const timeString = now.toLocaleTimeString('en-US', { 
-                hour: '2-digit', 
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: false 
-            });
-            document.getElementById('timeDisplay').textContent = timeString;
-            
-            // Update ML features
-            document.getElementById('autoHour').textContent = now.getHours();
-            document.getElementById('autoDay').textContent = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][now.getDay()];
-            document.getElementById('autoMonth').textContent = now.getMonth() + 1;
-        }
-
-        // ============================================================
-        // Event Listeners
-        // ============================================================
-        function initializeEventListeners() {
-            // Transaction form submission
-            document.getElementById('transactionForm').addEventListener('submit', handleTransactionSubmit);
-            
-            // Quick add sample
-            document.getElementById('quickAddBtn').addEventListener('click', quickAddSample);
-            
-            // Clear transactions
-            document.getElementById('clearTransactionsBtn').addEventListener('click', clearTransactions);
-            
-            // Total preview
-            document.getElementById('quantity').addEventListener('input', updateTotalPreview);
-            document.getElementById('unitPrice').addEventListener('input', updateTotalPreview);
-            
-            // Refresh categories
-            document.getElementById('refreshCategories').addEventListener('click', function() {
-                this.classList.add('loading');
-                loadAnalytics().finally(() => {
-                    setTimeout(() => this.classList.remove('loading'), 500);
-                });
-            });
-            
-            // Notification panel
-            document.getElementById('notificationBtn').addEventListener('click', () => {
-                document.getElementById('notificationPanel').classList.add('active');
-            });
-            
-            document.getElementById('closeNotifications').addEventListener('click', () => {
-                document.getElementById('notificationPanel').classList.remove('active');
-            });
-            
-            // Menu toggle for mobile
-            document.getElementById('menuToggle').addEventListener('click', () => {
-                document.getElementById('sidebar').classList.toggle('collapsed');
-            });
-            
-            // Date range change
-            document.getElementById('dateRangeSelect').addEventListener('change', function() {
-                loadAnalytics();
-            });
-        }
-
-        // ============================================================
-        // Total Preview
-        // ============================================================
-        function updateTotalPreview() {
-            const qty = parseFloat(document.getElementById('quantity').value) || 0;
-            const price = parseFloat(document.getElementById('unitPrice').value) || 0;
-            const total = qty * price;
-            document.getElementById('totalPreview').textContent = '₹' + total.toLocaleString('en-IN', {
-                maximumFractionDigits: 2,
-                minimumFractionDigits: 2
-            });
-        }
-
-        // ============================================================
-        // Transaction CRUD Operations
-        // ============================================================
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Categories</h3>
+                <i class="fas fa-sync-alt refresh-icon" id="refreshCategories"></i>
+            </div>
+            <div class="chart-container">
+                <canvas id="sourceChart"></canvas>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Charts Row 2 -->
+    <section class="charts-row-2">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Hourly Volume</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="visitorsChart"></canvas>
+            </div>
+        </div>
         
-        // Create Transaction
-        // In your index.html, update the form submission
-async function handleTransactionSubmit(e) {
-    e.preventDefault();
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3>Daily Sales</h3>
+            </div>
+            <div class="chart-container">
+                <canvas id="heatmapChart"></canvas>
+            </div>
+        </div>
+    </section>
     
-    const submitBtn = document.getElementById('submitTransactionBtn');
-    const originalText = submitBtn.innerHTML;
+    <!-- Recent Transactions -->
+    <section class="transactions-section">
+        <div class="transactions-card">
+            <div class="card-header">
+                <h3>Recent Transactions</h3>
+                <a href="#" class="view-all">View All <i class="fas fa-arrow-right"></i></a>
+            </div>
+            <table class="transactions-table">
+                <thead>
+                    <tr>
+                        <th>Product</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="recentTransactionsTable">
+                    <tr>
+                        <td colspan="4" style="text-align: center; color: var(--gray-400);">Loading transactions...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // ============================================================
+    // API Integration for Transactions
+    // ============================================================
     
-    submitBtn.innerHTML = '<span class="spinner"></span> Adding...';
-    submitBtn.disabled = true;
-    
-    const formData = {
-        product_name: document.getElementById('productName').value,
-        quantity: parseInt(document.getElementById('quantity').value),
-        unit_price: parseFloat(document.getElementById('unitPrice').value),
-        category: document.getElementById('category').value,
-        store_id: null  // Optional for now
-        // No customer_id - will be set by backend
+    // API Endpoints (using Django URL tags)
+    const API = {
+        create: "{% url 'mall_management_system:create_transaction' %}",
+        list: "{% url 'mall_management_system:get_transactions' %}",
+        clear: "{% url 'mall_management_system:clear_transactions' %}",
+        analytics: "{% url 'mall_management_system:get_analytics' %}"
     };
+
+    // CSRF Token
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Chart instances
+    let salesChart, categoryChart, hourlyChart, dailyChart;
+
+    // ============================================================
+    // Initialize on Page Load
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeDateTime();
+        initializeEventListeners();
+        loadTransactions();
+        loadAnalytics();
+    });
+
+    // ============================================================
+    // Date & Time Functions
+    // ============================================================
+    function initializeDateTime() {
+        const now = new Date();
+        document.getElementById('currentDay').textContent = now.getDate();
+        document.getElementById('currentMonth').textContent = now.toLocaleString('default', { month: 'long' });
+        document.getElementById('currentYear').textContent = now.getFullYear();
+        document.getElementById('currentWeekday').textContent = now.toLocaleString('default', { weekday: 'long' });
+        
+        updateTime();
+        setInterval(updateTime, 1000);
+    }
+
+    function updateTime() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: false 
+        });
+        document.getElementById('timeDisplay').textContent = timeString;
+        
+        // Update ML features
+        document.getElementById('autoHour').textContent = now.getHours();
+        document.getElementById('autoDay').textContent = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'][now.getDay()];
+        document.getElementById('autoMonth').textContent = now.getMonth() + 1;
+    }
+
+    // ============================================================
+    // Event Listeners
+    // ============================================================
+    function initializeEventListeners() {
+        // Transaction form submission
+        document.getElementById('transactionForm').addEventListener('submit', handleTransactionSubmit);
+        
+        // Quick add sample
+        document.getElementById('quickAddBtn').addEventListener('click', quickAddSample);
+        
+        // Clear transactions
+        document.getElementById('clearTransactionsBtn').addEventListener('click', clearTransactions);
+        
+        // Total preview
+        document.getElementById('quantity').addEventListener('input', updateTotalPreview);
+        document.getElementById('unitPrice').addEventListener('input', updateTotalPreview);
+        
+        // Refresh categories
+        document.getElementById('refreshCategories').addEventListener('click', function() {
+            this.classList.add('loading');
+            loadAnalytics().finally(() => {
+                setTimeout(() => this.classList.remove('loading'), 500);
+            });
+        });
+    }
+
+    // ============================================================
+    // Total Preview
+    // ============================================================
+    function updateTotalPreview() {
+        const qty = parseFloat(document.getElementById('quantity').value) || 0;
+        const price = parseFloat(document.getElementById('unitPrice').value) || 0;
+        const total = qty * price;
+        document.getElementById('totalPreview').textContent = '₹' + total.toLocaleString('en-IN', {
+            maximumFractionDigits: 2,
+            minimumFractionDigits: 2
+        });
+    }
+
+    // ============================================================
+    // Transaction CRUD Operations
+    // ============================================================
     
-    try {
-        const response = await fetch(API.create, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': csrftoken
-            },
-            body: JSON.stringify(formData),
-            credentials: 'same-origin'  // Important: sends cookies/session
+    // Create Transaction
+    async function handleTransactionSubmit(e) {
+        e.preventDefault();
+        
+        const submitBtn = document.getElementById('submitTransactionBtn');
+        const originalText = submitBtn.innerHTML;
+        
+        submitBtn.innerHTML = '<span class="spinner"></span> Adding...';
+        submitBtn.disabled = true;
+        
+        const formData = {
+            product_name: document.getElementById('productName').value,
+            quantity: parseInt(document.getElementById('quantity').value),
+            unit_price: parseFloat(document.getElementById('unitPrice').value),
+            category: document.getElementById('category').value,
+            store_id: null
+        };
+        
+        try {
+            const response = await fetch(API.create, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': csrftoken
+                },
+                body: JSON.stringify(formData),
+                credentials: 'same-origin'
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showToast('Transaction added successfully!', 'success');
+                document.getElementById('transactionForm').reset();
+                document.getElementById('quantity').value = '1';
+                updateTotalPreview();
+                
+                await loadTransactions();
+                await loadAnalytics();
+            } else {
+                showToast('Error: ' + (data.errors ? JSON.stringify(data.errors) : data.error), 'error');
+            }
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+            console.error('Create transaction error:', error);
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    // Load Transactions
+    async function loadTransactions() {
+        try {
+            const response = await fetch(API.list);
+            const data = await response.json();
+            
+            if (data.success) {
+                updateTransactionsTable(data.transactions);
+                updateSummary(data.summary);
+            }
+        } catch (error) {
+            console.error('Load transactions error:', error);
+            showToast('Failed to load transactions', 'error');
+        }
+    }
+
+    // Update Transactions Table
+    function updateTransactionsTable(transactions) {
+        const tbody = document.getElementById('liveTransactionsTable');
+        const recentTbody = document.getElementById('recentTransactionsTable');
+        
+        if (!transactions || transactions.length === 0) {
+            tbody.innerHTML = `
+                <tr class="empty-row">
+                    <td colspan="5">
+                        <div class="empty-message">
+                            <i class="fas fa-shopping-cart"></i>
+                            <p>No transactions yet</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            
+            recentTbody.innerHTML = `
+                <tr>
+                    <td colspan="4" style="text-align: center; color: var(--gray-400); padding: 2rem;">
+                        No transactions yet
+                    </td>
+                </tr>
+            `;
+            
+            document.getElementById('transactionCount').textContent = '0';
+            return;
+        }
+        
+        // Live transactions (latest 5)
+        let liveHtml = '';
+        const recentTransactions = transactions.slice(0, 5);
+        
+        recentTransactions.forEach(t => {
+            const time = t.formatted_time || new Date(t.transaction_time).toLocaleTimeString();
+            liveHtml += `
+                <tr>
+                    <td>${time}</td>
+                    <td>${t.product_name}</td>
+                    <td>${t.category}</td>
+                    <td>${t.quantity}</td>
+                    <td>₹${parseFloat(t.total_amount).toLocaleString('en-IN')}</td>
+                </tr>
+            `;
         });
         
-        const data = await response.json();
+        tbody.innerHTML = liveHtml;
+        document.getElementById('transactionCount').textContent = transactions.length;
         
-        if (data.success) {
-            showToast('Transaction added successfully!', 'success');
-            document.getElementById('transactionForm').reset();
-            document.getElementById('quantity').value = '1';
-            updateTotalPreview();
-            
-            await loadTransactions();
-            await loadAnalytics();
-        } else {
-            showToast('Error: ' + (data.errors ? JSON.stringify(data.errors) : data.error), 'error');
-        }
-    } catch (error) {
-        showToast('Error: ' + error.message, 'error');
-        console.error('Create transaction error:', error);
-    } finally {
-        submitBtn.innerHTML = originalText;
-        submitBtn.disabled = false;
+        // Recent transactions table
+        let recentHtml = '';
+        transactions.slice(0, 5).forEach(t => {
+            const time = t.formatted_time || new Date(t.transaction_time).toLocaleTimeString();
+            recentHtml += `
+                <tr>
+                    <td>${t.product_name}</td>
+                    <td>${t.category}</td>
+                    <td>₹${parseFloat(t.total_amount).toLocaleString('en-IN')}</td>
+                    <td>${time}</td>
+                </tr>
+            `;
+        });
+        
+        recentTbody.innerHTML = recentHtml;
     }
-}
-        // Load Transactions
-        async function loadTransactions() {
-            try {
-                const response = await fetch(API.list);
-                const data = await response.json();
-                
-                if (data.success) {
-                    updateTransactionsTable(data.transactions);
-                    updateSummary(data.summary);
-                }
-            } catch (error) {
-                console.error('Load transactions error:', error);
-                showToast('Failed to load transactions', 'error');
-            }
-        }
 
-        // Update Transactions Table
-        function updateTransactionsTable(transactions) {
-            const tbody = document.getElementById('liveTransactionsTable');
-            const recentTbody = document.getElementById('recentTransactionsTable');
+    // Update Summary
+    function updateSummary(summary) {
+        if (summary) {
+            document.getElementById('todayTotal').textContent = '₹' + (summary.today_total || 0).toLocaleString('en-IN');
+            document.getElementById('avgTransaction').textContent = '₹' + (summary.avg_transaction || 0).toLocaleString('en-IN');
             
-            if (!transactions || transactions.length === 0) {
-                // Live transactions empty state
-                tbody.innerHTML = `
-                    <tr class="empty-row">
-                        <td colspan="5">
-                            <div class="empty-message">
-                                <i class="fas fa-shopping-cart"></i>
-                                <p>No transactions yet</p>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-                
-                // Recent transactions empty state
-                recentTbody.innerHTML = `
-                    <tr>
-                        <td colspan="4" style="text-align: center; color: var(--gray-400); padding: 2rem;">
-                            No transactions yet
-                        </td>
-                    </tr>
-                `;
-                
-                document.getElementById('transactionCount').textContent = '0';
-                return;
-            }
-            
-            // Live transactions (latest 5)
-            let liveHtml = '';
-            const recentTransactions = transactions.slice(0, 5);
-            
-            recentTransactions.forEach(t => {
-                const time = t.formatted_time || new Date(t.transaction_time).toLocaleTimeString();
-                liveHtml += `
-                    <tr>
-                        <td>${time}</td>
-                        <td>${t.product_name}</td>
-                        <td>${t.category}</td>
-                        <td>${t.quantity}</td>
-                        <td>₹${parseFloat(t.total_amount).toLocaleString('en-IN')}</td>
-                    </tr>
-                `;
+            // Update KPI cards
+            document.getElementById('totalSales').textContent = '₹' + (summary.today_total || 0).toLocaleString('en-IN', {
+                notation: 'compact',
+                compactDisplay: 'short'
+            });
+            document.getElementById('totalTransactions').textContent = summary.today_count || 0;
+            document.getElementById('avgTransactionValue').textContent = '₹' + (summary.avg_transaction || 0).toLocaleString('en-IN');
+        }
+    }
+
+    // Clear Transactions
+    async function clearTransactions() {
+        if (!confirm('Are you sure you want to clear all transactions? This action cannot be undone.')) {
+            return;
+        }
+        
+        const clearBtn = document.getElementById('clearTransactionsBtn');
+        const originalText = clearBtn.innerHTML;
+        
+        clearBtn.innerHTML = '<span class="spinner"></span> Clearing...';
+        clearBtn.disabled = true;
+        
+        try {
+            const response = await fetch(API.clear, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': csrftoken
+                }
             });
             
-            tbody.innerHTML = liveHtml;
-            document.getElementById('transactionCount').textContent = transactions.length;
+            const data = await response.json();
             
-            // Recent transactions table
-            let recentHtml = '';
-            transactions.slice(0, 5).forEach(t => {
-                const time = t.formatted_time || new Date(t.transaction_time).toLocaleTimeString();
-                recentHtml += `
-                    <tr>
-                        <td>${t.product_name}</td>
-                        <td>${t.category}</td>
-                        <td>₹${parseFloat(t.total_amount).toLocaleString('en-IN')}</td>
-                        <td>${time}</td>
-                    </tr>
-                `;
+            if (data.success) {
+                showToast(data.message, 'success');
+                await loadTransactions();
+                await loadAnalytics();
+            } else {
+                showToast('Error: ' + data.error, 'error');
+            }
+        } catch (error) {
+            showToast('Error: ' + error.message, 'error');
+            console.error('Clear transactions error:', error);
+        } finally {
+            clearBtn.innerHTML = originalText;
+            clearBtn.disabled = false;
+        }
+    }
+
+    // ============================================================
+    // Analytics
+    // ============================================================
+    async function loadAnalytics() {
+        try {
+            const response = await fetch(API.analytics);
+            const data = await response.json();
+            
+            if (data.success) {
+                updateCharts(data.analytics);
+                updateKPIs(data.analytics);
+            }
+        } catch (error) {
+            console.error('Load analytics error:', error);
+        }
+    }
+
+    function updateCharts(analytics) {
+        // Weekly Sales Chart
+        if (analytics.weekly && analytics.weekly.length > 0) {
+            const weeklyLabels = analytics.weekly.map(d => {
+                const date = new Date(d.transaction_date);
+                return date.toLocaleDateString('en-US', { weekday: 'short' });
             });
+            const weeklyData = analytics.weekly.map(d => d.total);
             
-            recentTbody.innerHTML = recentHtml;
+            updateWeeklyChart(weeklyLabels, weeklyData);
         }
-
-        // Update Summary
-        function updateSummary(summary) {
-            if (summary) {
-                document.getElementById('todayTotal').textContent = '₹' + (summary.today_total || 0).toLocaleString('en-IN');
-                document.getElementById('avgTransaction').textContent = '₹' + (summary.avg_transaction || 0).toLocaleString('en-IN');
-                
-                // Update KPI cards
-                document.getElementById('totalSales').textContent = '₹' + (summary.today_total || 0).toLocaleString('en-IN', {
-                    notation: 'compact',
-                    compactDisplay: 'short'
-                });
-                document.getElementById('totalTransactions').textContent = summary.today_count || 0;
-                document.getElementById('avgTransactionValue').textContent = '₹' + (summary.avg_transaction || 0).toLocaleString('en-IN');
-            }
+        
+        // Category Chart
+        if (analytics.categories && analytics.categories.length > 0) {
+            const categoryLabels = analytics.categories.map(c => c.category);
+            const categoryData = analytics.categories.map(c => c.total);
+            const categoryColors = {
+                'electronics': '#2563eb',
+                'fashion': '#f59e0b',
+                'food': '#10b981',
+                'beauty': '#ef4444',
+                'sports': '#8b5cf6'
+            };
+            const colors = categoryLabels.map(cat => categoryColors[cat] || '#64748b');
+            
+            updateCategoryChart(categoryLabels, categoryData, colors);
+            document.getElementById('totalCategories').textContent = categoryLabels.length;
         }
-
-        // Clear Transactions
-        async function clearTransactions() {
-            if (!confirm('Are you sure you want to clear all transactions? This action cannot be undone.')) {
-                return;
-            }
+        
+        // Hourly Chart
+        if (analytics.hourly && analytics.hourly.length > 0) {
+            const hourlyLabels = analytics.hourly.map(h => `${h.hour}:00`);
+            const hourlyData = analytics.hourly.map(h => h.count);
             
-            const clearBtn = document.getElementById('clearTransactionsBtn');
-            const originalText = clearBtn.innerHTML;
-            
-            clearBtn.innerHTML = '<span class="spinner"></span> Clearing...';
-            clearBtn.disabled = true;
-            
-            try {
-                const response = await fetch(API.clear, {
-                    method: 'DELETE',
-                    headers: {
-                        'X-CSRFToken': csrftoken
-                    }
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showToast(data.message, 'success');
-                    await loadTransactions();
-                    await loadAnalytics();
-                } else {
-                    showToast('Error: ' + data.error, 'error');
-                }
-            } catch (error) {
-                showToast('Error: ' + error.message, 'error');
-                console.error('Clear transactions error:', error);
-            } finally {
-                clearBtn.innerHTML = originalText;
-                clearBtn.disabled = false;
-            }
+            updateHourlyChart(hourlyLabels, hourlyData);
         }
-
-        // ============================================================
-        // Analytics
-        // ============================================================
-        async function loadAnalytics() {
-            try {
-                const response = await fetch(API.analytics);
-                const data = await response.json();
-                
-                if (data.success) {
-                    updateCharts(data.analytics);
-                    updateKPIs(data.analytics);
-                }
-            } catch (error) {
-                console.error('Load analytics error:', error);
-            }
+        
+        // Daily Chart
+        if (analytics.weekly && analytics.weekly.length > 0) {
+            const dailyLabels = analytics.weekly.map(d => {
+                const date = new Date(d.transaction_date);
+                return date.toLocaleDateString('en-US', { weekday: 'short' });
+            });
+            const dailyData = analytics.weekly.map(d => d.total);
+            
+            updateDailyChart(dailyLabels, dailyData);
         }
+    }
 
-        function updateCharts(analytics) {
-            // Weekly Sales Chart
-            if (analytics.weekly && analytics.weekly.length > 0) {
-                const weeklyLabels = analytics.weekly.map(d => {
-                    const date = new Date(d.transaction_date);
-                    return date.toLocaleDateString('en-US', { weekday: 'short' });
-                });
-                const weeklyData = analytics.weekly.map(d => d.total);
-                
-                updateWeeklyChart(weeklyLabels, weeklyData);
-            }
-            
-            // Category Chart
-            if (analytics.categories && analytics.categories.length > 0) {
-                const categoryLabels = analytics.categories.map(c => c.category);
-                const categoryData = analytics.categories.map(c => c.total);
-                const categoryColors = {
-                    'electronics': '#2563eb',
-                    'fashion': '#f59e0b',
-                    'food': '#10b981',
-                    'beauty': '#ef4444',
-                    'sports': '#8b5cf6'
-                };
-                const colors = categoryLabels.map(cat => categoryColors[cat] || '#64748b');
-                
-                updateCategoryChart(categoryLabels, categoryData, colors);
-                document.getElementById('totalCategories').textContent = categoryLabels.length;
-            }
-            
-            // Hourly Chart
-            if (analytics.hourly && analytics.hourly.length > 0) {
-                const hourlyLabels = analytics.hourly.map(h => `${h.hour}:00`);
-                const hourlyData = analytics.hourly.map(h => h.count);
-                
-                updateHourlyChart(hourlyLabels, hourlyData);
-            }
-            
-            // Daily Chart
-            if (analytics.weekly && analytics.weekly.length > 0) {
-                const dailyLabels = analytics.weekly.map(d => {
-                    const date = new Date(d.transaction_date);
-                    return date.toLocaleDateString('en-US', { weekday: 'short' });
-                });
-                const dailyData = analytics.weekly.map(d => d.total);
-                
-                updateDailyChart(dailyLabels, dailyData);
-            }
+    function updateKPIs(analytics) {
+        if (analytics.categories) {
+            document.getElementById('totalCategories').textContent = analytics.categories.length;
         }
+    }
 
-        function updateKPIs(analytics) {
-            // Update KPI cards with analytics data
-            if (analytics.categories) {
-                document.getElementById('totalCategories').textContent = analytics.categories.length;
-            }
+    // ============================================================
+    // Chart Update Functions
+    // ============================================================
+    function updateWeeklyChart(labels, data) {
+        const ctx = document.getElementById('salesChart').getContext('2d');
+        
+        if (salesChart) {
+            salesChart.destroy();
         }
-
-        // ============================================================
-        // Chart Update Functions
-        // ============================================================
-        function updateWeeklyChart(labels, data) {
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            
-            if (salesChart) {
-                salesChart.destroy();
-            }
-            
-            salesChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'This Week',
-                        data: data,
-                        borderColor: '#2563eb',
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
-                        fill: true,
-                        tension: 0.4,
-                        pointRadius: 3
-                    }]
+        
+        salesChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'This Week',
+                    data: data,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 3
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false }
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: { color: '#f3f4f6' },
+                        ticks: { callback: value => '₹' + (value/1000) + 'k' }
                     },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: '#f3f4f6' },
-                            ticks: { callback: value => '₹' + (value/1000) + 'k' }
-                        },
-                        x: { grid: { display: false } }
-                    }
+                    x: { grid: { display: false } }
                 }
-            });
-        }
-
-        function updateCategoryChart(labels, data, colors) {
-            const ctx = document.getElementById('sourceChart').getContext('2d');
-            
-            if (categoryChart) {
-                categoryChart.destroy();
             }
-            
-            categoryChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: colors,
-                        borderWidth: 0
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                            labels: { 
-                                boxWidth: 8,
-                                padding: 10,
-                                font: { size: 11 }
-                            }
+        });
+    }
+
+    function updateCategoryChart(labels, data, colors) {
+        const ctx = document.getElementById('sourceChart').getContext('2d');
+        
+        if (categoryChart) {
+            categoryChart.destroy();
+        }
+        
+        categoryChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: colors,
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { 
+                            boxWidth: 8,
+                            padding: 10,
+                            font: { size: 11 }
                         }
                     }
                 }
-            });
-        }
-
-        function updateHourlyChart(labels, data) {
-            const ctx = document.getElementById('visitorsChart').getContext('2d');
-            
-            if (hourlyChart) {
-                hourlyChart.destroy();
             }
-            
-            hourlyChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: '#2563eb',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            grid: { color: '#f3f4f6' },
-                            ticks: { stepSize: 1 }
-                        },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
-        }
+        });
+    }
 
-        function updateDailyChart(labels, data) {
-            const ctx = document.getElementById('heatmapChart').getContext('2d');
-            
-            if (dailyChart) {
-                dailyChart.destroy();
-            }
-            
-            dailyChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: '#2563eb',
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { 
-                            beginAtZero: true, 
-                            grid: { color: '#f3f4f6' },
-                            ticks: { callback: value => '₹' + (value/1000) + 'k' }
-                        },
-                        x: { grid: { display: false } }
-                    }
-                }
-            });
+    function updateHourlyChart(labels, data) {
+        const ctx = document.getElementById('visitorsChart').getContext('2d');
+        
+        if (hourlyChart) {
+            hourlyChart.destroy();
         }
-
-        // ============================================================
-        // Quick Add Sample
-        // ============================================================
-        function quickAddSample() {
-            const samples = [
-                { product: 'Wireless Headphones', category: 'electronics', price: 2999 },
-                { product: 'Cotton T-Shirt', category: 'fashion', price: 799 },
-                { product: 'Cappuccino', category: 'food', price: 250 },
-                { product: 'Face Cream', category: 'beauty', price: 599 },
-                { product: 'Yoga Mat', category: 'sports', price: 1299 }
-            ];
-            
-            const sample = samples[Math.floor(Math.random() * samples.length)];
-            
-            document.getElementById('productName').value = sample.product;
-            document.getElementById('category').value = sample.category;
-            document.getElementById('unitPrice').value = sample.price;
-            document.getElementById('quantity').value = Math.floor(Math.random() * 3) + 1;
-            
-            updateTotalPreview();
-        }
-
-        // ============================================================
-        // Toast Notification
-        // ============================================================
-        function showToast(message, type = 'success') {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            
-            const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
-            
-            toast.innerHTML = `
-                <div class="toast-icon">
-                    <i class="fas fa-${icon}"></i>
-                </div>
-                <div class="toast-content">
-                    <h4>${type === 'success' ? 'Success!' : 'Error!'}</h4>
-                    <p>${message}</p>
-                </div>
-                <button class="toast-close" onclick="this.parentElement.remove()">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            
-            container.appendChild(toast);
-            
-            // Trigger animation
-            setTimeout(() => toast.classList.add('show'), 10);
-            
-            // Auto remove after 5 seconds
-            setTimeout(() => {
-                if (toast.parentElement) {
-                    toast.classList.remove('show');
-                    setTimeout(() => toast.remove(), 300);
-                }
-            }, 5000);
-        }
-
-        // ============================================================
-        // Helper Functions
-        // ============================================================
-        function getCookie(name) {
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
+        
+        hourlyChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: '#2563eb',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: '#f3f4f6' },
+                        ticks: { stepSize: 1 }
+                    },
+                    x: { grid: { display: false } }
                 }
             }
-            return cookieValue;
+        });
+    }
+
+    function updateDailyChart(labels, data) {
+        const ctx = document.getElementById('heatmapChart').getContext('2d');
+        
+        if (dailyChart) {
+            dailyChart.destroy();
         }
-    </script>
-</body>
-</html>
+        
+        dailyChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: data,
+                    backgroundColor: '#2563eb',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        grid: { color: '#f3f4f6' },
+                        ticks: { callback: value => '₹' + (value/1000) + 'k' }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    }
+
+    // ============================================================
+    // Quick Add Sample
+    // ============================================================
+    function quickAddSample() {
+        const samples = [
+            { product: 'Wireless Headphones', category: 'electronics', price: 2999 },
+            { product: 'Cotton T-Shirt', category: 'fashion', price: 799 },
+            { product: 'Cappuccino', category: 'food', price: 250 },
+            { product: 'Face Cream', category: 'beauty', price: 599 },
+            { product: 'Yoga Mat', category: 'sports', price: 1299 }
+        ];
+        
+        const sample = samples[Math.floor(Math.random() * samples.length)];
+        
+        document.getElementById('productName').value = sample.product;
+        document.getElementById('category').value = sample.category;
+        document.getElementById('unitPrice').value = sample.price;
+        document.getElementById('quantity').value = Math.floor(Math.random() * 3) + 1;
+        
+        updateTotalPreview();
+    }
+</script>
+{% endblock %}
+
