@@ -72,17 +72,21 @@ class DashboardService:
         """Get all KPI data in one dictionary"""
         total_sales = self.get_total_sales()
         total_visitors = self.get_total_visitors()
+        sales_change = round(self.get_sales_change_percentage(), 1)
+        visitors_change = round(self.get_visitors_change_percentage(), 1)
         
         return {
-            'total_sales': total_sales,
-            'total_sales_formatted': self._format_currency(total_sales),
-            'total_visitors': total_visitors,
-            'total_visitors_formatted': self._format_number(total_visitors),
+            'total_sales': self._format_currency(total_sales),        # ✅ formatted for display
+            'total_sales_raw': total_sales,
+            'total_visitors': self._format_number(total_visitors),     # ✅ formatted for display
+            'total_visitors_raw': total_visitors,
             'total_transactions': self.get_total_transactions(),
             'conversion_rate': round(self.get_conversion_rate(), 1),
-            'profit_margin': 24.6,  # This could come from a settings or calculation
-            'sales_change': round(self.get_sales_change_percentage(), 1),
-            'visitors_change': round(self.get_visitors_change_percentage(), 1),
+            'profit_margin': 24.6,
+            'sales_change': sales_change,
+            'visitors_change': visitors_change,
+            'sales_change_direction': 'positive' if sales_change >= 0 else 'negative',    # ✅ added
+            'visitors_change_direction': 'positive' if visitors_change >= 0 else 'negative',  # ✅ added
         }
     
     # ============================================================
@@ -130,7 +134,6 @@ class DashboardService:
                 data.append(float(item['total']))
                 categories.append(item['category'])
         
-        # Color mapping for categories
         colors = self._get_category_colors(categories)
         
         return {
@@ -140,7 +143,7 @@ class DashboardService:
         }
     
     def get_hourly_data(self):
-        """Get hourly sales data for today"""
+        """Get hourly sales data for today (used as heatmap)"""
         data = []
         labels = []
         
@@ -153,7 +156,14 @@ class DashboardService:
             ).aggregate(Sum('total_amount'))['total_amount__sum'] or 0
             
             data.append(float(hour_sales))
-            labels.append(f"{hour}:00" if hour <= 12 else f"{hour-12}:00 PM")
+            # ✅ Fixed label logic — was showing wrong PM labels
+            if hour == 12:
+                label = "12:00 PM"
+            elif hour < 12:
+                label = f"{hour}:00 AM"
+            else:
+                label = f"{hour - 12}:00 PM"
+            labels.append(label)
         
         return {'labels': labels, 'data': data}
     
@@ -176,15 +186,15 @@ class DashboardService:
         
         return {
             'weekly_labels': weekly['labels'],
-            'weekly_sales_data': weekly['data'],
-            'last_week_sales_data': self.get_last_week_sales_data(),
+            'weekly_current_data': weekly['data'],                      # ✅ renamed from weekly_sales_data
+            'weekly_last_week_data': self.get_last_week_sales_data(),
             'category_labels': category['labels'],
             'category_data': category['data'],
             'category_colors': category['colors'],
-            'hourly_labels': hourly['labels'],
-            'hourly_data': hourly['data'],
             'visitor_labels': weekly['labels'],
             'visitor_data': self.get_visitors_per_day(),
+            'heatmap_labels': hourly['labels'],                         # ✅ added
+            'heatmap_data': hourly['data'],                             # ✅ added
         }
     
     # ============================================================
@@ -192,10 +202,22 @@ class DashboardService:
     # ============================================================
     
     def get_recent_transactions(self, limit=5):
-        """Get recent transactions with related data"""
-        return Transaction.objects.select_related(
+        """Get recent transactions formatted for the template"""
+        transactions = Transaction.objects.select_related(
             'store_id', 'customer_id'
         ).order_by('-created_at')[:limit]
+        
+        # ✅ Return a list of dicts matching what the template expects
+        result = []
+        for t in transactions:
+            result.append({
+                'customer_name': t.customer_id.get_full_name() or t.customer_id.username,
+                'store_name': t.store_id.name if t.store_id else '—',
+                'amount_formatted': self._format_currency(t.total_amount),
+                'time': t.transaction_datetime.strftime('%d %b, %H:%M'),
+                'status': 'completed',  # or derive from a status field if you add one
+            })
+        return result
     
     # ============================================================
     # Helper Methods
@@ -203,6 +225,7 @@ class DashboardService:
     
     def _format_currency(self, value):
         """Format currency values"""
+        value = float(value)
         if value >= 100000:
             return f"₹{value/100000:.2f}L"
         elif value >= 1000:
@@ -240,27 +263,23 @@ class SalesService:
         self.today = self.now.date()
     
     def get_monthly_sales(self):
-        """Get current month sales"""
         return Transaction.objects.filter(
             transaction_date__month=self.now.month,
             transaction_date__year=self.now.year
         ).aggregate(total=Sum('total_amount'))['total'] or 0
     
     def get_weekly_sales(self):
-        """Get current week sales"""
         week_start = self.today - timedelta(days=self.today.weekday())
         return Transaction.objects.filter(
             transaction_date__gte=week_start
         ).aggregate(total=Sum('total_amount'))['total'] or 0
     
     def get_daily_sales(self):
-        """Get today's sales"""
         return Transaction.objects.filter(
             transaction_date=self.today
         ).aggregate(total=Sum('total_amount'))['total'] or 0
     
     def get_all_sales_data(self):
-        """Get all sales data"""
         monthly = self.get_monthly_sales()
         weekly = self.get_weekly_sales()
         daily = self.get_daily_sales()
@@ -280,17 +299,14 @@ class CustomerService:
     """Service class for customer analytics"""
     
     def get_total_customers(self):
-        """Get total active customers"""
         return User.objects.filter(is_active=True).count()
     
     def get_active_today(self):
-        """Get customers active today"""
         return Transaction.objects.filter(
             transaction_date=timezone.now().date()
         ).values('customer_id').distinct().count()
     
     def get_all_customer_data(self):
-        """Get all customer data"""
         return {
             'total_customers': self.get_total_customers(),
             'active_today': self.get_active_today(),
