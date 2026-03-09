@@ -10,7 +10,7 @@ from rest_framework import status
 from .serializers import TransactionCreateSerializer, TransactionSerializer
 from django.utils import timezone
 import json
-from .dashboard_services import DashboardService
+from .dashboard_services import DashboardService, CustomerService
 
 try:
     from bson.decimal128 import Decimal128
@@ -141,17 +141,51 @@ def sales(request):
     return render(request, 'sales/sales.html', context)
 
 def customers(request):
-    """Customers view with date context"""
-    service = DashboardService()
+    """Customers view with customer analytics data"""
     
+    # Initialize the customer service
+    service = CustomerService()
+    
+    # Get all customer data
+    customer_data = service.get_all_customer_data()
+    
+    # Get recent customers list
+    recent_customers = service.get_recent_customers(limit=10)
+    
+    # Get chart data
+    acquisition_data = service.get_acquisition_data()
+    segment_data = service.get_segment_data()
+    
+    # Context for template
     context = {
-        'current_day': service.now.day,
-        'current_month': service.now.strftime('%B'),
-        'current_year': service.now.year,
-        'current_weekday': service.now.strftime('%A'),
-        'date_range': f"{service.now.strftime('%B')} {service.now.year}",
+        'total_customers': customer_data['total_customers'],
+        'active_today': customer_data['active_today'],
+        'new_customers_today': customer_data['new_customers_today'],
+        'loyal_customers': customer_data['loyal_customers'],
+        'customer_growth': customer_data['customer_growth'],
+        'avg_customer_spend': customer_data['avg_customer_spend'],
+        'avg_customer_spend_formatted': f"₹{customer_data['avg_customer_spend']:,.0f}",
+        'repeat_rate': customer_data['repeat_rate'],
+        'satisfaction_score': customer_data['satisfaction_score'],
+        'recent_customers': recent_customers,
+        
+        # Chart data - acquisition trend
+        'acquisition_dates': json.dumps(acquisition_data['dates']),
+        'acquisition_counts': json.dumps(acquisition_data['counts']),
+        
+        # Chart data - segment distribution
+        'segment_labels': json.dumps(segment_data['labels']),
+        'segment_values': json.dumps(segment_data['values']),
+        'segment_colors': json.dumps(segment_data['colors']),
+        
+        # Date context
+        'current_day': timezone.now().day,
+        'current_month': timezone.now().strftime('%B'),
+        'current_year': timezone.now().year,
+        'current_weekday': timezone.now().strftime('%A'),
+        'date_range': f"{timezone.now().strftime('%B')} {timezone.now().year}",
     }
-    print(context)
+    
     return render(request, 'Customers/customers.html', context)
 
 def inventory(request):
