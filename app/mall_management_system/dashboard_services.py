@@ -460,7 +460,7 @@ class CustomerService:
             'counts': counts,
         }
     
-    def get_segment_data(self):
+    def get_segment_data(self): # this is currently just static later i will integrate with our trained model
         """Get customer segment distribution"""
         from django.db.models import Count
         
