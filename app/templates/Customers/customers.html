@@ -17,6 +17,27 @@
         border-radius: var(--radius-lg);
         padding: 1.25rem;
         border: 1px solid var(--gray-200);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+    .customer-kpi-card:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-md);
+    }
+    .customer-kpi-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 3px;
+        background: var(--primary);
+        opacity: 0;
+        transition: opacity 0.2s;
+    }
+    .customer-kpi-card:hover::before {
+        opacity: 1;
     }
     .customer-kpi-header {
         display: flex;
@@ -34,11 +55,41 @@
         background: var(--gray-100);
         color: var(--primary);
     }
-    .customer-kpi-header h3 { font-size: 0.875rem; color: var(--gray-500); }
-    .customer-kpi-value { font-size: 1.75rem; font-weight: 700; }
-    .customer-kpi-change { font-size: 0.75rem; margin-top: 0.5rem; }
-    .change-positive { color: var(--success); }
-    .customers-content { display: flex; flex-direction: column; gap: 1.5rem; }
+    .customer-kpi-header h3 { 
+        font-size: 0.875rem; 
+        color: var(--gray-500);
+        text-transform: uppercase;
+        letter-spacing: 0.025em;
+        font-weight: 500;
+    }
+    .customer-kpi-value { 
+        font-size: 1.75rem; 
+        font-weight: 700; 
+        color: var(--gray-900);
+        line-height: 1.2;
+        margin-bottom: 0.25rem;
+    }
+    .customer-kpi-change { 
+        font-size: 0.75rem; 
+        margin-top: 0.5rem; 
+    }
+    .change-positive { 
+        color: var(--success); 
+        font-weight: 600;
+    }
+    .change-negative { 
+        color: var(--danger); 
+        font-weight: 600;
+    }
+    .change-label {
+        color: var(--gray-500);
+        margin-left: 0.25rem;
+    }
+    .customers-content { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 1.5rem; 
+    }
     .customer-charts-section .charts-grid {
         display: grid;
         grid-template-columns: 2fr 1fr;
@@ -49,6 +100,11 @@
         border-radius: var(--radius-lg);
         padding: 1.25rem;
         border: 1px solid var(--gray-200);
+        transition: var(--transition);
+    }
+    .chart-card:hover {
+        border-color: var(--primary);
+        box-shadow: var(--shadow-md);
     }
     .chart-header {
         display: flex;
@@ -56,8 +112,15 @@
         align-items: center;
         margin-bottom: 1rem;
     }
-    .chart-header h3 { font-size: 1rem; font-weight: 600; }
-    .chart-container { height: 250px; }
+    .chart-header h3 { 
+        font-size: 1rem; 
+        font-weight: 600; 
+        color: var(--gray-900);
+    }
+    .chart-container { 
+        height: 250px; 
+        position: relative;
+    }
     .customers-table-container {
         background: white;
         border-radius: var(--radius-lg);
@@ -77,11 +140,16 @@
         text-transform: uppercase;
         background: var(--gray-50);
         border-bottom: 1px solid var(--gray-200);
+        letter-spacing: 0.025em;
     }
     .customers-table td {
         padding: 1rem;
         font-size: 0.875rem;
         border-bottom: 1px solid var(--gray-100);
+        color: var(--gray-700);
+    }
+    .customers-table tr:hover td {
+        background: var(--gray-50);
     }
     .segment-badge {
         display: inline-block;
@@ -90,10 +158,37 @@
         font-size: 0.75rem;
         font-weight: 500;
     }
-    .segment-badge.new { background: rgba(37,99,235,0.1); color: var(--primary); }
-    .segment-badge.regular { background: rgba(16,185,129,0.1); color: var(--success); }
-    .segment-badge.loyal { background: rgba(245,158,11,0.1); color: var(--warning); }
-    .segment-badge.vip { background: rgba(139,92,246,0.1); color: #8b5cf6; }
+    .segment-badge.new { 
+        background: rgba(37,99,235,0.1); 
+        color: var(--primary); 
+    }
+    .segment-badge.regular { 
+        background: rgba(16,185,129,0.1); 
+        color: var(--success); 
+    }
+    .segment-badge.loyal { 
+        background: rgba(245,158,11,0.1); 
+        color: var(--warning); 
+    }
+    .segment-badge.vip { 
+        background: rgba(139,92,246,0.1); 
+        color: #8b5cf6; 
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: var(--radius-lg);
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    .status-badge.active {
+        background: rgba(16, 185, 129, 0.1);
+        color: var(--success);
+    }
+    .status-badge.inactive {
+        background: rgba(239, 68, 68, 0.1);
+        color: var(--danger);
+    }
     .calendar-widget {
         background: var(--primary);
         border-radius: var(--radius);
@@ -101,14 +196,80 @@
         color: white;
         margin-top: auto;
     }
-    .calendar-widget h3 { font-size: 0.75rem; margin-bottom: 1rem; }
-    .customer-insights-summary { display: flex; flex-direction: column; gap: 0.75rem; }
-    .insight-item { display: flex; align-items: center; gap: 0.5rem; }
-    .insight-details { display: flex; flex-direction: column; }
-    .insight-value { font-size: 1.25rem; font-weight: 600; }
-    .insight-label { font-size: 0.625rem; opacity: 0.8; }
-    @media (max-width: 1200px) { .customer-kpis { grid-template-columns: repeat(2, 1fr); } .customer-charts-section .charts-grid { grid-template-columns: 1fr; } }
-    @media (max-width: 768px) { .customer-kpis { grid-template-columns: 1fr; } }
+    .calendar-widget h3 { 
+        font-size: 0.75rem; 
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        opacity: 0.9;
+    }
+    .customer-insights-summary { 
+        display: flex; 
+        flex-direction: column; 
+        gap: 0.75rem; 
+    }
+    .insight-item { 
+        display: flex; 
+        align-items: center; 
+        gap: 0.5rem; 
+        padding: 0.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: var(--radius);
+    }
+    .insight-item i {
+        width: 2rem;
+        height: 2rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: var(--radius);
+    }
+    .insight-details { 
+        display: flex; 
+        flex-direction: column; 
+    }
+    .insight-value { 
+        font-size: 1.25rem; 
+        font-weight: 600; 
+    }
+    .insight-label { 
+        font-size: 0.625rem; 
+        opacity: 0.8; 
+    }
+    .loading-spinner {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid var(--gray-200);
+        border-top-color: var(--primary);
+        border-radius: 50%;
+        animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+    @media (max-width: 1200px) { 
+        .customer-kpis { 
+            grid-template-columns: repeat(2, 1fr); 
+        } 
+        .customer-charts-section .charts-grid { 
+            grid-template-columns: 1fr; 
+        } 
+    }
+    @media (max-width: 768px) { 
+        .customer-kpis { 
+            grid-template-columns: 1fr; 
+        } 
+        .customers-table {
+            font-size: 0.75rem;
+        }
+        .customers-table th,
+        .customers-table td {
+            padding: 0.5rem;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -123,15 +284,22 @@
         <div class="insight-item">
             <i class="fas fa-user-plus"></i>
             <div class="insight-details">
-                <span class="insight-value" id="newCustomersToday">0</span>
+                <span class="insight-value" id="newCustomersToday">{{ new_customers_today|default:"0" }}</span>
                 <span class="insight-label">New Today</span>
             </div>
         </div>
         <div class="insight-item">
             <i class="fas fa-star"></i>
             <div class="insight-details">
-                <span class="insight-value" id="loyalCustomers">0</span>
+                <span class="insight-value" id="loyalCustomers">{{ loyal_customers|default:"0" }}</span>
                 <span class="insight-label">Loyal Customers</span>
+            </div>
+        </div>
+        <div class="insight-item">
+            <i class="fas fa-calendar-check"></i>
+            <div class="insight-details">
+                <span class="insight-value" id="activeToday">{{ active_today|default:"0" }}</span>
+                <span class="insight-label">Active Today</span>
             </div>
         </div>
     </div>
@@ -140,57 +308,95 @@
 
 {% block content %}
 <div class="customers-content">
+    <!-- KPI Cards -->
     <section class="customer-kpis">
         <div class="customer-kpi-card">
             <div class="customer-kpi-header">
                 <i class="fas fa-users"></i>
                 <div><h3>Total Customers</h3></div>
             </div>
-            <div class="customer-kpi-value" id="totalCustomers">0</div>
-            <div class="customer-kpi-change"><span class="change-positive" id="customerGrowth">+0%</span> this month</div>
+            <div class="customer-kpi-value" id="totalCustomers">{{ total_customers|default:"0" }}</div>
+            <div class="customer-kpi-change">
+                <span class="change-positive">{{ customer_growth|default:"0" }}%</span>
+                <span class="change-label">this month</span>
+            </div>
         </div>
         <div class="customer-kpi-card">
             <div class="customer-kpi-header">
                 <i class="fas fa-wallet"></i>
                 <div><h3>Avg. Spend</h3></div>
             </div>
-            <div class="customer-kpi-value" id="avgCustomerSpend">₹ 0</div>
-            <div class="customer-kpi-change"><span class="change-positive">+0%</span> vs last month</div>
+            <div class="customer-kpi-value" id="avgCustomerSpend">{{ avg_customer_spend_formatted|default:"₹0" }}</div>
+            <div class="customer-kpi-change">
+                <span class="change-positive">+{{ customer_growth|default:"0" }}%</span>
+                <span class="change-label">vs last month</span>
+            </div>
         </div>
         <div class="customer-kpi-card">
             <div class="customer-kpi-header">
                 <i class="fas fa-sync-alt"></i>
                 <div><h3>Repeat Rate</h3></div>
             </div>
-            <div class="customer-kpi-value" id="repeatRate">0%</div>
-            <div class="customer-kpi-change"><span class="change-positive">+0%</span> vs last month</div>
+            <div class="customer-kpi-value" id="repeatRate">{{ repeat_rate|default:"0" }}%</div>
+            <div class="customer-kpi-change">
+                <span class="change-positive">+{{ customer_growth|default:"0" }}%</span>
+                <span class="change-label">vs last month</span>
+            </div>
         </div>
         <div class="customer-kpi-card">
             <div class="customer-kpi-header">
                 <i class="fas fa-smile"></i>
                 <div><h3>Satisfaction</h3></div>
             </div>
-            <div class="customer-kpi-value" id="satisfactionScore">0.0</div>
-            <div class="customer-kpi-change"><span class="change-positive">+0%</span> this month</div>
+            <div class="customer-kpi-value" id="satisfactionScore">{{ satisfaction_score|default:"4.8" }}</div>
+            <div class="customer-kpi-change">
+                <span class="change-positive">+0.2</span>
+                <span class="change-label">this month</span>
+            </div>
         </div>
     </section>
     
+    <!-- Charts Section -->
     <section class="customer-charts-section">
         <div class="charts-grid">
             <div class="chart-card">
                 <div class="chart-header">
                     <h3>Customer Acquisition Trend</h3>
+                    <span class="badge">Last 30 days</span>
                 </div>
-                <div class="chart-container"><canvas id="acquisitionChart"></canvas></div>
+                <div class="chart-container">
+                    <canvas id="acquisitionChart" 
+                        data-dates="{{ acquisition_dates|safe }}"
+                        data-counts="{{ acquisition_counts|safe }}">
+                    </canvas>
+                </div>
             </div>
             <div class="chart-card">
-                <div class="chart-header"><h3>Customer Segments</h3></div>
-                <div class="chart-container"><canvas id="segmentsChart"></canvas></div>
+                <div class="chart-header">
+                    <h3>Customer Segments</h3>
+                </div>
+                <div class="chart-container">
+                    <canvas id="segmentsChart"
+                        data-labels="{{ segment_labels|safe }}"
+                        data-values="{{ segment_values|safe }}"
+                        data-colors="{{ segment_colors|safe }}">
+                    </canvas>
+                </div>
             </div>
         </div>
     </section>
     
+    <!-- Customers Table -->
     <section class="customers-table-container">
+        <div style="padding: 1rem 1rem 0; display: flex; justify-content: space-between; align-items: center;">
+            <h3 style="font-size: 1rem; font-weight: 600;">Recent Customers</h3>
+            <div style="display: flex; gap: 0.5rem;">
+                <input type="text" placeholder="Search customers..." class="search-input" style="padding: 0.5rem; border: 1px solid var(--gray-200); border-radius: var(--radius);">
+                <button class="filter-btn" style="padding: 0.5rem 1rem; background: var(--primary); color: white; border: none; border-radius: var(--radius); cursor: pointer;">
+                    <i class="fas fa-filter"></i>
+                </button>
+            </div>
+        </div>
         <table class="customers-table">
             <thead>
                 <tr>
@@ -204,14 +410,189 @@
                 </tr>
             </thead>
             <tbody id="customersTable">
-                <tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--gray-400)">Loading customers...</td></tr>
+                {% for customer in recent_customers %}
+                <tr>
+                    <td>
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <div style="width: 2rem; height: 2rem; background: var(--gray-200); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-user" style="color: var(--gray-600);"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight: 600;">{{ customer.name }}</div>
+                                <div style="font-size: 0.75rem; color: var(--gray-500);">ID: {{ customer.id }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>{{ customer.email }}</td>
+                    <td><span class="segment-badge {{ customer.segment }}">{{ customer.segment_display }}</span></td>
+                    <td><span style="font-weight: 600;">{{ customer.total_spend_formatted }}</span></td>
+                    <td>{{ customer.visit_count }}</td>
+                    <td>{{ customer.last_visit }}</td>
+                    <td><span class="status-badge active">Active</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7" style="text-align:center;padding:3rem;color:var(--gray-400)">
+                        <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                        <p>No customer data available</p>
+                    </td>
+                </tr>
+                {% endfor %}
             </tbody>
         </table>
+        <div style="padding: 1rem; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--gray-200);">
+            <div style="color: var(--gray-500); font-size: 0.875rem;">
+                Showing {{ recent_customers|length }} of {{ total_customers|default:"0" }} customers
+            </div>
+            <div style="display: flex; gap: 0.5rem;">
+                <button class="pagination-btn" style="padding: 0.5rem 1rem; border: 1px solid var(--gray-200); background: white; border-radius: var(--radius); cursor: pointer;">Previous</button>
+                <button class="pagination-btn" style="padding: 0.5rem 1rem; border: 1px solid var(--gray-200); background: white; border-radius: var(--radius); cursor: pointer;">Next</button>
+            </div>
+        </div>
     </section>
 </div>
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Acquisition Chart
+    const acquisitionCtx = document.getElementById('acquisitionChart').getContext('2d');
+    const acquisitionCanvas = document.getElementById('acquisitionChart');
+    
+    // Default data if not provided
+    const labels = acquisitionCanvas.dataset.dates ? 
+        JSON.parse(acquisitionCanvas.dataset.dates) : 
+        ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    
+    const counts = acquisitionCanvas.dataset.counts ? 
+        JSON.parse(acquisitionCanvas.dataset.counts) : 
+        [12, 19, 15, 17];
+    
+    new Chart(acquisitionCtx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'New Customers',
+                data: counts,
+                borderColor: '#2563eb',
+                backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                fill: true,
+                tension: 0.4,
+                pointBackgroundColor: '#2563eb',
+                pointBorderColor: 'white',
+                pointBorderWidth: 2,
+                pointRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { 
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `New Customers: ${context.raw}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color: '#f3f4f6' },
+                    ticks: { stepSize: 5 }
+                },
+                x: { grid: { display: false } }
+            }
+        }
+    });
+
+    // Initialize Segments Chart
+    const segmentsCtx = document.getElementById('segmentsChart').getContext('2d');
+    const segmentsCanvas = document.getElementById('segmentsChart');
+    
+    const segmentLabels = segmentsCanvas.dataset.labels ? 
+        JSON.parse(segmentsCanvas.dataset.labels) : 
+        ['New', 'Regular', 'Loyal', 'VIP'];
+    
+    const segmentValues = segmentsCanvas.dataset.values ? 
+        JSON.parse(segmentsCanvas.dataset.values) : 
+        [30, 45, 20, 5];
+    
+    const segmentColors = segmentsCanvas.dataset.colors ? 
+        JSON.parse(segmentsCanvas.dataset.colors) : 
+        ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6'];
+    
+    new Chart(segmentsCtx, {
+        type: 'doughnut',
+        data: {
+            labels: segmentLabels,
+            datasets: [{
+                data: segmentValues,
+                backgroundColor: segmentColors,
+                borderWidth: 0,
+                hoverOffset: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { 
+                    position: 'right',
+                    labels: {
+                        boxWidth: 10,
+                        padding: 15,
+                        font: { size: 11 }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = ((context.raw / total) * 100).toFixed(1);
+                            return `${context.label}: ${context.raw} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            cutout: '60%'
+        }
+    });
+
+    // Search functionality
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#customersTable tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm) || searchTerm === '') {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    }
+
+    // Refresh data button (if exists)
+    const refreshBtn = document.querySelector('.filter-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', function() {
+            this.innerHTML = '<span class="loading-spinner"></span>';
+            setTimeout(() => {
+                window.location.reload();
+            }, 500);
+        });
+    }
+});
+</script>
 <script src="{% static 'javascripts/customers.js' %}"></script>
 {% endblock %}
-
