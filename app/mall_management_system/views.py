@@ -154,8 +154,8 @@ def customers(request):
     
     # Get chart data
     acquisition_data = service.get_acquisition_data()
-    segment_data = service.get_segment_data()
-    
+    model_prediction = service.get_segment_data()
+    print(model_prediction)
     # Context for template
     context = {
         'total_customers': customer_data['total_customers'],
@@ -172,12 +172,6 @@ def customers(request):
         # Chart data - acquisition trend
         'acquisition_dates': json.dumps(acquisition_data['dates']),
         'acquisition_counts': json.dumps(acquisition_data['counts']),
-        
-        # Chart data - segment distribution
-        'segment_labels': json.dumps(segment_data['labels']),
-        'segment_values': json.dumps(segment_data['values']),
-        'segment_colors': json.dumps(segment_data['colors']),
-        
         # Date context
         'current_day': timezone.now().day,
         'current_month': timezone.now().strftime('%B'),
