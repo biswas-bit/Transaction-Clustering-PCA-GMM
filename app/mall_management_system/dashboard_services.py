@@ -462,40 +462,23 @@ class CustomerService:
     
     def get_segment_data(self): # this is currently just static later i will integrate with our trained model
         """Get customer segment distribution"""
-        from django.db.models import Count
+        from .models import Transaction
+        import numpy as np
         
-        # Get customer counts by segment
-        segment_counts = Transaction.objects.values(
-            'customer_id'
-        ).annotate(
-            visit_count=Count('id')
-        )
+        try:
+            from models import Segmenter
+            data = list(Transaction.objects.values("quantity", "unit_price", "hour","day_of_week"))
+            if data:
+                rows = [list(item.values()) for item in data]
+                x = np.array(rows,dtype=float) 
+                model_predict = Segmenter('app/models/Customer_Segmentation_v1.pkl').get_cluster(x)
+                print(model_predict)
+        except Exception as e:
+            print(f"ML Model error (non-fatal): {e}")
         
-        # Count customers in each segment
-        new_count = 0
-        regular_count = 0
-        loyal_count = 0
-        vip_count = 0
-        
-        for c in segment_counts:
-            if c['visit_count'] >= 10:
-                vip_count += 1
-            elif c['visit_count'] >= 5:
-                loyal_count += 1
-            elif c['visit_count'] >= 2:
-                regular_count += 1
-            else:
-                new_count += 1
-        
-        # If no transaction data, provide default distribution
-        if segment_counts.count() == 0:
-            new_count = 10
-            regular_count = 15
-            loyal_count = 8
-            vip_count = 2
-        
+        # Return static segment data (the ML integration is optional)
         return {
-            'labels': ['New', 'Regular', 'Loyal', 'VIP'],
-            'values': [new_count, regular_count, loyal_count, vip_count],
-            'colors': ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6'],
+            'labels': ['Premium Retail', 'Standard Retail', 'Growth Retail', 'wholesale'],
+            'values': [30, 40, 20, 10],
+            'colors': ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6']
         }
