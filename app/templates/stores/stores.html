@@ -190,6 +190,9 @@
     <button class="filter-btn" data-category="food"><i class="fas fa-utensils"></i> Food & Beverage</button>
     <button class="filter-btn" data-category="beauty"><i class="fas fa-spa"></i> Beauty</button>
     <button class="filter-btn" data-category="entertainment"><i class="fas fa-film"></i> Entertainment</button>
+    <button class="btn-primary add-store-btn" id="addStoreBtn" style="margin-left: auto; padding: 0.5rem 1rem; background: var(--primary); color: white; border: none; border-radius: var(--radius-lg); font-size: 0.875rem; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="fas fa-plus"></i> Add Store
+    </button>
 </section>
 
 <section class="stores-display">
@@ -253,5 +256,30 @@
 
 {% block extra_js %}
 <script src="{% static 'javascripts/stores.js' %}"></script>
+<script>
+    // Direct click handler as backup
+    document.addEventListener('DOMContentLoaded', function() {
+        var addStoreBtn = document.getElementById('addStoreBtn');
+        if (addStoreBtn) {
+            addStoreBtn.addEventListener('click', function() {
+                // Call the function from stores.js
+                if (typeof openAddStoreModal === 'function') {
+                    openAddStoreModal();
+                } else {
+                    alert('Add Store button clicked! Loading modal...');
+                }
+            });
+        }
+        
+        var addFirstStoreBtn = document.getElementById('addFirstStoreBtn');
+        if (addFirstStoreBtn) {
+            addFirstStoreBtn.addEventListener('click', function() {
+                if (typeof openAddStoreModal === 'function') {
+                    openAddStoreModal();
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}
 

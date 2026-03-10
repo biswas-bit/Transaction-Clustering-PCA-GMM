@@ -2,17 +2,17 @@ version: '3.8'
 
 services:
   db:
-    image: mongo:latest
-    container_name: mall_mongo_db
+    image: postgres:15
+    container_name: mall_postgres_db
     restart: always
     environment:
-      MONGO_INITDB_ROOT_USERNAME: ${DB_USER:-admin}
-      MONGO_INITDB_ROOT_PASSWORD: ${DB_PASSWORD:-secretpassword}
-      MONGO_INITDB_DATABASE: ${DB_NAME:-mall_analytics_db}
+      POSTGRES_DB: ${DB_NAME:-mall_analytics_db}
+      POSTGRES_USER: ${DB_USER:-admin}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-secretpassword}
     ports:
-      - "27017:27017"
+      - "5432:5432"
     volumes:
-      - mongo_data:/data/db
+      - postgres_data:/var/lib/postgresql/data
     networks:
       - mall_network
 
@@ -33,9 +33,7 @@ services:
       - mall_network
 
 volumes:
-  mongo_data:
+  postgres_data:
 
 networks:
   mall_network:
-    driver: bridge
-

@@ -80,27 +80,16 @@ WSGI_APPLICATION = 'app.wsgi.application'
 
 # Use SQLite for local development (no MongoDB required)
 # For production with MongoDB, use djongo configuration below
-USE_SQLITE = True
-
-if USE_SQLITE:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('DB_NAME', 'mall_analytics_db'),
+        'USER': os.environ.get('DB_USER', 'admin'),
+        'PASSWORD': os.environ.get('DB_PASSWORD', 'secretpassword'),
+        'HOST': os.environ.get('DB_HOST', 'db'),
+        'PORT': os.environ.get('DB_PORT', '5432'),
     }
-else:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'djongo',
-            'NAME': os.environ.get('DB_NAME', 'mall_analytics_db'),
-            'ENFORCE_SCHEMA': False,
-            'CLIENT': {
-                'host': f"mongodb://{os.environ.get('DB_USER', 'admin')}:{os.environ.get('DB_PASSWORD', 'secretpassword')}@{os.environ.get('DB_HOST', 'db')}:{os.environ.get('DB_PORT', '27017')}/?authSource=admin",
-            }
-        }
-    }
-
+}
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
 
