@@ -11,6 +11,9 @@ from .serializers import TransactionCreateSerializer, TransactionSerializer
 from django.utils import timezone
 import json
 from .dashboard_services import DashboardService, CustomerService
+import numpy as np
+from rest_framework import status
+
 
 try:
     from bson.decimal128 import Decimal128
@@ -140,46 +143,132 @@ def sales(request):
     }
     return render(request, 'sales/sales.html', context)
 
+# ==============================================================
+# ML Prediction Api
+#===============================================================
+
+@api_view(['POST'])
+def predict_customer_segment(request):
+    """
+    API endpoint to predict customer segment from transaction features.
+    
+    POST /api/customers/predict-segment/
+    Body: {
+        "quantity": 3,
+        "unit_price": 499.99,
+        "hour": 14,
+        "day_of_week": 2
+    }
+    Returns: {
+        "success": true,
+        "cluster": 1,
+        "segment": "Regular",
+        "probabilities": {"New": 0.1, "Regular": 0.6, "Loyal": 0.2, "VIP": 0.1}
+    }
+    """
+    try:
+        data = request.data 
+        required_fields = ['quantity', 'unit_price', 'hour', 'day_of_week'] 
+        missing = [f for f in required_fields if f not in data]
+        if missing:
+            return Response({
+                'success':False,
+                'error': f"missing required fields : {','.join(missing)}",
+            }, status = status.HTTP_400_BAD_REQUEST)
+            
+        # vector
+        features = [
+            float(data.get('quantity',0) or 0),
+            float(data.get('unit_price',0) or 0),
+            float(data.get('hour', 0) or 0),
+            float(data.get('day_of_week', 0) or 0),
+        ]
+        from .models import Segmenter
+        segmenter = Segmenter('app/models/Customer_Segmentation_v1.pkl')
+        cluster = segmenter.get_cluster(features)
+        proba_raw = segmenter.get_probabilities(features)
+        segment_names = {0:'Premium Retail',1:'Standard Retail',2:'Growth Retail',3:'wholesale'}
+        segment = segment_names.get(int(cluster), 'Premium Retail')
+        
+        # format proba
+        probabilities = {}
+        if proba_raw is not None:
+            for i, p in enumerate(proba_raw[0] if hasattr(proba_raw[0],'__iter__') else proba_raw):
+                 probabilities[segment_names.get(i, f'Cluster {i}')] = round(float(p), 4)
+                 
+        return Response({
+            'success':       True,
+            'cluster':       int(cluster),
+            'segment':       segment,
+            'probabilities': probabilities,
+            'features_used': {
+                'quantity':    features[0],
+                'unit_price':  features[1],
+                'hour':        features[2],
+                'day_of_week': features[3],
+            }
+        }, status=status.HTTP_200_OK)
+        
+        
+    except FileNotFoundError:
+          return Response({
+            'success': False,
+            'error': 'ML model file not found. Please ensure the model is trained and saved.'
+        }, status=status.HTTP_503_SERVICE_UNAVAILABLE)
+
+    except Exception as e:
+        return Response({
+            'success': False,
+            'error':   str(e)
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+    
+
 def customers(request):
     """Customers view with customer analytics data"""
-    
-    # Initialize the customer service
+
     service = CustomerService()
-    
-    # Get all customer data
-    customer_data = service.get_all_customer_data()
-    
-    # Get recent customers list
+
+    customer_data    = service.get_all_customer_data()
     recent_customers = service.get_recent_customers(limit=10)
-    
-    # Get chart data
     acquisition_data = service.get_acquisition_data()
-    model_prediction = service.get_segment_data()
-    print(model_prediction)
-    # Context for template
-    context = {
-        'total_customers': customer_data['total_customers'],
-        'active_today': customer_data['active_today'],
-        'new_customers_today': customer_data['new_customers_today'],
-        'loyal_customers': customer_data['loyal_customers'],
-        'customer_growth': customer_data['customer_growth'],
-        'avg_customer_spend': customer_data['avg_customer_spend'],
-        'avg_customer_spend_formatted': f"₹{customer_data['avg_customer_spend']:,.0f}",
-        'repeat_rate': customer_data['repeat_rate'],
-        'satisfaction_score': customer_data['satisfaction_score'],
-        'recent_customers': recent_customers,
-        
-        # Chart data - acquisition trend
-        'acquisition_dates': json.dumps(acquisition_data['dates']),
-        'acquisition_counts': json.dumps(acquisition_data['counts']),
-        # Date context
-        'current_day': timezone.now().day,
-        'current_month': timezone.now().strftime('%B'),
-        'current_year': timezone.now().year,
-        'current_weekday': timezone.now().strftime('%A'),
-        'date_range': f"{timezone.now().strftime('%B')} {timezone.now().year}",
+
+    # Static fallback segment data — chart is populated via JS API call
+    fallback_segments = {
+        'labels': ['New', 'Regular', 'Loyal', 'VIP'],
+        'values': [0, 0, 0, 0],
+        'colors': ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6'],
     }
-    
+
+    context = {
+        'total_customers':            customer_data['total_customers'],
+        'active_today':               customer_data['active_today'],
+        'new_customers_today':        customer_data['new_customers_today'],
+        'loyal_customers':            customer_data['loyal_customers'],
+        'customer_growth':            customer_data['customer_growth'],
+        'avg_customer_spend':         customer_data['avg_customer_spend'],
+        'avg_customer_spend_formatted': f"₹{customer_data['avg_customer_spend']:,.0f}",
+        'repeat_rate':                customer_data['repeat_rate'],
+        'satisfaction_score':         customer_data['satisfaction_score'],
+        'recent_customers':           recent_customers,
+
+        # Acquisition chart
+        'acquisition_dates':  json.dumps(acquisition_data['dates']),
+        'acquisition_counts': json.dumps(acquisition_data['counts']),
+
+        # Segment chart — loaded async via JS; pass fallback so chart renders immediately
+        'segment_labels': json.dumps(fallback_segments['labels']),
+        'segment_values': json.dumps(fallback_segments['values']),
+        'segment_colors': json.dumps(fallback_segments['colors']),
+
+        # Date context
+        'current_day':     timezone.now().day,
+        'current_month':   timezone.now().strftime('%B'),
+        'current_year':    timezone.now().year,
+        'current_weekday': timezone.now().strftime('%A'),
+        'date_range':      f"{timezone.now().strftime('%B')} {timezone.now().year}",
+    }
+
     return render(request, 'Customers/customers.html', context)
 
 def inventory(request):
