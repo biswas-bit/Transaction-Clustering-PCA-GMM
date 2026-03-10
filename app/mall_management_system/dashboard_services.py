@@ -465,20 +465,44 @@ class CustomerService:
         from .models import Transaction
         import numpy as np
         
+        # Default static data - using simple heuristics
+        segment_counts = {'New': 0, 'Regular': 0, 'Loyal': 0, 'VIP': 0}
+        
         try:
             from models import Segmenter
-            data = list(Transaction.objects.values("quantity", "unit_price", "hour","day_of_week"))
-            if data:
-                rows = [list(item.values()) for item in data]
-                x = np.array(rows,dtype=float) 
-                model_predict = Segmenter('app/models/Customer_Segmentation_v1.pkl').get_cluster(x)
-                print(model_predict)
+            # Get raw transaction data
+            data = list(Transaction.objects.values("quantity", "unit_price", "hour", "day_of_week"))
+            
+            if data and len(data) > 0:
+                segmenter = Segmenter('app/models/Customer_Segmentation_v1.pkl')
+                
+                # Process each transaction
+                for item in data:
+                    try:
+                        # Create feature vector in correct order [Quantity, UnitPrice, Hours, DayOfweek]
+                        features = [
+                            float(item.get('quantity', 0) or 0),
+                            float(item.get('unit_price', 0) or 0),
+                            float(item.get('hour', 0) or 0),
+                            float(item.get('day_of_week', 0) or 0)
+                        ]
+                        cluster = segmenter.get_cluster(features)
+                        probabilites = segmenter.get_probabilities(features)
+                        print(cluster)
+                        print(probabilites)
+                        # Map cluster to segment name
+                        segment_names = {0: 'New', 1: 'Regular', 2: 'Loyal', 3: 'VIP'}
+                        segment = segment_names.get(cluster, 'New')
+                        segment_counts[segment] = segment_counts.get(segment, 0) + 1
+                    except Exception as e:
+                        pass  # Skip problematic records
+                        
         except Exception as e:
             print(f"ML Model error (non-fatal): {e}")
         
-        # Return static segment data (the ML integration is optional)
+        # Return the segment data
         return {
-            'labels': ['Premium Retail', 'Standard Retail', 'Growth Retail', 'wholesale'],
-            'values': [30, 40, 20, 10],
+            'labels': list(segment_counts.keys()),
+            'values': list(segment_counts.values()),
             'colors': ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6']
         }
