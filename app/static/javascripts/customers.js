@@ -1,1833 +1,973 @@
-// Customer Management JavaScript
+// =============================================================
+//  customers.js  —  Full version with ML Segment API
+// =============================================================
 
-// Customer Data Structure
-let customersData = [];
-let filteredCustomers = [];
-let currentSegment = 'all';
-let currentSort = 'recent';
-let currentPage = 1;
-const itemsPerPage = 10;
-let selectedCustomers = new Set();
+'use strict';
 
-// Initialize Customer Management System
+// ── State ─────────────────────────────────────────────────────
+var customersData     = [];
+var filteredCustomers = [];
+var currentSegment    = 'all';
+var currentSort       = 'recent';
+var currentPage       = 1;
+var itemsPerPage      = 10;
+var selectedCustomers = new Set();
+
+// ── Boot ──────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', function () {
+    initCustomerManagement();
+});
+
 function initCustomerManagement() {
-    // Load sample customer data
     loadSampleCustomers();
-    
-    // Initialize UI components
-    initCustomerUI();
-    
-    // Setup event listeners
-    setupCustomerEventListeners();
-    
-    // Initialize charts
-    initCustomerCharts();
-    
-    // Update customer displays
-    updateCustomerKPIs();
-    updateCustomersTable();
-    updateTodayInsights();
-    updateCustomerInsights();
+    setupModalControls();
+    setupTableControls();
+    initCharts();
+    updateKPIs();
+    renderTable();
+    updateSidebarInsights();
+    fetchSegmentDistribution();   // ← ML API call
 }
 
-// Load sample customer data
-function loadSampleCustomers() {
-    const firstNames = ['Aarav', 'Vivaan', 'Aditya', 'Vihaan', 'Arjun', 'Sai', 'Reyansh', 'Mohammed', 'Dhruv', 'Kabir', 
-                       'Ananya', 'Diya', 'Aadhya', 'Advika', 'Anika', 'Ishita', 'Myra', 'Pari', 'Sara', 'Tanvi'];
-    
-    const lastNames = ['Sharma', 'Verma', 'Patel', 'Reddy', 'Kumar', 'Singh', 'Nair', 'Menon', 'Iyer', 'Pillai', 
-                      'Mehta', 'Joshi', 'Desai', 'Choudhary', 'Gupta', 'Malhotra', 'Kapoor', 'Chopra', 'Khanna', 'Agarwal'];
-    
-    const cities = ['Mumbai', 'Delhi', 'Bangalore', 'Hyderabad', 'Chennai', 'Kolkata', 'Pune', 'Ahmedabad', 'Jaipur', 'Lucknow'];
-    
-    const interestsList = ['Fashion', 'Electronics', 'Food', 'Movies', 'Sports', 'Books', 'Music', 'Travel', 'Fitness', 'Gaming', 
-                          'Photography', 'Art', 'Cooking', 'Technology', 'Shopping', 'Beauty', 'Home Decor', 'Cars', 'Pets', 'Outdoors'];
-    
-    const now = luxon.DateTime.now();
-    customersData = [];
+// =============================================================
+//  ML API — Segment Distribution
+// =============================================================
+function fetchSegmentDistribution() {
+    var statusEl    = document.getElementById('segmentStatus');
+    var breakdownEl = document.getElementById('segmentBreakdown');
 
-    for (let i = 0; i < 150; i++) {
-        const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-        const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-        const name = `${firstName} ${lastName}`;
-        const gender = Math.random() > 0.5 ? 'male' : 'female';
-        const age = Math.floor(Math.random() * 50) + 18; // 18-68
-        const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${i}@example.com`;
-        const phone = `+91 ${Math.floor(Math.random() * 9000000000) + 1000000000}`;
-        const city = cities[Math.floor(Math.random() * cities.length)];
-        const daysAgo = Math.floor(Math.random() * 365); // Up to 1 year ago
-        const joinDate = now.minus({ days: daysAgo });
-        
-        // Determine customer segment based on behavior
-        const totalSpend = Math.floor(Math.random() * 100000) + 1000;
-        const visits = Math.floor(Math.random() * 50) + 1;
-        const avgSpend = totalSpend / visits;
-        
-        let segment = 'regular';
-        if (avgSpend > 5000) segment = 'high-value';
-        if (visits > 30 && avgSpend > 3000) segment = 'vip';
-        if (visits > 10 && avgSpend > 2000) segment = 'loyal';
-        if (visits <= 2) segment = 'new';
-        if (now.diff(joinDate, 'days').days > 180 && visits < 3) segment = 'inactive';
-        
-        // Generate random interests (2-5 interests per customer)
-        const numInterests = Math.floor(Math.random() * 4) + 2;
-        const interests = [];
-        for (let j = 0; j < numInterests; j++) {
-            const interest = interestsList[Math.floor(Math.random() * interestsList.length)];
-            if (!interests.includes(interest)) {
-                interests.push(interest);
-            }
-        }
-        
-        // Calculate loyalty points (1 point per ₹100 spent, bonus for high spenders)
-        const loyaltyPoints = Math.floor(totalSpend / 100) + (segment === 'vip' ? 500 : segment === 'loyal' ? 200 : 0);
-        
-        customersData.push({
-            id: `CUST${1000 + i}`,
-            name: name,
-            gender: gender,
-            age: age,
-            dob: generateRandomDOB(age),
-            email: email,
-            phone: phone,
-            address: `${Math.floor(Math.random() * 100) + 1} Street, ${city}`,
-            city: city,
-            joinDate: joinDate.toISODate(),
-            joinTimestamp: joinDate.toISO(),
-            segment: segment,
-            source: ['walk-in', 'online', 'referral', 'campaign', 'event'][Math.floor(Math.random() * 5)],
-            interests: interests,
-            totalSpend: totalSpend,
-            totalVisits: visits,
-            avgSpend: avgSpend,
-            lastVisit: now.minus({ days: Math.floor(Math.random() * 30) }).toISODate(),
-            loyaltyPoints: loyaltyPoints,
-            status: segment === 'inactive' ? 'inactive' : 'active',
-            communication: {
-                email: Math.random() > 0.1,
-                sms: Math.random() > 0.2,
-                whatsapp: Math.random() > 0.3,
-                promotions: Math.random() > 0.15
-            },
-            satisfaction: (Math.random() * 2 + 3).toFixed(1) // 3-5 star rating
-        });
+    // Show loading state
+    if (statusEl) {
+        statusEl.style.display = 'flex';
+        statusEl.innerHTML =
+            '<span class="loading-spinner"></span>' +
+            '<span style="font-size:0.72rem;color:#9ca3af;margin-left:4px;">Loading ML…</span>';
+    }
+    if (breakdownEl) {
+        breakdownEl.innerHTML =
+            '<div style="text-align:center;padding:0.75rem;color:#9ca3af;font-size:0.8rem;">' +
+            '<span class="loading-spinner"></span>&nbsp;Predicting segments…</div>';
     }
 
-    // Sort by join date (newest first)
-    customersData.sort((a, b) => new Date(b.joinTimestamp) - new Date(a.joinTimestamp));
-    filteredCustomers = [...customersData];
-}
+    fetch('/api/customers/segment-distribution/', {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    })
+    .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.json();
+    })
+    .then(function (data) {
+        if (!data.success || !data.segments) {
+            throw new Error(data.error || 'API returned failure');
+        }
+        var seg = data.segments;
 
-// Initialize UI components
-function initCustomerUI() {
-    // Initialize search functionality
-    const searchInput = document.getElementById('customerSearch');
-    searchInput.addEventListener('input', handleCustomerSearch);
-    
-    // Initialize segment filter
-    document.getElementById('customerSegmentFilter').addEventListener('change', handleSegmentFilter);
-    
-    // Initialize sort dropdown
-    document.getElementById('customerSort').addEventListener('change', handleCustomerSort);
-    
-    // Initialize interests tags input
-    initInterestsTags();
-}
+        // 1. Update doughnut chart
+        if (window.segmentsChart) {
+            window.segmentsChart.data.labels                          = seg.labels;
+            window.segmentsChart.data.datasets[0].data               = seg.values;
+            window.segmentsChart.data.datasets[0].backgroundColor    = seg.colors;
+            window.segmentsChart.update();
+        }
 
-// Setup event listeners
-function setupCustomerEventListeners() {
-    // Add customer button
-    const addCustomerBtn = document.getElementById('addCustomerBtn');
-    const addCustomerModal = document.getElementById('addCustomerModal');
-    const closeCustomerModal = document.getElementById('closeCustomerModal');
-    const cancelCustomerBtn = document.getElementById('cancelCustomerBtn');
-    const addCustomerForm = document.getElementById('addCustomerForm');
-    
-    addCustomerBtn.addEventListener('click', () => {
-        addCustomerModal.classList.add('active');
-    });
-    
-    closeCustomerModal.addEventListener('click', () => {
-        addCustomerModal.classList.remove('active');
-    });
-    
-    cancelCustomerBtn.addEventListener('click', () => {
-        addCustomerModal.classList.remove('active');
-        resetCustomerForm();
-    });
-    
-    addCustomerForm.addEventListener('submit', handleAddCustomer);
-    
-    // Bulk action button
-    const bulkActionBtn = document.getElementById('bulkActionBtn');
-    const campaignModal = document.getElementById('campaignModal');
-    const closeCampaignModal = document.getElementById('closeCampaignModal');
-    const cancelCampaignBtn = document.getElementById('cancelCampaignBtn');
-    const campaignForm = document.getElementById('campaignForm');
-    
-    bulkActionBtn.addEventListener('click', () => {
-        if (selectedCustomers.size === 0) {
-            alert('Please select customers first by checking the boxes');
-            return;
+        // 2. Status badge
+        if (statusEl) {
+            var badge = data.model_used
+                ? '<span class="ml-badge model">ML Model</span>'
+                : '<span class="ml-badge heuristic">Heuristic</span>';
+            statusEl.innerHTML =
+                badge +
+                '<span style="font-size:0.72rem;color:#6b7280;margin-left:4px;">' +
+                data.total_processed + ' transactions</span>';
         }
-        campaignModal.classList.add('active');
-    });
-    
-    closeCampaignModal.addEventListener('click', () => {
-        campaignModal.classList.remove('active');
-    });
-    
-    cancelCampaignBtn.addEventListener('click', () => {
-        campaignModal.classList.remove('active');
-    });
-    
-    campaignForm.addEventListener('submit', handleCampaignSend);
-    
-    // Export customers
-    document.getElementById('exportCustomersBtn').addEventListener('click', () => {
-        exportCustomerData();
-    });
-    
-    // Pagination
-    document.getElementById('prevPageBtn').addEventListener('click', goToPrevPage);
-    document.getElementById('nextPageBtn').addEventListener('click', goToNextPage);
-    
-    // Insights tabs
-    document.querySelectorAll('.insights-tab').forEach(tab => {
-        tab.addEventListener('click', handleInsightsTabChange);
-    });
-    
-    // Acquisition chart period
-    document.getElementById('acquisitionChartPeriod').addEventListener('change', updateAcquisitionChart);
-    
-    // Engagement tools
-    document.getElementById('emailCampaignBtn').addEventListener('click', () => {
-        alert('Email campaign feature will be implemented soon!');
-    });
-    
-    document.getElementById('smsCampaignBtn').addEventListener('click', () => {
-        alert('SMS campaign feature will be implemented soon!');
-    });
-    
-    document.getElementById('loyaltyRewardsBtn').addEventListener('click', () => {
-        alert('Loyalty rewards feature will be implemented soon!');
-    });
-    
-    document.getElementById('feedbackSurveyBtn').addEventListener('click', () => {
-        alert('Feedback survey feature will be implemented soon!');
-    });
-    
-    // Select all checkbox
-    document.getElementById('selectAllCustomers').addEventListener('change', handleSelectAll);
-    
-    // Close modals when clicking outside
-    window.addEventListener('click', (e) => {
-        if (e.target === addCustomerModal) {
-            addCustomerModal.classList.remove('active');
+
+        // 3. Per-segment breakdown list
+        if (breakdownEl) {
+            var total = seg.values.reduce(function (a, b) { return a + b; }, 0);
+            breakdownEl.innerHTML = seg.labels.map(function (label, i) {
+                var pct = seg.percentages
+                    ? seg.percentages[label]
+                    : (total > 0 ? ((seg.values[i] / total) * 100).toFixed(1) : '0.0');
+                return '<div class="seg-row">' +
+                    '<div style="display:flex;align-items:center;">' +
+                        '<span class="seg-dot" style="background:' + seg.colors[i] + ';"></span>' +
+                        '<span style="font-weight:500;color:#374151;">' + label + '</span>' +
+                    '</div>' +
+                    '<div style="display:flex;align-items:center;gap:0.625rem;">' +
+                        '<span style="font-weight:700;color:#111827;">' + seg.values[i] + '</span>' +
+                        '<span style="color:#9ca3af;min-width:3rem;text-align:right;">' + pct + '%</span>' +
+                    '</div>' +
+                '</div>';
+            }).join('');
         }
-        
-        if (e.target === document.getElementById('customerDetailModal')) {
-            document.getElementById('customerDetailModal').classList.remove('active');
+
+        // 4. Update sidebar Loyal+VIP counter
+        var loyalIdx = seg.labels.indexOf('Loyal');
+        var vipIdx   = seg.labels.indexOf('VIP');
+        var loyalCount =
+            (loyalIdx >= 0 ? seg.values[loyalIdx] : 0) +
+            (vipIdx   >= 0 ? seg.values[vipIdx]   : 0);
+        setElText('loyalCustomers', loyalCount);
+    })
+    .catch(function (err) {
+        console.error('[Segment API]', err);
+        if (statusEl) {
+            statusEl.innerHTML =
+                '<span style="color:#ef4444;font-size:0.72rem;">API unavailable — sample data</span>';
         }
-        
-        if (e.target === campaignModal) {
-            campaignModal.classList.remove('active');
+        if (breakdownEl) {
+            breakdownEl.innerHTML =
+                '<div style="text-align:center;padding:0.75rem;color:#9ca3af;font-size:0.8rem;">' +
+                'Could not load ML predictions</div>';
         }
-        
-        const notificationPanel = document.getElementById('notificationPanel');
-        const notificationBtn = document.getElementById('notificationBtn');
-        if (e.target === notificationPanel && !notificationBtn.contains(e.target)) {
-            notificationPanel.classList.remove('active');
-        }
-    });
-    
-    // Notification panel
-    const notificationBtn = document.getElementById('notificationBtn');
-    const notificationPanel = document.getElementById('notificationPanel');
-    const closeNotifications = document.getElementById('closeNotifications');
-    
-    notificationBtn.addEventListener('click', () => {
-        notificationPanel.classList.toggle('active');
-    });
-    
-    closeNotifications.addEventListener('click', () => {
-        notificationPanel.classList.remove('active');
-    });
-    
-    // Mark all as read
-    document.querySelector('.mark-all-read').addEventListener('click', (e) => {
-        e.preventDefault();
-        document.querySelectorAll('.notification-item.unread').forEach(item => {
-            item.classList.remove('unread');
-        });
-        document.querySelector('.notification-badge').textContent = '0';
     });
 }
 
-// Initialize customer charts
-function initCustomerCharts() {
-    // Acquisition Chart
-    const acquisitionCtx = document.getElementById('acquisitionChart').getContext('2d');
-    window.acquisitionChart = new Chart(acquisitionCtx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: [{
-                label: 'New Customers',
-                data: [],
-                borderColor: '#9b59b6',
-                backgroundColor: 'rgba(155, 89, 182, 0.1)',
-                borderWidth: 3,
-                fill: true,
-                tension: 0.4,
-                pointBackgroundColor: '#9b59b6',
-                pointBorderColor: '#ffffff',
-                pointBorderWidth: 2,
-                pointRadius: 5
-            }]
+// Helper: predict a single transaction (optional)
+function predictSegment(txData, cb) {
+    fetch('/api/customers/predict-segment/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
+        body: JSON.stringify(txData)
+    })
+    .then(function (r) { return r.json(); })
+    .then(function (d) { if (typeof cb === 'function') cb(d.success ? null : d.error, d); })
+    .catch(function (e) { if (typeof cb === 'function') cb(e.message, null); });
+}
+
+// =============================================================
+//  Sample Data
+// =============================================================
+function loadSampleCustomers() {
+    var firstNames = [
+        'Aarav','Vivaan','Aditya','Vihaan','Arjun','Sai','Reyansh','Mohammed','Dhruv','Kabir',
+        'Ananya','Diya','Aadhya','Advika','Anika','Ishita','Myra','Pari','Sara','Tanvi'
+    ];
+    var lastNames = [
+        'Sharma','Verma','Patel','Reddy','Kumar','Singh','Nair','Menon','Iyer','Pillai',
+        'Mehta','Joshi','Desai','Choudhary','Gupta','Malhotra','Kapoor','Chopra','Khanna','Agarwal'
+    ];
+    var cities = [
+        'Mumbai','Delhi','Bangalore','Hyderabad','Chennai',
+        'Kolkata','Pune','Ahmedabad','Jaipur','Lucknow'
+    ];
+    var interestsList = [
+        'Fashion','Electronics','Food','Movies','Sports','Books','Music','Travel',
+        'Fitness','Gaming','Photography','Art','Cooking','Technology','Shopping',
+        'Beauty','Home Decor','Cars','Pets','Outdoors'
+    ];
+    var now = luxon.DateTime.now();
+    customersData = [];
+
+    for (var i = 0; i < 150; i++) {
+        var fn  = firstNames[rnd(firstNames.length)];
+        var ln  = lastNames[rnd(lastNames.length)];
+        var city = cities[rnd(cities.length)];
+        var daysAgo = Math.floor(Math.random() * 365);
+        var joinDate = now.minus({ days: daysAgo });
+        var spend  = Math.floor(Math.random() * 100000) + 1000;
+        var visits = Math.floor(Math.random() * 50) + 1;
+        var avg    = spend / visits;
+
+        var seg = 'regular';
+        if (avg > 5000)                                           seg = 'high-value';
+        if (visits > 30 && avg > 3000)                           seg = 'vip';
+        if (visits > 10 && avg > 2000)                           seg = 'loyal';
+        if (visits <= 2)                                          seg = 'new';
+        if (now.diff(joinDate,'days').days > 180 && visits < 3)  seg = 'inactive';
+
+        var interests = [];
+        var ni = Math.floor(Math.random() * 4) + 2;
+        for (var j = 0; j < ni; j++) {
+            var it = interestsList[rnd(interestsList.length)];
+            if (interests.indexOf(it) === -1) interests.push(it);
+        }
+
+        customersData.push({
+            id:            'CUST' + (1000 + i),
+            name:          fn + ' ' + ln,
+            gender:        Math.random() > 0.5 ? 'male' : 'female',
+            age:           Math.floor(Math.random() * 50) + 18,
+            dob:           genDOB(Math.floor(Math.random() * 50) + 18),
+            email:         fn.toLowerCase() + '.' + ln.toLowerCase() + i + '@example.com',
+            phone:         '+91 ' + (Math.floor(Math.random() * 9e9) + 1e9),
+            address:       (Math.floor(Math.random() * 100) + 1) + ' Street, ' + city,
+            city:          city,
+            joinDate:      joinDate.toISODate(),
+            joinTimestamp: joinDate.toISO(),
+            segment:       seg,
+            source:        ['walk-in','online','referral','campaign','event'][rnd(5)],
+            interests:     interests,
+            totalSpend:    spend,
+            totalVisits:   visits,
+            avgSpend:      avg,
+            lastVisit:     now.minus({ days: Math.floor(Math.random() * 30) }).toISODate(),
+            loyaltyPoints: Math.floor(spend / 100) + (seg === 'vip' ? 500 : seg === 'loyal' ? 200 : 0),
+            status:        seg === 'inactive' ? 'inactive' : 'active',
+            communication: {
+                email: Math.random() > 0.1, sms: Math.random() > 0.2,
+                whatsapp: Math.random() > 0.3, promotions: Math.random() > 0.15
             },
-            scales: {
-                x: {
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
-                    },
-                    ticks: {
-                        precision: 0
-                    }
+            satisfaction:  (Math.random() * 2 + 3).toFixed(1)
+        });
+    }
+    customersData.sort(function (a, b) {
+        return new Date(b.joinTimestamp) - new Date(a.joinTimestamp);
+    });
+    filteredCustomers = customersData.slice();
+}
+
+// =============================================================
+//  Charts
+// =============================================================
+function initCharts() {
+    // ── Acquisition line chart ────────────────────────────
+    var acqEl = document.getElementById('acquisitionChart');
+    if (acqEl) {
+        // Try to use Django-provided data
+        var djDates  = tryParse(acqEl.dataset.dates);
+        var djCounts = tryParse(acqEl.dataset.counts);
+
+        window.acquisitionChart = new Chart(acqEl.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: djDates || [],
+                datasets: [{
+                    label: 'New Customers',
+                    data: djCounts || [],
+                    borderColor: '#7c3aed',
+                    backgroundColor: 'rgba(124,58,237,0.08)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#7c3aed',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { color: 'rgba(0,0,0,0.04)' } },
+                    y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.04)' }, ticks: { precision: 0 } }
                 }
             }
-        }
-    });
-    
-    // Segments Chart
-    const segmentsCtx = document.getElementById('segmentsChart').getContext('2d');
-    window.segmentsChart = new Chart(segmentsCtx, {
-        type: 'doughnut',
-        data: {
-            labels: [],
-            datasets: [{
-                data: [],
-                backgroundColor: [],
-                borderWidth: 2,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '70%',
-            plugins: {
-                legend: {
-                    position: 'right',
-                    labels: {
-                        padding: 15,
-                        usePointStyle: true,
-                        pointStyle: 'circle',
-                        font: {
-                            size: 11
+        });
+
+        // If no Django data, generate from sample customers
+        if (!djDates) buildAcquisitionData();
+    }
+
+    // ── Segments doughnut — starts empty; ML API fills it ──
+    var segEl = document.getElementById('segmentsChart');
+    if (segEl) {
+        // Use Django fallback data if ML API is down
+        var djLabels = tryParse(segEl.dataset.labels) || ['New','Regular','Loyal','VIP'];
+        var djValues = tryParse(segEl.dataset.values) || [0,0,0,0];
+        var djColors = tryParse(segEl.dataset.colors) || ['#2563eb','#10b981','#f59e0b','#8b5cf6'];
+
+        window.segmentsChart = new Chart(segEl.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: djLabels,
+                datasets: [{
+                    data: djValues,
+                    backgroundColor: djColors,
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                    hoverOffset: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: { padding: 14, usePointStyle: true, pointStyle: 'circle', font: { size: 11 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                var tot = ctx.dataset.data.reduce(function (a, b) { return a + b; }, 0);
+                                var pct = tot > 0 ? ((ctx.raw / tot) * 100).toFixed(1) : 0;
+                                return ctx.label + ': ' + ctx.raw + ' (' + pct + '%)';
+                            }
                         }
                     }
                 }
             }
-        }
-    });
-    
-    // Age Distribution Chart
-    const ageCtx = document.getElementById('ageDistributionChart').getContext('2d');
-    window.ageDistributionChart = new Chart(ageCtx, {
-        type: 'bar',
-        data: {
-            labels: ['18-25', '26-35', '36-45', '46-55', '56+'],
-            datasets: [{
-                label: 'Customers',
-                data: [],
-                backgroundColor: 'rgba(67, 97, 238, 0.7)',
-                borderColor: '#4361ee',
-                borderWidth: 1,
-                borderRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
-                    },
-                    ticks: {
-                        precision: 0
-                    }
-                }
-            }
-        }
-    });
-    
-    // Gender Distribution Chart
-    const genderCtx = document.getElementById('genderDistributionChart').getContext('2d');
-    window.genderDistributionChart = new Chart(genderCtx, {
-        type: 'pie',
-        data: {
-            labels: ['Male', 'Female', 'Other'],
-            datasets: [{
-                data: [],
-                backgroundColor: ['#3498db', '#e74c3c', '#95a5a6'],
-                borderWidth: 2,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'right',
-                    labels: {
-                        padding: 15,
-                        usePointStyle: true,
-                        pointStyle: 'circle'
-                    }
-                }
-            }
-        }
-    });
-    
-    // Visit Frequency Chart
-    const visitCtx = document.getElementById('visitFrequencyChart').getContext('2d');
-    window.visitFrequencyChart = new Chart(visitCtx, {
-        type: 'bar',
-        data: {
-            labels: ['1-5', '6-10', '11-20', '21-50', '50+'],
-            datasets: [{
-                label: 'Customers',
-                data: [],
-                backgroundColor: 'rgba(46, 204, 113, 0.7)',
-                borderColor: '#2ecc71',
-                borderWidth: 1,
-                borderRadius: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
-            },
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    grid: {
-                        color: 'rgba(0, 0, 0, 0.05)'
-                    },
-                    ticks: {
-                        precision: 0
-                    }
-                }
-            }
-        }
-    });
-    
-    // Preferred Time Chart
-    const timeCtx = document.getElementById('preferredTimeChart').getContext('2d');
-    window.preferredTimeChart = new Chart(timeCtx, {
-        type: 'polarArea',
-        data: {
-            labels: ['Morning', 'Afternoon', 'Evening', 'Night'],
-            datasets: [{
-                data: [],
-                backgroundColor: ['#3498db', '#2ecc71', '#e74c3c', '#9b59b6'],
-                borderWidth: 2,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'right',
-                    labels: {
-                        padding: 15,
-                        usePointStyle: true,
-                        pointStyle: 'circle'
-                    }
-                }
-            }
-        }
-    });
-    
-    // Loyalty Tier Chart
-    const loyaltyCtx = document.getElementById('loyaltyTierChart').getContext('2d');
-    window.loyaltyTierChart = new Chart(loyaltyCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Bronze', 'Silver', 'Gold', 'Platinum'],
-            datasets: [{
-                data: [],
-                backgroundColor: ['#cd7f32', '#c0c0c0', '#ffd700', '#e5e4e2'],
-                borderWidth: 2,
-                borderColor: '#ffffff'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            cutout: '70%',
-            plugins: {
-                legend: {
-                    position: 'right',
-                    labels: {
-                        padding: 15,
-                        usePointStyle: true,
-                        pointStyle: 'circle'
-                    }
-                }
-            }
-        }
-    });
-    
-    // Satisfaction Chart
-    const satisfactionCtx = document.getElementById('satisfactionChart').getContext('2d');
-    window.satisfactionChart = new Chart(satisfactionCtx, {
-        type: 'radar',
-        data: {
-            labels: ['Service', 'Products', 'Pricing', 'Ambiance', 'Location', 'Cleanliness'],
-            datasets: [{
-                label: 'Satisfaction Score',
-                data: [],
-                backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                borderColor: '#3498db',
-                borderWidth: 2,
-                pointBackgroundColor: '#3498db',
-                pointBorderColor: '#ffffff',
-                pointBorderWidth: 2
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                r: {
-                    beginAtZero: true,
-                    max: 5,
-                    ticks: {
-                        stepSize: 1
-                    }
-                }
-            }
-        }
-    });
-    
-    // Update all charts
-    updateCustomerCharts();
-}
-
-// Update customer charts
-function updateCustomerCharts() {
-    updateAcquisitionChart();
-    updateSegmentsChart();
-    updateAgeDistributionChart();
-    updateGenderDistributionChart();
-    updateVisitFrequencyChart();
-    updatePreferredTimeChart();
-    updateLoyaltyTierChart();
-    updateSatisfactionChart();
-    updateTopLocations();
-    updateShoppingPatterns();
-    updateLoyaltyBenefits();
-    updateRecentFeedback();
-}
-
-// Update acquisition chart
-function updateAcquisitionChart() {
-    const period = document.getElementById('acquisitionChartPeriod').value;
-    const now = luxon.DateTime.now();
-    let labels = [];
-    let data = [];
-    
-    switch (period) {
-        case 'daily':
-            // Last 14 days
-            labels = Array.from({ length: 14 }, (_, i) => {
-                const date = now.minus({ days: 13 - i });
-                return date.toFormat('dd/MM');
-            });
-            
-            data = Array.from({ length: 14 }, (_, i) => {
-                const date = now.minus({ days: 13 - i });
-                return customersData.filter(c => c.joinDate === date.toISODate()).length;
-            });
-            break;
-            
-        case 'weekly':
-            // Last 12 weeks
-            labels = Array.from({ length: 12 }, (_, i) => `Week ${i + 1}`);
-            
-            data = Array.from({ length: 12 }, (_, i) => {
-                const startDate = now.minus({ weeks: 11 - i });
-                const endDate = startDate.plus({ days: 6 });
-                return customersData.filter(c => {
-                    const joinDate = luxon.DateTime.fromISO(c.joinTimestamp);
-                    return joinDate >= startDate && joinDate <= endDate;
-                }).length;
-            });
-            break;
-            
-        case 'monthly':
-            // Last 6 months
-            labels = Array.from({ length: 6 }, (_, i) => {
-                const date = now.minus({ months: 5 - i });
-                return date.toFormat('MMM');
-            });
-            
-            data = Array.from({ length: 6 }, (_, i) => {
-                const month = now.minus({ months: 5 - i });
-                return customersData.filter(c => {
-                    const joinDate = luxon.DateTime.fromISO(c.joinTimestamp);
-                    return joinDate.month === month.month && joinDate.year === month.year;
-                }).length;
-            });
-            break;
+        });
     }
-    
+}
+
+function buildAcquisitionData() {
+    if (!window.acquisitionChart) return;
+    var now = luxon.DateTime.now();
+    var labels = [], data = [];
+    for (var i = 0; i < 12; i++) {
+        var wStart = now.minus({ weeks: 11 - i });
+        var wEnd   = wStart.plus({ days: 6 });
+        labels.push('W' + (i + 1));
+        data.push(customersData.filter(function (c) {
+            var jd = luxon.DateTime.fromISO(c.joinTimestamp);
+            return jd >= wStart && jd <= wEnd;
+        }).length);
+    }
     window.acquisitionChart.data.labels = labels;
     window.acquisitionChart.data.datasets[0].data = data;
     window.acquisitionChart.update();
 }
 
-// Update segments chart
-function updateSegmentsChart() {
-    const segments = {};
-    
-    customersData.forEach(customer => {
-        if (!segments[customer.segment]) {
-            segments[customer.segment] = 0;
-        }
-        segments[customer.segment] += 1;
-    });
-    
-    const segmentLabels = {
-        'new': 'New',
-        'regular': 'Regular',
-        'loyal': 'Loyal',
-        'vip': 'VIP',
-        'high-value': 'High Value',
-        'inactive': 'Inactive'
-    };
-    
-    const segmentColors = {
-        'new': '#3498db',
-        'regular': '#2ecc71',
-        'loyal': '#9b59b6',
-        'vip': '#f39c12',
-        'high-value': '#e74c3c',
-        'inactive': '#95a5a6'
-    };
-    
-    const sortedSegments = Object.entries(segments).sort((a, b) => b[1] - a[1]);
-    
-    window.segmentsChart.data.labels = sortedSegments.map(s => segmentLabels[s[0]] || s[0]);
-    window.segmentsChart.data.datasets[0].data = sortedSegments.map(s => s[1]);
-    window.segmentsChart.data.datasets[0].backgroundColor = sortedSegments.map(s => 
-        segmentColors[s[0]] || '#6c757d'
-    );
-    window.segmentsChart.update();
-}
-
-// Update age distribution chart
-function updateAgeDistributionChart() {
-    const ageGroups = {
-        '18-25': 0,
-        '26-35': 0,
-        '36-45': 0,
-        '46-55': 0,
-        '56+': 0
-    };
-    
-    customersData.forEach(customer => {
-        if (customer.age >= 18 && customer.age <= 25) ageGroups['18-25']++;
-        else if (customer.age <= 35) ageGroups['26-35']++;
-        else if (customer.age <= 45) ageGroups['36-45']++;
-        else if (customer.age <= 55) ageGroups['46-55']++;
-        else ageGroups['56+']++;
-    });
-    
-    window.ageDistributionChart.data.datasets[0].data = Object.values(ageGroups);
-    window.ageDistributionChart.update();
-}
-
-// Update gender distribution chart
-function updateGenderDistributionChart() {
-    const genders = {
-        'male': 0,
-        'female': 0,
-        'other': 0
-    };
-    
-    customersData.forEach(customer => {
-        if (genders[customer.gender] !== undefined) {
-            genders[customer.gender]++;
-        } else {
-            genders['other']++;
-        }
-    });
-    
-    window.genderDistributionChart.data.datasets[0].data = Object.values(genders);
-    window.genderDistributionChart.update();
-}
-
-// Update visit frequency chart
-function updateVisitFrequencyChart() {
-    const visitGroups = {
-        '1-5': 0,
-        '6-10': 0,
-        '11-20': 0,
-        '21-50': 0,
-        '50+': 0
-    };
-    
-    customersData.forEach(customer => {
-        const visits = customer.totalVisits;
-        if (visits <= 5) visitGroups['1-5']++;
-        else if (visits <= 10) visitGroups['6-10']++;
-        else if (visits <= 20) visitGroups['11-20']++;
-        else if (visits <= 50) visitGroups['21-50']++;
-        else visitGroups['50+']++;
-    });
-    
-    window.visitFrequencyChart.data.datasets[0].data = Object.values(visitGroups);
-    window.visitFrequencyChart.update();
-}
-
-// Update preferred time chart
-function updatePreferredTimeChart() {
-    // Simulated data for preferred shopping times
-    const timeData = [
-        Math.floor(Math.random() * 30) + 20, // Morning
-        Math.floor(Math.random() * 40) + 30, // Afternoon
-        Math.floor(Math.random() * 50) + 40, // Evening
-        Math.floor(Math.random() * 20) + 10  // Night
-    ];
-    
-    window.preferredTimeChart.data.datasets[0].data = timeData;
-    window.preferredTimeChart.update();
-}
-
-// Update loyalty tier chart
-function updateLoyaltyTierChart() {
-    // Simulated loyalty tier distribution
-    const tierData = [
-        Math.floor(customersData.length * 0.4), // Bronze
-        Math.floor(customersData.length * 0.3), // Silver
-        Math.floor(customersData.length * 0.2), // Gold
-        Math.floor(customersData.length * 0.1)  // Platinum
-    ];
-    
-    window.loyaltyTierChart.data.datasets[0].data = tierData;
-    window.loyaltyTierChart.update();
-}
-
-// Update satisfaction chart
-function updateSatisfactionChart() {
-    // Simulated satisfaction scores across different categories
-    const satisfactionData = [
-        (Math.random() * 1.5 + 3.5).toFixed(1), // Service
-        (Math.random() * 1.5 + 3.5).toFixed(1), // Products
-        (Math.random() * 1.5 + 3.5).toFixed(1), // Pricing
-        (Math.random() * 1.5 + 3.5).toFixed(1), // Ambiance
-        (Math.random() * 1.5 + 3.5).toFixed(1), // Location
-        (Math.random() * 1.5 + 3.5).toFixed(1)  // Cleanliness
-    ];
-    
-    window.satisfactionChart.data.datasets[0].data = satisfactionData;
-    window.satisfactionChart.update();
-}
-
-// Update top locations
-function updateTopLocations() {
-    const locations = {};
-    
-    customersData.forEach(customer => {
-        if (!locations[customer.city]) {
-            locations[customer.city] = 0;
-        }
-        locations[customer.city]++;
-    });
-    
-    const topLocations = Object.entries(locations)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
-    
-    const topLocationsList = document.getElementById('topLocationsList');
-    let html = '';
-    
-    topLocations.forEach(([city, count]) => {
-        html += `
-            <div class="location-item">
-                <div class="location-name">${city}</div>
-                <div class="location-count">${count} customers</div>
-            </div>
-        `;
-    });
-    
-    topLocationsList.innerHTML = html;
-}
-
-// Update shopping patterns
-function updateShoppingPatterns() {
-    const shoppingPatterns = document.getElementById('shoppingPatterns');
-    
-    const patterns = [
-        { label: 'Avg. Visit Frequency', value: (customersData.reduce((sum, c) => sum + c.totalVisits, 0) / customersData.length).toFixed(1) + '/month' },
-        { label: 'Peak Shopping Day', value: 'Saturday' },
-        { label: 'Avg. Basket Size', value: '₹ ' + Math.floor(customersData.reduce((sum, c) => sum + c.avgSpend, 0) / customersData.length).toLocaleString('en-IN') },
-        { label: 'Most Popular Category', value: 'Fashion' },
-        { label: 'Online vs Offline', value: '70% Offline' },
-        { label: 'Return Rate', value: '12%' }
-    ];
-    
-    let html = '';
-    patterns.forEach(pattern => {
-        html += `
-            <div class="stat-item">
-                <div class="stat-value">${pattern.value}</div>
-                <div class="stat-label">${pattern.label}</div>
-            </div>
-        `;
-    });
-    
-    shoppingPatterns.innerHTML = html;
-}
-
-// Update loyalty benefits
-function updateLoyaltyBenefits() {
-    const loyaltyBenefits = document.getElementById('loyaltyBenefits');
-    
-    const benefits = [
-        { icon: 'fas fa-percentage', title: 'Exclusive Discounts', description: 'Up to 30% off for loyal customers' },
-        { icon: 'fas fa-gift', title: 'Birthday Rewards', description: 'Special gifts on birthdays' },
-        { icon: 'fas fa-clock', title: 'Priority Service', description: 'Faster checkout and support' },
-        { icon: 'fas fa-ticket-alt', title: 'Event Invitations', description: 'Exclusive mall event access' },
-        { icon: 'fas fa-car', title: 'Free Parking', description: 'Complimentary parking hours' },
-        { icon: 'fas fa-coffee', title: 'Lounge Access', description: 'Access to premium customer lounge' }
-    ];
-    
-    let html = '';
-    benefits.forEach(benefit => {
-        html += `
-            <div class="benefit-item">
-                <div class="benefit-icon">
-                    <i class="${benefit.icon}"></i>
-                </div>
-                <div class="benefit-details">
-                    <h5>${benefit.title}</h5>
-                    <p>${benefit.description}</p>
-                </div>
-            </div>
-        `;
-    });
-    
-    loyaltyBenefits.innerHTML = html;
-}
-
-// Update recent feedback
-function updateRecentFeedback() {
-    const recentFeedbackList = document.getElementById('recentFeedbackList');
-    
-    const recentCustomers = customersData
-        .filter(c => Math.random() > 0.7) // Random selection
-        .slice(0, 5);
-    
-    let html = '';
-    recentCustomers.forEach(customer => {
-        const rating = Math.floor(Math.random() * 2) + 3; // 3-5 stars
-        const feedbacks = [
-            'Great shopping experience! Will visit again.',
-            'Loved the variety of stores. Food court was excellent.',
-            'Customer service was very helpful.',
-            'Clean and well-maintained mall.',
-            'Parking could be improved, but overall good experience.'
-        ];
-        const feedback = feedbacks[Math.floor(Math.random() * feedbacks.length)];
-        const timeAgo = ['2 hours ago', '1 day ago', '3 days ago', '1 week ago'][Math.floor(Math.random() * 4)];
-        
-        html += `
-            <div class="feedback-item">
-                <div class="feedback-header">
-                    <div class="customer-name">${customer.name}</div>
-                    <div class="feedback-rating">
-                        ${'★'.repeat(rating)}${'☆'.repeat(5 - rating)}
-                    </div>
-                </div>
-                <div class="feedback-content">${feedback}</div>
-                <div class="feedback-time">${timeAgo}</div>
-            </div>
-        `;
-    });
-    
-    recentFeedbackList.innerHTML = html;
-}
-
-// Update customer KPIs
-function updateCustomerKPIs() {
-    const totalCustomers = customersData.length;
-    
-    // Customer growth (this month vs last month)
-    const now = luxon.DateTime.now();
-    const thisMonth = now.month;
-    const lastMonth = now.minus({ months: 1 }).month;
-    
-    const thisMonthCustomers = customersData.filter(c => {
-        const joinDate = luxon.DateTime.fromISO(c.joinTimestamp);
-        return joinDate.month === thisMonth;
+// =============================================================
+//  KPIs
+// =============================================================
+function updateKPIs() {
+    var n   = customersData.length;
+    var now = luxon.DateTime.now();
+    var thisMo = customersData.filter(function (c) {
+        return luxon.DateTime.fromISO(c.joinTimestamp).month === now.month;
     }).length;
-    
-    const lastMonthCustomers = customersData.filter(c => {
-        const joinDate = luxon.DateTime.fromISO(c.joinTimestamp);
-        return joinDate.month === lastMonth;
+    var lastMo = customersData.filter(function (c) {
+        return luxon.DateTime.fromISO(c.joinTimestamp).month === now.minus({ months: 1 }).month;
     }).length;
-    
-    const growthRate = lastMonthCustomers > 0 ? 
-        ((thisMonthCustomers - lastMonthCustomers) / lastMonthCustomers * 100).toFixed(1) : 0;
-    
-    // Average spend
-    const totalSpend = customersData.reduce((sum, c) => sum + c.totalSpend, 0);
-    const avgSpend = totalCustomers > 0 ? totalSpend / totalCustomers : 0;
-    
-    // Repeat rate (customers with > 1 visit)
-    const repeatCustomers = customersData.filter(c => c.totalVisits > 1).length;
-    const repeatRate = totalCustomers > 0 ? (repeatCustomers / totalCustomers * 100).toFixed(1) : 0;
-    
-    // Average satisfaction
-    const avgSatisfaction = customersData.length > 0 ? 
-        (customersData.reduce((sum, c) => sum + parseFloat(c.satisfaction), 0) / customersData.length).toFixed(1) : 0;
-    
-    // Update KPI elements
-    document.getElementById('totalCustomers').textContent = totalCustomers.toLocaleString('en-IN');
-    document.getElementById('customerGrowth').textContent = `+${growthRate}%`;
-    document.getElementById('customerGrowth').className = `change-${growthRate >= 0 ? 'positive' : 'negative'}`;
-    
-    document.getElementById('avgCustomerSpend').textContent = `₹ ${formatCurrency(avgSpend)}`;
-    document.getElementById('spendGrowth').textContent = '+8.5%'; // Simulated growth
-    
-    document.getElementById('repeatRate').textContent = `${repeatRate}%`;
-    document.getElementById('repeatRateChange').textContent = '+2.1%'; // Simulated change
-    
-    document.getElementById('satisfactionScore').textContent = avgSatisfaction;
-    document.getElementById('satisfactionChange').textContent = '+0.3'; // Simulated change
-}
+    var growth  = lastMo > 0 ? ((thisMo - lastMo) / lastMo * 100).toFixed(1) : 0;
+    var avgSpend = n > 0
+        ? customersData.reduce(function (s, c) { return s + c.totalSpend; }, 0) / n
+        : 0;
+    var repeatRate = n > 0
+        ? (customersData.filter(function (c) { return c.totalVisits > 1; }).length / n * 100).toFixed(1)
+        : 0;
+    var avgSat = n > 0
+        ? (customersData.reduce(function (s, c) { return s + parseFloat(c.satisfaction); }, 0) / n).toFixed(1)
+        : 0;
 
-// Update customers table
-function updateCustomersTable() {
-    const tableBody = document.getElementById('customersTable');
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentData = filteredCustomers.slice(startIndex, endIndex);
-    
-    let html = '';
-    
-    if (currentData.length === 0) {
-        html = `
-            <tr>
-                <td colspan="10" class="empty-state">
-                    <i class="fas fa-users"></i>
-                    <p>No customers found</p>
-                </td>
-            </tr>
-        `;
-    } else {
-        currentData.forEach(customer => {
-            const joinDate = luxon.DateTime.fromISO(customer.joinTimestamp);
-            const lastVisit = luxon.DateTime.fromISO(customer.lastVisit);
-            const isSelected = selectedCustomers.has(customer.id);
-            
-            html += `
-                <tr class="customer-row ${isSelected ? 'selected' : ''}" data-customer-id="${customer.id}">
-                    <td>
-                        <input type="checkbox" class="customer-checkbox" data-customer-id="${customer.id}" ${isSelected ? 'checked' : ''}>
-                    </td>
-                    <td>
-                        <div class="customer-info">
-                            <div class="customer-avatar">
-                                <i class="fas fa-user"></i>
-                            </div>
-                            <div class="customer-details">
-                                <h4>${customer.name}</h4>
-                                <div class="email">${customer.email}</div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                        <div>${customer.phone}</div>
-                        <div class="text-small">${customer.city}</div>
-                    </td>
-                    <td>
-                        <span class="segment-badge ${customer.segment}">
-                            ${getSegmentLabel(customer.segment)}
-                        </span>
-                    </td>
-                    <td><strong>₹ ${customer.totalSpend.toLocaleString('en-IN')}</strong></td>
-                    <td>${customer.totalVisits}</td>
-                    <td>
-                        <div>${lastVisit.toFormat('dd/MM/yyyy')}</div>
-                        <div class="text-small">${getDaysAgo(lastVisit)} days ago</div>
-                    </td>
-                    <td>
-                        <span class="loyalty-points">${customer.loyaltyPoints}</span>
-                    </td>
-                    <td>
-                        <span class="status-badge ${customer.status}">
-                            ${customer.status.charAt(0).toUpperCase() + customer.status.slice(1)}
-                        </span>
-                    </td>
-                    <td>
-                        <div class="table-actions">
-                            <button class="action-icon-btn view" onclick="viewCustomer('${customer.id}')">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                            <button class="action-icon-btn edit" onclick="editCustomer('${customer.id}')">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="action-icon-btn delete" onclick="deleteCustomer('${customer.id}')">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        });
+    setElText('totalCustomers',    n.toLocaleString('en-IN'));
+    setElText('avgCustomerSpend',  '\u20B9 ' + fmtCurrency(avgSpend));
+    setElText('repeatRate',        repeatRate + '%');
+    setElText('satisfactionScore', avgSat);
+
+    var gEl = document.getElementById('customerGrowth');
+    if (gEl) {
+        gEl.textContent  = (growth >= 0 ? '+' : '') + growth + '%';
+        gEl.className    = 'change-' + (growth >= 0 ? 'positive' : 'negative');
     }
-    
-    tableBody.innerHTML = html;
-    
-    // Add event listeners to checkboxes
-    document.querySelectorAll('.customer-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('change', handleCustomerCheckbox);
+}
+
+// =============================================================
+//  Table
+// =============================================================
+function renderTable() {
+    var tbody = document.getElementById('customersTable');
+    if (!tbody) return;
+
+    var start = (currentPage - 1) * itemsPerPage;
+    var page  = filteredCustomers.slice(start, start + itemsPerPage);
+
+    if (page.length === 0) {
+        tbody.innerHTML =
+            '<tr><td colspan="10" style="text-align:center;padding:3rem;color:#9ca3af;">' +
+            '<i class="fas fa-users" style="font-size:2.5rem;display:block;margin-bottom:0.5rem;opacity:0.3;"></i>' +
+            'No customers found</td></tr>';
+        updatePagination();
+        return;
+    }
+
+    tbody.innerHTML = page.map(function (c) {
+        var lv      = luxon.DateTime.fromISO(c.lastVisit);
+        var daysAgo = Math.floor(luxon.DateTime.now().diff(lv, 'days').days);
+        var chk     = selectedCustomers.has(c.id) ? 'checked' : '';
+        var rowBg   = selectedCustomers.has(c.id) ? 'style="background:#eff6ff;"' : '';
+
+        return '<tr ' + rowBg + ' data-id="' + c.id + '">' +
+            '<td><input type="checkbox" class="customer-checkbox" data-customer-id="' + c.id + '" ' + chk + '></td>' +
+            '<td>' +
+                '<div style="display:flex;align-items:center;gap:0.5rem;">' +
+                    '<div style="width:2rem;height:2rem;background:#e5e7eb;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+                        '<i class="fas fa-user" style="color:#9ca3af;font-size:0.7rem;"></i>' +
+                    '</div>' +
+                    '<div>' +
+                        '<div style="font-weight:600;">' + esc(c.name) + '</div>' +
+                        '<div style="font-size:0.7rem;color:#9ca3af;">' + c.city + '</div>' +
+                    '</div>' +
+                '</div>' +
+            '</td>' +
+            '<td style="font-size:0.8rem;color:#6b7280;">' + esc(c.email) + '</td>' +
+            '<td><span class="segment-badge ' + c.segment + '">' + segLabel(c.segment) + '</span></td>' +
+            '<td><strong>\u20B9 ' + c.totalSpend.toLocaleString('en-IN') + '</strong></td>' +
+            '<td>' + c.totalVisits + '</td>' +
+            '<td>' +
+                '<div style="font-size:0.8rem;">' + lv.toFormat('dd/MM/yyyy') + '</div>' +
+                '<div style="font-size:0.7rem;color:#9ca3af;">' + daysAgo + 'd ago</div>' +
+            '</td>' +
+            '<td style="font-weight:600;color:#7c3aed;">' + c.loyaltyPoints + '</td>' +
+            '<td><span class="status-badge ' + c.status + '">' + cap(c.status) + '</span></td>' +
+            '<td>' +
+                '<div style="display:flex;gap:0.25rem;">' +
+                    '<button class="action-btn view"   onclick="viewCustomer(\'' + c.id + '\')"><i class="fas fa-eye"></i></button>' +
+                    '<button class="action-btn edit"   onclick="editCustomer(\'' + c.id + '\')"><i class="fas fa-edit"></i></button>' +
+                    '<button class="action-btn delete" onclick="deleteCustomer(\'' + c.id + '\')"><i class="fas fa-trash"></i></button>' +
+                '</div>' +
+            '</td>' +
+        '</tr>';
+    }).join('');
+
+    // Re-attach checkbox listeners
+    tbody.querySelectorAll('.customer-checkbox').forEach(function (cb) {
+        cb.addEventListener('change', onCheckbox);
     });
-    
-    // Update pagination
+
     updatePagination();
 }
 
-// Update pagination
 function updatePagination() {
-    const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
-    const prevBtn = document.getElementById('prevPageBtn');
-    const nextBtn = document.getElementById('nextPageBtn');
-    const currentPageSpan = document.getElementById('currentPage');
-    const totalPagesSpan = document.getElementById('totalPages');
-    const showingCountSpan = document.getElementById('showingCount');
-    const totalCountSpan = document.getElementById('totalCount');
-    
-    currentPageSpan.textContent = currentPage;
-    totalPagesSpan.textContent = totalPages;
-    showingCountSpan.textContent = Math.min(filteredCustomers.length, currentPage * itemsPerPage);
-    totalCountSpan.textContent = filteredCustomers.length;
-    
-    prevBtn.disabled = currentPage === 1;
-    nextBtn.disabled = currentPage === totalPages || totalPages === 0;
+    var total = Math.max(1, Math.ceil(filteredCustomers.length / itemsPerPage));
+    setElText('currentPage',  currentPage);
+    setElText('totalPages',   total);
+    setElText('showingCount', Math.min(filteredCustomers.length, currentPage * itemsPerPage));
+    setElText('totalCount',   filteredCustomers.length);
+    var prev = document.getElementById('prevPageBtn');
+    var next = document.getElementById('nextPageBtn');
+    if (prev) prev.disabled = currentPage <= 1;
+    if (next) next.disabled = currentPage >= total;
 }
 
-// Update today's insights
-function updateTodayInsights() {
-    const today = luxon.DateTime.now().toISODate();
-    const newToday = customersData.filter(customer => customer.joinDate === today).length;
-    
-    // Loyal customers (visited > 10 times and spent > ₹10,000)
-    const loyalCustomers = customersData.filter(customer => 
-        customer.totalVisits > 10 && customer.totalSpend > 10000
-    ).length;
-    
-    document.getElementById('newCustomersToday').textContent = newToday;
-    document.getElementById('loyalCustomers').textContent = loyalCustomers;
-}
-
-// Update customer insights tab
-function updateCustomerInsights() {
-    // This function is called when switching tabs
-    // The charts are already updated in updateCustomerCharts()
-}
-
-// Handle customer search
-function handleCustomerSearch(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    
-    if (searchTerm === '') {
-        filteredCustomers = [...customersData];
-    } else {
-        filteredCustomers = customersData.filter(customer => 
-            customer.name.toLowerCase().includes(searchTerm) ||
-            customer.email.toLowerCase().includes(searchTerm) ||
-            customer.phone.includes(searchTerm) ||
-            customer.city.toLowerCase().includes(searchTerm)
-        );
+function updateSidebarInsights() {
+    var today    = luxon.DateTime.now().toISODate();
+    var newToday = customersData.filter(function (c) { return c.joinDate === today; }).length;
+    var loyal    = customersData.filter(function (c) {
+        return c.totalVisits > 10 && c.totalSpend > 10000;
+    }).length;
+    setElText('newCustomersToday', newToday);
+    // Only set as fallback — API will overwrite loyalCustomers
+    var loyalEl = document.getElementById('loyalCustomers');
+    if (loyalEl && (loyalEl.textContent === '0' || loyalEl.textContent === '')) {
+        loyalEl.textContent = loyal;
     }
-    
+}
+
+// =============================================================
+//  Modal Controls
+// =============================================================
+function setupModalControls() {
+    // ── Add Customer ──────────────────────────────────────
+    var addModal  = document.getElementById('addCustomerModal');
+    var addForm   = document.getElementById('addCustomerForm');
+
+    on('addCustomerBtn',     'click',  function () { showModal('addCustomerModal'); });
+    on('closeCustomerModal', 'click',  function () { hideModal('addCustomerModal'); });
+    on('cancelCustomerBtn',  'click',  function () { hideModal('addCustomerModal'); resetAddForm(); });
+    if (addForm) addForm.addEventListener('submit', onAddCustomer);
+
+    // ── Campaign ──────────────────────────────────────────
+    var campaignForm = document.getElementById('campaignForm');
+    on('bulkActionBtn',      'click',  function () {
+        if (selectedCustomers.size === 0) { toast('Please select at least one customer first.', 'error'); return; }
+        showModal('campaignModal');
+    });
+    on('closeCampaignModal', 'click',  function () { hideModal('campaignModal'); });
+    on('cancelCampaignBtn',  'click',  function () { hideModal('campaignModal'); });
+    if (campaignForm) campaignForm.addEventListener('submit', onSendCampaign);
+
+    // ── Export ────────────────────────────────────────────
+    on('exportCustomersBtn', 'click',  exportCSV);
+
+    // ── Close on overlay click ────────────────────────────
+    ['addCustomerModal','campaignModal','customerDetailModal'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.addEventListener('click', function (e) {
+            if (e.target === el) el.style.display = 'none';
+        });
+    });
+
+    // ── Interests tag input ───────────────────────────────
+    var intInput = document.getElementById('customerInterests');
+    if (intInput) {
+        intInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                var v = intInput.value.trim();
+                if (v) { addTag(v); intInput.value = ''; }
+            }
+        });
+    }
+}
+
+// =============================================================
+//  Table Controls
+// =============================================================
+function setupTableControls() {
+    on('customerSearch',        'input',  onSearch);
+    on('customerSegmentFilter', 'change', onSegmentFilter);
+    on('customerSort',          'change', onSort);
+    on('selectAllCustomers',    'change', onSelectAll);
+    on('prevPageBtn',           'click',  function () { if (currentPage > 1) { currentPage--; renderTable(); } });
+    on('nextPageBtn',           'click',  function () {
+        var total = Math.ceil(filteredCustomers.length / itemsPerPage);
+        if (currentPage < total) { currentPage++; renderTable(); }
+    });
+}
+
+// =============================================================
+//  Handlers
+// =============================================================
+function onSearch(e) {
+    var term = e.target.value.toLowerCase().trim();
+    filteredCustomers = term === ''
+        ? customersData.slice()
+        : customersData.filter(function (c) {
+            return c.name.toLowerCase().indexOf(term) >= 0 ||
+                   c.email.toLowerCase().indexOf(term) >= 0 ||
+                   c.city.toLowerCase().indexOf(term) >= 0 ||
+                   c.phone.indexOf(term) >= 0;
+        });
     currentPage = 1;
-    updateCustomersTable();
+    renderTable();
 }
 
-// Handle segment filter
-function handleSegmentFilter(e) {
-    const segment = e.target.value;
-    
-    currentSegment = segment;
-    
-    if (segment === 'all') {
-        filteredCustomers = [...customersData];
-    } else {
-        filteredCustomers = customersData.filter(customer => customer.segment === segment);
-    }
-    
+function onSegmentFilter(e) {
+    currentSegment = e.target.value;
+    filteredCustomers = currentSegment === 'all'
+        ? customersData.slice()
+        : customersData.filter(function (c) { return c.segment === currentSegment; });
     currentPage = 1;
-    updateCustomersTable();
+    renderTable();
 }
 
-// Handle customer sort
-function handleCustomerSort(e) {
-    const sortBy = e.target.value;
-    currentSort = sortBy;
-    
-    switch (sortBy) {
-        case 'recent':
-            filteredCustomers.sort((a, b) => new Date(b.joinTimestamp) - new Date(a.joinTimestamp));
-            break;
-        case 'name':
-            filteredCustomers.sort((a, b) => a.name.localeCompare(b.name));
-            break;
-        case 'spend':
-            filteredCustomers.sort((a, b) => b.totalSpend - a.totalSpend);
-            break;
-        case 'visits':
-            filteredCustomers.sort((a, b) => b.totalVisits - a.totalVisits);
-            break;
-        case 'loyalty':
-            filteredCustomers.sort((a, b) => b.loyaltyPoints - a.loyaltyPoints);
-            break;
-    }
-    
-    updateCustomersTable();
+function onSort(e) {
+    currentSort = e.target.value;
+    var fn = {
+        recent:  function (a, b) { return new Date(b.joinTimestamp) - new Date(a.joinTimestamp); },
+        name:    function (a, b) { return a.name.localeCompare(b.name); },
+        spend:   function (a, b) { return b.totalSpend   - a.totalSpend; },
+        visits:  function (a, b) { return b.totalVisits  - a.totalVisits; },
+        loyalty: function (a, b) { return b.loyaltyPoints - a.loyaltyPoints; }
+    }[currentSort];
+    if (fn) filteredCustomers.sort(fn);
+    renderTable();
 }
 
-// Handle add customer
-function handleAddCustomer(e) {
+function onAddCustomer(e) {
     e.preventDefault();
-    
-    const name = document.getElementById('customerName').value;
-    const gender = document.getElementById('customerGender').value;
-    const age = parseInt(document.getElementById('customerAge').value) || null;
-    const dob = document.getElementById('customerDOB').value;
-    const email = document.getElementById('customerEmail').value;
-    const phone = document.getElementById('customerPhone').value;
-    const address = document.getElementById('customerAddress').value;
-    const city = document.getElementById('customerCity').value;
-    const segment = document.getElementById('customerSegment').value;
-    const source = document.getElementById('customerSource').value;
-    
-    // Get interests from tags
-    const interests = Array.from(document.querySelectorAll('.interest-tag')).map(tag => 
-        tag.querySelector('span').textContent
-    );
-    
-    // Get communication preferences
-    const communication = {
-        email: document.getElementById('prefEmail').checked,
-        sms: document.getElementById('prefSMS').checked,
-        whatsapp: document.getElementById('prefWhatsApp').checked,
-        promotions: document.getElementById('prefPromotions').checked
-    };
-    
-    const now = luxon.DateTime.now();
-    const newCustomer = {
-        id: `CUST${1000 + customersData.length + 1}`,
-        name: name,
-        gender: gender || 'prefer-not-to-say',
-        age: age,
-        dob: dob || null,
-        email: email,
-        phone: phone,
-        address: address || '',
-        city: city || '',
-        joinDate: now.toISODate(),
+    var now = luxon.DateTime.now();
+    var interests = Array.from(
+        document.querySelectorAll('#interestsContainer .interest-tag span')
+    ).map(function (s) { return s.textContent; });
+
+    var c = {
+        id:            'CUST' + (1000 + customersData.length + 1),
+        name:          val('customerName'),
+        gender:        val('customerGender') || 'other',
+        age:           parseInt(val('customerAge')) || null,
+        dob:           val('customerDOB') || null,
+        email:         val('customerEmail'),
+        phone:         val('customerPhone'),
+        address:       val('customerAddress') || '',
+        city:          val('customerCity') || '',
+        joinDate:      now.toISODate(),
         joinTimestamp: now.toISO(),
-        segment: segment,
-        source: source,
-        interests: interests,
-        totalSpend: 0,
-        totalVisits: 0,
-        avgSpend: 0,
-        lastVisit: now.toISODate(),
+        segment:       val('customerSegment'),
+        source:        val('customerSource'),
+        interests:     interests,
+        totalSpend:    0, totalVisits: 0, avgSpend: 0,
+        lastVisit:     now.toISODate(),
         loyaltyPoints: 0,
-        status: 'active',
-        communication: communication,
+        status:        'active',
+        communication: {
+            email:      chk('prefEmail'),
+            sms:        chk('prefSMS'),
+            whatsapp:   chk('prefWhatsApp'),
+            promotions: chk('prefPromotions')
+        },
         satisfaction: '4.0'
     };
-    
-    // Add to customers data
-    customersData.unshift(newCustomer);
-    filteredCustomers.unshift(newCustomer);
-    
-    // Close modal
-    document.getElementById('addCustomerModal').classList.remove('active');
-    
-    // Reset form
-    resetCustomerForm();
-    
-    // Update UI
-    updateCustomerKPIs();
-    updateCustomersTable();
-    updateCustomerCharts();
-    updateTodayInsights();
-    
-    // Show success message
-    showCustomerNotification(`Customer "${name}" added successfully!`, 'success');
-    
-    console.log('New customer added:', newCustomer);
+
+    customersData.unshift(c);
+    filteredCustomers.unshift(c);
+    hideModal('addCustomerModal');
+    resetAddForm();
+    updateKPIs();
+    renderTable();
+    updateSidebarInsights();
+    toast('Customer "' + c.name + '" added successfully!');
 }
 
-// Handle customer checkbox
-function handleCustomerCheckbox(e) {
-    const customerId = e.target.dataset.customerId;
-    const row = e.target.closest('.customer-row');
-    
-    if (e.target.checked) {
-        selectedCustomers.add(customerId);
-        row.classList.add('selected');
-    } else {
-        selectedCustomers.delete(customerId);
-        row.classList.remove('selected');
-    }
-    
-    // Update select all checkbox state
-    updateSelectAllCheckbox();
-}
-
-// Handle select all
-function handleSelectAll(e) {
-    const isChecked = e.target.checked;
-    const checkboxes = document.querySelectorAll('.customer-checkbox');
-    
-    if (isChecked) {
-        // Select all customers on current page
-        const currentData = filteredCustomers.slice(
-            (currentPage - 1) * itemsPerPage,
-            currentPage * itemsPerPage
-        );
-        currentData.forEach(customer => {
-            selectedCustomers.add(customer.id);
-        });
-        
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = true;
-            const row = checkbox.closest('.customer-row');
-            if (row) row.classList.add('selected');
-        });
-    } else {
-        // Deselect all customers
-        selectedCustomers.clear();
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = false;
-            const row = checkbox.closest('.customer-row');
-            if (row) row.classList.remove('selected');
-        });
-    }
-}
-
-// Handle campaign send
-function handleCampaignSend(e) {
+function onSendCampaign(e) {
     e.preventDefault();
-    
-    const campaignType = document.getElementById('campaignType').value;
-    const audience = document.getElementById('campaignAudience').value;
-    const subject = document.getElementById('campaignSubject').value;
-    const message = document.getElementById('campaignMessage').value;
-    
-    let targetCount = 0;
-    if (audience === 'selected') {
-        targetCount = selectedCustomers.size;
-    } else {
-        targetCount = filteredCustomers.length;
-    }
-    
-    // Show success message
-    const campaignLabels = {
-        'email': 'Email',
-        'sms': 'SMS',
-        'whatsapp': 'WhatsApp'
-    };
-    
-    showCustomerNotification(
-        `${campaignLabels[campaignType]} campaign sent to ${targetCount} customers!`,
-        'success'
-    );
-    
-    // Close modal
-    document.getElementById('campaignModal').classList.remove('active');
-    
-    // Reset form
+    var type     = val('campaignType');
+    var audience = val('campaignAudience');
+    var count    = audience === 'selected' ? selectedCustomers.size : filteredCustomers.length;
+    var label    = { email: 'Email', sms: 'SMS', whatsapp: 'WhatsApp' }[type] || type;
+    toast(label + ' campaign sent to ' + count + ' customers!');
+    hideModal('campaignModal');
     document.getElementById('campaignForm').reset();
 }
 
-// Handle insights tab change
-function handleInsightsTabChange(e) {
-    const tab = e.target.dataset.tab;
-    
-    // Update active tab
-    document.querySelectorAll('.insights-tab').forEach(t => {
-        t.classList.remove('active');
-    });
-    e.target.classList.add('active');
-    
-    // Hide all tab contents
-    document.querySelectorAll('.insights-tab-content').forEach(content => {
-        content.classList.remove('active');
-    });
-    
-    // Show active tab content
-    document.getElementById(`${tab}Tab`).classList.add('active');
+function onCheckbox(e) {
+    var id = e.target.dataset.customerId;
+    if (e.target.checked) selectedCustomers.add(id);
+    else selectedCustomers.delete(id);
+    syncSelectAll();
 }
 
-// Initialize interests tags
-function initInterestsTags() {
-    const interestsInput = document.getElementById('customerInterests');
-    const interestsContainer = document.getElementById('interestsContainer');
-    
-    interestsInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' || e.key === ',') {
-            e.preventDefault();
-            const interest = interestsInput.value.trim();
-            if (interest) {
-                addInterestTag(interest);
-                interestsInput.value = '';
-            }
-        }
-    });
-}
-
-// Add interest tag
-function addInterestTag(interest) {
-    const interestsContainer = document.getElementById('interestsContainer');
-    const tagId = `interest-${Date.now()}`;
-    
-    const tagHTML = `
-        <div class="interest-tag" id="${tagId}">
-            <span>${interest}</span>
-            <button type="button" class="interest-tag-remove" onclick="removeInterestTag('${tagId}')">
-                <i class="fas fa-times"></i>
-            </button>
-        </div>
-    `;
-    
-    interestsContainer.insertAdjacentHTML('beforeend', tagHTML);
-}
-
-// Remove interest tag
-function removeInterestTag(tagId) {
-    const tag = document.getElementById(tagId);
-    if (tag) {
-        tag.remove();
-    }
-}
-
-// Reset customer form
-function resetCustomerForm() {
-    document.getElementById('addCustomerForm').reset();
-    
-    // Clear interests tags
-    document.getElementById('interestsContainer').innerHTML = '';
-    
-    // Reset checkboxes to default
-    document.getElementById('prefEmail').checked = true;
-    document.getElementById('prefSMS').checked = true;
-    document.getElementById('prefWhatsApp').checked = true;
-    document.getElementById('prefPromotions').checked = true;
-}
-
-// View customer details
-function viewCustomer(customerId) {
-    const customer = customersData.find(c => c.id === customerId);
-    if (!customer) return;
-    
-    const modal = document.getElementById('customerDetailModal');
-    const content = document.getElementById('customerDetailContent');
-    
-    const joinDate = luxon.DateTime.fromISO(customer.joinTimestamp);
-    const lastVisit = luxon.DateTime.fromISO(customer.lastVisit);
-    
-    content.innerHTML = `
-        <div class="customer-detail-header">
-            <div class="customer-avatar-large">
-                <i class="fas fa-user"></i>
-            </div>
-            <div class="customer-detail-title">
-                <h2>${customer.name}</h2>
-                <span class="customer-segment-large segment-badge ${customer.segment}">
-                    ${getSegmentLabel(customer.segment)}
-                </span>
-            </div>
-        </div>
-        
-        <div class="customer-detail-grid">
-            <div class="detail-group">
-                <h4>Personal Information</h4>
-                <div class="detail-item">
-                    <span class="detail-label">Email</span>
-                    <span class="detail-value">${customer.email}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Phone</span>
-                    <span class="detail-value">${customer.phone}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Gender</span>
-                    <span class="detail-value">${customer.gender.charAt(0).toUpperCase() + customer.gender.slice(1)}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Age</span>
-                    <span class="detail-value">${customer.age || 'Not specified'}</span>
-                </div>
-            </div>
-            
-            <div class="detail-group">
-                <h4>Location</h4>
-                <div class="detail-item">
-                    <span class="detail-label">Address</span>
-                    <span class="detail-value">${customer.address || 'Not specified'}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">City</span>
-                    <span class="detail-value">${customer.city || 'Not specified'}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Join Date</span>
-                    <span class="detail-value">${joinDate.toFormat('dd MMM yyyy')}</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Customer Source</span>
-                    <span class="detail-value">${getSourceLabel(customer.source)}</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="customer-stats">
-            <h4>Shopping Statistics</h4>
-            <div class="stats-grid">
-                <div class="stat-item-large">
-                    <h5>Total Spend</h5>
-                    <div class="stat-value-large">₹ ${customer.totalSpend.toLocaleString('en-IN')}</div>
-                </div>
-                <div class="stat-item-large">
-                    <h5>Total Visits</h5>
-                    <div class="stat-value-large">${customer.totalVisits}</div>
-                </div>
-                <div class="stat-item-large">
-                    <h5>Avg. Spend</h5>
-                    <div class="stat-value-large">₹ ${Math.round(customer.avgSpend).toLocaleString('en-IN')}</div>
-                </div>
-                <div class="stat-item-large">
-                    <h5>Last Visit</h5>
-                    <div class="stat-value-large">${getDaysAgo(lastVisit)} days ago</div>
-                </div>
-                <div class="stat-item-large">
-                    <h5>Loyalty Points</h5>
-                    <div class="stat-value-large">${customer.loyaltyPoints}</div>
-                </div>
-                <div class="stat-item-large">
-                    <h5>Satisfaction</h5>
-                    <div class="stat-value-large">${customer.satisfaction}/5.0</div>
-                </div>
-            </div>
-        </div>
-        
-        <div class="customer-interests">
-            <h4>Interests</h4>
-            <div class="interests-list">
-                ${customer.interests.map(interest => `
-                    <span class="interest-tag">
-                        <span>${interest}</span>
-                    </span>
-                `).join('')}
-                ${customer.interests.length === 0 ? '<p class="text-muted">No interests specified</p>' : ''}
-            </div>
-        </div>
-        
-        <div class="form-actions">
-            <button class="btn-secondary" onclick="closeCustomerDetail()">
-                Close
-            </button>
-            <button class="btn-primary" onclick="editCustomer('${customer.id}')">
-                <i class="fas fa-edit"></i> Edit Customer
-            </button>
-        </div>
-    `;
-    
-    modal.classList.add('active');
-}
-
-// Edit customer
-function editCustomer(customerId) {
-    const customer = customersData.find(c => c.id === customerId);
-    if (!customer) return;
-    
-    // Fill the add customer form with existing data
-    document.getElementById('customerName').value = customer.name;
-    document.getElementById('customerGender').value = customer.gender;
-    document.getElementById('customerAge').value = customer.age || '';
-    document.getElementById('customerDOB').value = customer.dob || '';
-    document.getElementById('customerEmail').value = customer.email;
-    document.getElementById('customerPhone').value = customer.phone;
-    document.getElementById('customerAddress').value = customer.address || '';
-    document.getElementById('customerCity').value = customer.city || '';
-    document.getElementById('customerSegment').value = customer.segment;
-    document.getElementById('customerSource').value = customer.source;
-    
-    // Fill interests
-    const interestsContainer = document.getElementById('interestsContainer');
-    interestsContainer.innerHTML = '';
-    customer.interests.forEach(interest => {
-        addInterestTag(interest);
-    });
-    
-    // Fill communication preferences
-    document.getElementById('prefEmail').checked = customer.communication.email;
-    document.getElementById('prefSMS').checked = customer.communication.sms;
-    document.getElementById('prefWhatsApp').checked = customer.communication.whatsapp;
-    document.getElementById('prefPromotions').checked = customer.communication.promotions;
-    
-    // Change form to update mode
-    const form = document.getElementById('addCustomerForm');
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const modalTitle = document.querySelector('#addCustomerModal h3');
-    
-    modalTitle.textContent = 'Edit Customer';
-    submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Customer';
-    
-    // Remove existing submit listener
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
-    
-    // Add new submit listener for update
-    newForm.addEventListener('submit', (e) => handleUpdateCustomer(e, customerId));
-    
-    // Show modal
-    document.getElementById('addCustomerModal').classList.add('active');
-}
-
-// Handle update customer
-function handleUpdateCustomer(e, customerId) {
-    e.preventDefault();
-    
-    const form = e.target;
-    const customerIndex = customersData.findIndex(c => c.id === customerId);
-    
-    if (customerIndex === -1) return;
-    
-    // Update customer data
-    customersData[customerIndex] = {
-        ...customersData[customerIndex],
-        name: document.getElementById('customerName').value,
-        gender: document.getElementById('customerGender').value,
-        age: parseInt(document.getElementById('customerAge').value) || null,
-        dob: document.getElementById('customerDOB').value || null,
-        email: document.getElementById('customerEmail').value,
-        phone: document.getElementById('customerPhone').value,
-        address: document.getElementById('customerAddress').value || '',
-        city: document.getElementById('customerCity').value || '',
-        segment: document.getElementById('customerSegment').value,
-        source: document.getElementById('customerSource').value,
-        interests: Array.from(document.querySelectorAll('.interest-tag')).map(tag => 
-            tag.querySelector('span').textContent
-        ),
-        communication: {
-            email: document.getElementById('prefEmail').checked,
-            sms: document.getElementById('prefSMS').checked,
-            whatsapp: document.getElementById('prefWhatsApp').checked,
-            promotions: document.getElementById('prefPromotions').checked
-        }
-    };
-    
-    // Update filtered customers
-    const filteredIndex = filteredCustomers.findIndex(c => c.id === customerId);
-    if (filteredIndex !== -1) {
-        filteredCustomers[filteredIndex] = customersData[customerIndex];
-    }
-    
-    // Close modal
-    document.getElementById('addCustomerModal').classList.remove('active');
-    
-    // Reset form to add mode
-    resetAddCustomerForm();
-    
-    // Update UI
-    updateCustomersTable();
-    updateCustomerKPIs();
-    updateCustomerCharts();
-    
-    // Show success message
-    showCustomerNotification(`Customer "${customersData[customerIndex].name}" updated successfully!`, 'success');
-}
-
-// Delete customer
-function deleteCustomer(customerId) {
-    const customer = customersData.find(c => c.id === customerId);
-    
-    if (!confirm(`Are you sure you want to delete customer "${customer?.name}"? This action cannot be undone.`)) {
-        return;
-    }
-    
-    // Remove from customers data
-    customersData = customersData.filter(c => c.id !== customerId);
-    filteredCustomers = filteredCustomers.filter(c => c.id !== customerId);
-    selectedCustomers.delete(customerId);
-    
-    // Update UI
-    updateCustomersTable();
-    updateCustomerKPIs();
-    updateCustomerCharts();
-    updateTodayInsights();
-    
-    // Show success message
-    showCustomerNotification(`Customer "${customer?.name}" deleted successfully!`, 'success');
-}
-
-// Reset add customer form to default
-function resetAddCustomerForm() {
-    const form = document.getElementById('addCustomerForm');
-    form.reset();
-    
-    const submitBtn = form.querySelector('button[type="submit"]');
-    const modalTitle = document.querySelector('#addCustomerModal h3');
-    
-    modalTitle.textContent = 'Add New Customer';
-    submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Add Customer';
-    
-    // Remove any existing listeners and re-add the default one
-    const newForm = form.cloneNode(true);
-    form.parentNode.replaceChild(newForm, form);
-    newForm.addEventListener('submit', handleAddCustomer);
-    
-    // Clear interests tags
-    document.getElementById('interestsContainer').innerHTML = '';
-    
-    // Reset checkboxes to default
-    document.getElementById('prefEmail').checked = true;
-    document.getElementById('prefSMS').checked = true;
-    document.getElementById('prefWhatsApp').checked = true;
-    document.getElementById('prefPromotions').checked = true;
-}
-
-// Close customer detail modal
-function closeCustomerDetail() {
-    document.getElementById('customerDetailModal').classList.remove('active');
-}
-
-// Export customer data
-function exportCustomerData() {
-    const dataToExport = filteredCustomers.map(customer => ({
-        'Customer ID': customer.id,
-        'Name': customer.name,
-        'Email': customer.email,
-        'Phone': customer.phone,
-        'City': customer.city,
-        'Segment': getSegmentLabel(customer.segment),
-        'Total Spend': customer.totalSpend,
-        'Total Visits': customer.totalVisits,
-        'Loyalty Points': customer.loyaltyPoints,
-        'Status': customer.status,
-        'Join Date': customer.joinDate,
-        'Last Visit': customer.lastVisit
-    }));
-    
-    // Convert to CSV
-    const headers = Object.keys(dataToExport[0]).join(',');
-    const rows = dataToExport.map(obj => Object.values(obj).map(v => `"${v}"`).join(','));
-    const csv = [headers, ...rows].join('\n');
-    
-    // Download CSV
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `customers-data-${luxon.DateTime.now().toFormat('yyyy-MM-dd')}.csv`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
-    
-    showCustomerNotification('Customer data exported successfully!', 'success');
-}
-
-// Pagination functions
-function goToPrevPage() {
-    if (currentPage > 1) {
-        currentPage--;
-        updateCustomersTable();
-    }
-}
-
-function goToNextPage() {
-    const totalPages = Math.ceil(filteredCustomers.length / itemsPerPage);
-    if (currentPage < totalPages) {
-        currentPage++;
-        updateCustomersTable();
-    }
-}
-
-// Update select all checkbox
-function updateSelectAllCheckbox() {
-    const selectAllCheckbox = document.getElementById('selectAllCustomers');
-    const currentData = filteredCustomers.slice(
+function onSelectAll(e) {
+    var slice = filteredCustomers.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-    
-    if (currentData.length === 0) {
-        selectAllCheckbox.checked = false;
-        selectAllCheckbox.indeterminate = false;
-        return;
-    }
-    
-    const selectedCount = Array.from(selectedCustomers).filter(id => 
-        currentData.some(c => c.id === id)
-    ).length;
-    
-    if (selectedCount === 0) {
-        selectAllCheckbox.checked = false;
-        selectAllCheckbox.indeterminate = false;
-    } else if (selectedCount === currentData.length) {
-        selectAllCheckbox.checked = true;
-        selectAllCheckbox.indeterminate = false;
-    } else {
-        selectAllCheckbox.checked = false;
-        selectAllCheckbox.indeterminate = true;
-    }
-}
-
-// Helper functions
-function getSegmentLabel(segment) {
-    const labels = {
-        'new': 'New',
-        'regular': 'Regular',
-        'loyal': 'Loyal',
-        'vip': 'VIP',
-        'high-value': 'High Value',
-        'inactive': 'Inactive'
-    };
-    return labels[segment] || segment;
-}
-
-function getSourceLabel(source) {
-    const labels = {
-        'walk-in': 'Walk-in',
-        'online': 'Online Registration',
-        'referral': 'Referral',
-        'campaign': 'Marketing Campaign',
-        'event': 'Mall Event',
-        'other': 'Other'
-    };
-    return labels[source] || source;
-}
-
-function getDaysAgo(date) {
-    const now = luxon.DateTime.now();
-    const diff = now.diff(date, 'days');
-    return Math.floor(diff.days);
-}
-
-function formatCurrency(amount) {
-    if (amount >= 100000) {
-        return (amount / 100000).toFixed(1) + 'L';
-    } else if (amount >= 1000) {
-        return (amount / 1000).toFixed(1) + 'K';
-    }
-    return Math.round(amount).toLocaleString('en-IN');
-}
-
-function generateRandomDOB(age) {
-    const now = luxon.DateTime.now();
-    const birthYear = now.year - age;
-    const birthMonth = Math.floor(Math.random() * 12) + 1;
-    const birthDay = Math.floor(Math.random() * 28) + 1;
-    return `${birthYear}-${birthMonth.toString().padStart(2, '0')}-${birthDay.toString().padStart(2, '0')}`;
-}
-
-function showCustomerNotification(message, type = 'info') {
-    // Create notification element
-    const notification = document.createElement('div');
-    notification.className = `customer-notification-toast ${type}`;
-    notification.innerHTML = `
-        <div class="toast-icon">
-            <i class="fas fa-${type === 'success' ? 'check-circle' : 'info-circle'}"></i>
-        </div>
-        <div class="toast-content">
-            <p>${message}</p>
-        </div>
-        <button class="toast-close">
-            <i class="fas fa-times"></i>
-        </button>
-    `;
-    
-    // Add to page
-    document.body.appendChild(notification);
-    
-    // Show with animation
-    setTimeout(() => {
-        notification.classList.add('show');
-    }, 10);
-    
-    // Auto remove after 5 seconds
-    setTimeout(() => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 300);
-    }, 5000);
-    
-    // Close button
-    notification.querySelector('.toast-close').addEventListener('click', () => {
-        notification.classList.remove('show');
-        setTimeout(() => {
-            if (notification.parentNode) {
-                notification.parentNode.removeChild(notification);
-            }
-        }, 300);
+    document.querySelectorAll('.customer-checkbox').forEach(function (cb) {
+        cb.checked = e.target.checked;
+        if (e.target.checked) selectedCustomers.add(cb.dataset.customerId);
+        else selectedCustomers.delete(cb.dataset.customerId);
     });
 }
 
-// Initialize customer management when page loads
-document.addEventListener('DOMContentLoaded', initCustomerManagement);
+function syncSelectAll() {
+    var cb    = document.getElementById('selectAllCustomers');
+    if (!cb) return;
+    var slice = filteredCustomers.slice(
+        (currentPage - 1) * itemsPerPage, currentPage * itemsPerPage
+    );
+    var sel = slice.filter(function (c) { return selectedCustomers.has(c.id); }).length;
+    cb.checked       = sel === slice.length && slice.length > 0;
+    cb.indeterminate = sel > 0 && sel < slice.length;
+}
+
+// =============================================================
+//  Customer CRUD
+// =============================================================
+function viewCustomer(id) {
+    var c = find(id);
+    if (!c) return;
+    var modal   = document.getElementById('customerDetailModal');
+    var content = document.getElementById('customerDetailContent');
+    var jd = luxon.DateTime.fromISO(c.joinTimestamp);
+    var lv = luxon.DateTime.fromISO(c.lastVisit);
+    var daysAgo = Math.floor(luxon.DateTime.now().diff(lv, 'days').days);
+
+    content.innerHTML =
+        '<div style="display:flex;align-items:center;gap:1rem;margin-bottom:1.5rem;">' +
+            '<div style="width:3.5rem;height:3.5rem;background:#eff6ff;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">' +
+                '<i class="fas fa-user" style="font-size:1.5rem;color:#2563eb;"></i>' +
+            '</div>' +
+            '<div>' +
+                '<h2 style="margin:0 0 0.25rem;font-size:1.2rem;font-weight:700;">' + esc(c.name) + '</h2>' +
+                '<span class="segment-badge ' + c.segment + '">' + segLabel(c.segment) + '</span>' +
+                '&nbsp;<span class="status-badge ' + c.status + '">' + cap(c.status) + '</span>' +
+            '</div>' +
+        '</div>' +
+        '<div class="detail-cards">' +
+            dc('Email',        esc(c.email)) +
+            dc('Phone',        c.phone) +
+            dc('Gender',       cap(c.gender)) +
+            dc('Age',          c.age || 'N/A') +
+            dc('City',         c.city || 'N/A') +
+            dc('Join Date',    jd.toFormat('dd MMM yyyy')) +
+            dc('Total Spend',  '\u20B9 ' + c.totalSpend.toLocaleString('en-IN')) +
+            dc('Visits',       c.totalVisits) +
+            dc('Avg Spend',    '\u20B9 ' + Math.round(c.avgSpend).toLocaleString('en-IN')) +
+            dc('Last Visit',   daysAgo + ' days ago') +
+            dc('Loyalty Pts',  c.loyaltyPoints) +
+            dc('Satisfaction', c.satisfaction + ' / 5.0') +
+        '</div>' +
+        (c.interests.length
+            ? '<div style="margin-bottom:1.25rem;">' +
+                '<p style="font-size:0.75rem;font-weight:600;color:#6b7280;text-transform:uppercase;margin-bottom:0.5rem;">Interests</p>' +
+                '<div style="display:flex;flex-wrap:wrap;gap:0.375rem;">' +
+                c.interests.map(function (it) {
+                    return '<span style="padding:0.2rem 0.5rem;background:#f3f4f6;border-radius:20px;font-size:0.75rem;color:#374151;">' + esc(it) + '</span>';
+                }).join('') +
+                '</div></div>'
+            : '') +
+        '<div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1rem;">' +
+            '<button class="btn-cancel" onclick="document.getElementById(\'customerDetailModal\').style.display=\'none\'">Close</button>' +
+            '<button class="btn-submit" onclick="editCustomer(\'' + c.id + '\')"><i class="fas fa-edit"></i> Edit</button>' +
+        '</div>';
+
+    showModal('customerDetailModal');
+}
+
+function editCustomer(id) {
+    var c = find(id);
+    if (!c) return;
+
+    setVal('customerName',    c.name);
+    setVal('customerGender',  c.gender);
+    setVal('customerAge',     c.age || '');
+    setVal('customerDOB',     c.dob || '');
+    setVal('customerEmail',   c.email);
+    setVal('customerPhone',   c.phone);
+    setVal('customerAddress', c.address || '');
+    setVal('customerCity',    c.city || '');
+    setVal('customerSegment', c.segment);
+    setVal('customerSource',  c.source);
+
+    var pref = c.communication || {};
+    setCk('prefEmail',      pref.email     !== false);
+    setCk('prefSMS',        pref.sms       !== false);
+    setCk('prefWhatsApp',   pref.whatsapp  !== false);
+    setCk('prefPromotions', pref.promotions !== false);
+
+    var container = document.getElementById('interestsContainer');
+    if (container) {
+        container.innerHTML = '';
+        (c.interests || []).forEach(addTag);
+    }
+
+    // Swap form submit handler for update
+    var form    = document.getElementById('addCustomerForm');
+    var newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+    newForm.addEventListener('submit', function (e) { onUpdateCustomer(e, id); });
+
+    // Re-wire interests input on the cloned form
+    var intInput = document.getElementById('customerInterests');
+    if (intInput) {
+        intInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                var v = intInput.value.trim();
+                if (v) { addTag(v); intInput.value = ''; }
+            }
+        });
+    }
+
+    var submitBtn = newForm.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-save"></i> Update Customer';
+    var titleEl = document.querySelector('#addCustomerModal .modal-header h3');
+    if (titleEl) titleEl.innerHTML = '<i class="fas fa-edit" style="color:#2563eb;margin-right:0.5rem;"></i>Edit Customer';
+
+    hideModal('customerDetailModal');
+    showModal('addCustomerModal');
+}
+
+function onUpdateCustomer(e, id) {
+    e.preventDefault();
+    var idx = customersData.findIndex(function (c) { return c.id === id; });
+    if (idx === -1) return;
+
+    var interests = Array.from(
+        document.querySelectorAll('#interestsContainer .interest-tag span')
+    ).map(function (s) { return s.textContent; });
+
+    customersData[idx] = Object.assign({}, customersData[idx], {
+        name:      val('customerName'),
+        gender:    val('customerGender'),
+        age:       parseInt(val('customerAge')) || null,
+        email:     val('customerEmail'),
+        phone:     val('customerPhone'),
+        address:   val('customerAddress'),
+        city:      val('customerCity'),
+        segment:   val('customerSegment'),
+        source:    val('customerSource'),
+        interests: interests,
+        communication: {
+            email: chk('prefEmail'), sms: chk('prefSMS'),
+            whatsapp: chk('prefWhatsApp'), promotions: chk('prefPromotions')
+        }
+    });
+
+    var fi = filteredCustomers.findIndex(function (c) { return c.id === id; });
+    if (fi !== -1) filteredCustomers[fi] = customersData[idx];
+
+    hideModal('addCustomerModal');
+    resetAddForm();
+    updateKPIs();
+    renderTable();
+    toast('Customer updated successfully!');
+}
+
+function deleteCustomer(id) {
+    var c = find(id);
+    if (!confirm('Delete "' + (c ? c.name : id) + '"? This cannot be undone.')) return;
+    customersData     = customersData.filter(function (x) { return x.id !== id; });
+    filteredCustomers = filteredCustomers.filter(function (x) { return x.id !== id; });
+    selectedCustomers.delete(id);
+    updateKPIs();
+    renderTable();
+    updateSidebarInsights();
+    toast('Customer deleted.');
+}
+
+// =============================================================
+//  Interest Tags
+// =============================================================
+function addTag(text) {
+    var container = document.getElementById('interestsContainer');
+    if (!container) return;
+    var uid = 'tag-' + Date.now() + '-' + Math.random().toString(36).slice(2);
+    var el  = document.createElement('div');
+    el.className = 'interest-tag';
+    el.id = uid;
+    el.innerHTML =
+        '<span>' + esc(text) + '</span>' +
+        '<button type="button" onclick="removeTag(\'' + uid + '\')">&times;</button>';
+    container.appendChild(el);
+}
+function removeTag(uid) {
+    var el = document.getElementById(uid);
+    if (el) el.remove();
+}
+
+// =============================================================
+//  Export CSV
+// =============================================================
+function exportCSV() {
+    var headers = 'ID,Name,Email,Phone,City,Segment,Total Spend,Visits,Loyalty Points,Status,Join Date,Last Visit';
+    var rows = filteredCustomers.map(function (c) {
+        return [c.id, c.name, c.email, c.phone, c.city, segLabel(c.segment),
+                c.totalSpend, c.totalVisits, c.loyaltyPoints, c.status, c.joinDate, c.lastVisit]
+               .map(function (v) { return '"' + String(v).replace(/"/g,'""') + '"'; }).join(',');
+    });
+    var a      = document.createElement('a');
+    a.href     = 'data:text/csv,' + encodeURIComponent(headers + '\n' + rows.join('\n'));
+    a.download = 'customers-' + luxon.DateTime.now().toFormat('yyyy-MM-dd') + '.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    toast('Exported ' + filteredCustomers.length + ' customers!');
+}
+
+// =============================================================
+//  Form Reset
+// =============================================================
+function resetAddForm() {
+    var form = document.getElementById('addCustomerForm');
+    var newForm = form.cloneNode(true);
+    form.parentNode.replaceChild(newForm, form);
+    newForm.reset();
+    newForm.addEventListener('submit', onAddCustomer);
+
+    // Re-wire interests on fresh form
+    var intInput = document.getElementById('customerInterests');
+    if (intInput) {
+        intInput.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ',') {
+                e.preventDefault();
+                var v = intInput.value.trim();
+                if (v) { addTag(v); intInput.value = ''; }
+            }
+        });
+    }
+
+    var container = document.getElementById('interestsContainer');
+    if (container) container.innerHTML = '';
+
+    ['prefEmail','prefSMS','prefWhatsApp','prefPromotions'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) el.checked = true;
+    });
+
+    var submitBtn = newForm.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-user-plus"></i> Add Customer';
+    var titleEl = document.querySelector('#addCustomerModal .modal-header h3');
+    if (titleEl) titleEl.innerHTML =
+        '<i class="fas fa-user-plus" style="color:#2563eb;margin-right:0.5rem;"></i>Add New Customer';
+}
+
+// =============================================================
+//  Toast
+// =============================================================
+function toast(msg, type) {
+    var n = document.createElement('div');
+    n.className = 'toast' + (type === 'error' ? ' error' : '');
+    n.innerHTML =
+        '<i class="fas fa-' + (type === 'error' ? 'exclamation-circle' : 'check-circle') +
+        '" style="color:' + (type === 'error' ? '#ef4444' : '#10b981') + ';font-size:1rem;flex-shrink:0;"></i>' +
+        '<span style="color:#374151;flex:1;">' + esc(msg) + '</span>' +
+        '<button onclick="this.parentNode.remove()" style="background:none;border:none;cursor:pointer;color:#9ca3af;font-size:1rem;padding:0;">&times;</button>';
+    document.body.appendChild(n);
+    setTimeout(function () { n.classList.add('show'); }, 10);
+    setTimeout(function () {
+        n.classList.remove('show');
+        setTimeout(function () { if (n.parentNode) n.parentNode.removeChild(n); }, 300);
+    }, 5000);
+}
+
+// =============================================================
+//  Utility Helpers
+// =============================================================
+function showModal(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'flex';
+}
+function hideModal(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+}
+function on(id, evt, fn) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener(evt, fn);
+}
+function setElText(id, v) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = v;
+}
+function find(id) {
+    return customersData.find(function (c) { return c.id === id; });
+}
+function val(id) {
+    var el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+}
+function setVal(id, v) {
+    var el = document.getElementById(id);
+    if (el) el.value = v;
+}
+function chk(id) {
+    var el = document.getElementById(id);
+    return el ? el.checked : false;
+}
+function setCk(id, v) {
+    var el = document.getElementById(id);
+    if (el) el.checked = v;
+}
+function rnd(n) { return Math.floor(Math.random() * n); }
+function cap(s) { return s ? s.charAt(0).toUpperCase() + s.slice(1) : ''; }
+function esc(s) {
+    return String(s)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function segLabel(s) {
+    return { new:'New', regular:'Regular', loyal:'Loyal', vip:'VIP',
+             'high-value':'High Value', inactive:'Inactive' }[s] || s;
+}
+function fmtCurrency(v) {
+    if (v >= 1e5) return (v / 1e5).toFixed(1) + 'L';
+    if (v >= 1e3) return (v / 1e3).toFixed(1) + 'K';
+    return Math.round(v).toLocaleString('en-IN');
+}
+function genDOB(age) {
+    var now = luxon.DateTime.now();
+    var y = now.year - age;
+    var m = Math.floor(Math.random() * 12) + 1;
+    var d = Math.floor(Math.random() * 28) + 1;
+    return y + '-' + String(m).padStart(2,'0') + '-' + String(d).padStart(2,'0');
+}
+function getCookie(name) {
+    var parts = document.cookie.split(';');
+    for (var i = 0; i < parts.length; i++) {
+        var kv = parts[i].trim().split('=');
+        if (kv[0] === name) return decodeURIComponent(kv[1] || '');
+    }
+    return '';
+}
+function tryParse(str) {
+    try { return JSON.parse(str); } catch (e) { return null; }
+}
+// Detail card helper
+function dc(label, value) {
+    return '<div class="detail-card">' +
+        '<div class="detail-card-label">' + label + '</div>' +
+        '<div class="detail-card-value">' + value + '</div>' +
+    '</div>';
+}
