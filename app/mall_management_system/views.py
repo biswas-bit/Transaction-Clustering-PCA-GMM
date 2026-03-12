@@ -190,6 +190,9 @@ def predict_customer_segment(request):
         segment_names = {0:'Premium Retail',1:'Standard Retail',2:'Growth Retail',3:'wholesale'}
         segment = segment_names.get(int(cluster), 'Premium Retail')
         
+        print(cluster)
+        print(proba_raw)
+        
         # format proba
         probabilities = {}
         if proba_raw is not None:
@@ -238,25 +241,35 @@ def get_segment_distribution(request):
             "labels": ["New", "Regular", "Loyal", "VIP"],
             "values": [120, 340, 85, 22],
             "colors": ["#2563eb", "#10b981", "#f59e0b", "#8b5cf6"],
-            "percentages": {"New": 21.0, "Regular": 59.6, ...}
+            "percentages": {"New": 21.0, "Regular": 59.6, "Loyal": 14.9, "VIP": 3.9}
         },
         "total_processed": 567,
         "model_used": true
     }
     """
     try:
-        from .models import Transaction  # your Django model
-        from models import Segmenter  
-
-        # Use cluster names that match the UI
+        from .models import Transaction
+        from django.db.models import Count, Sum
+        
+        # Define the segment names and colors that match your frontend
+        segment_order = ['New', 'Regular', 'Loyal', 'VIP']
+        segment_colors = {
+            'New': '#2563eb',
+            'Regular': '#10b981', 
+            'Loyal': '#f59e0b',
+            'VIP': '#8b5cf6'
+        }
+        
         segment_counts = {'New': 0, 'Regular': 0, 'Loyal': 0, 'VIP': 0}
-        segment_names = {0: 'New', 1: 'Regular', 2: 'Loyal', 3: 'VIP'}
         model_used = False
         total_processed = 0
 
-        # Try ML model first
+        # Try ML model first (if available)
         try:
+            from models import Segmenter
             segmenter = Segmenter('app/models/Customer_Segmentation_v1.pkl')
+            segment_names = {0: 'New', 1: 'Regular', 2: 'Loyal', 3: 'VIP'}
+            
             data = list(Transaction.objects.values('quantity', 'unit_price', 'hour', 'day_of_week'))
 
             if data:
@@ -271,7 +284,7 @@ def get_segment_distribution(request):
                         ]
                         cluster = segmenter.get_cluster(features)
                         segment = segment_names.get(int(cluster), 'New')
-                        segment_counts[segment] += 1
+                        segment_counts[segment] = segment_counts.get(segment, 0) + 1
                         total_processed += 1
                     except Exception as e:
                         print(f"Error processing item: {e}")
@@ -281,18 +294,20 @@ def get_segment_distribution(request):
             # Fallback: use heuristic segmentation if model unavailable
             print(f'ML model unavailable, using heuristic: {e}')
             
-            from django.db.models import Count, Sum
+            # Get customer transaction stats
             customer_stats = (
                 Transaction.objects
-                .values('customer_id_id')
+                .values('customer_id')
                 .annotate(
                     txn_count=Count('id'),
                     total_spend=Sum('total_amount')
                 )
             )
+            
             for c in customer_stats:
                 txn_count = c['txn_count']
                 total_spend = float(c['total_spend'] or 0)
+                
                 if txn_count >= 10 or total_spend >= 50000:
                     segment_counts['VIP'] += 1
                 elif txn_count >= 5 or total_spend >= 20000:
@@ -307,17 +322,20 @@ def get_segment_distribution(request):
         total = sum(segment_counts.values()) or 1
         percentages = {k: round((v / total) * 100, 1) for k, v in segment_counts.items()}
 
-        return Response({
+        # Prepare response in the format expected by frontend
+        response_data = {
             'success': True,
             'segments': {
-                'labels': list(segment_counts.keys()),
-                'values': list(segment_counts.values()),
-                'colors': ['#2563eb', '#10b981', '#f59e0b', '#8b5cf6'],
+                'labels': segment_order,
+                'values': [segment_counts[label] for label in segment_order],
+                'colors': [segment_colors[label] for label in segment_order],
                 'percentages': percentages,
             },
             'total_processed': total_processed,
             'model_used': model_used,
-        }, status=status.HTTP_200_OK)
+        }
+        
+        return Response(response_data, status=status.HTTP_200_OK)
 
     except Exception as e:
         import traceback
@@ -326,7 +344,6 @@ def get_segment_distribution(request):
             'success': False,
             'error': str(e)
         }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
     
 
 def customers(request):
