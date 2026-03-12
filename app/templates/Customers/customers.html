@@ -70,7 +70,7 @@
 
 /* Segment status badge */
 #segmentStatus {
-    display: none;
+    display: flex;
     align-items: center;
     gap: .4rem;
     font-size: .72rem;
@@ -381,14 +381,14 @@
         <div class="insight-row">
             <div class="insight-icon"><i class="fas fa-user-plus"></i></div>
             <div>
-                <div class="insight-val" id="newCustomersToday">{{ new_customers_today|default:"0" }}</div>
+                <div class="insight-val" id="newCustomersToday">0</div>
                 <div class="insight-lbl">New Today</div>
             </div>
         </div>
         <div class="insight-row">
             <div class="insight-icon"><i class="fas fa-star"></i></div>
             <div>
-                <div class="insight-val" id="loyalCustomers">{{ loyal_customers|default:"0" }}</div>
+                <div class="insight-val" id="loyalCustomers">0</div>
                 <div class="insight-lbl">Loyal + VIP</div>
             </div>
         </div>
@@ -415,7 +415,7 @@
         </div>
         <div class="kpi-value" id="totalCustomers">{{ total_customers|default:"0" }}</div>
         <div class="kpi-change">
-            <span id="customerGrowth" class="change-up">+0%</span>
+            <span id="customerGrowth" class="change-up">+{{ customer_growth|default:"0" }}%</span>
             <span class="change-lbl">vs last month</span>
         </div>
     </div>
@@ -426,7 +426,7 @@
         </div>
         <div class="kpi-value" id="avgCustomerSpend">{{ avg_customer_spend_formatted|default:"₹0" }}</div>
         <div class="kpi-change">
-            <span class="change-up">+8.5%</span>
+            <span class="change-up">+{{ customer_growth|default:"0" }}%</span>
             <span class="change-lbl">vs last month</span>
         </div>
     </div>
@@ -437,7 +437,7 @@
         </div>
         <div class="kpi-value" id="repeatRate">{{ repeat_rate|default:"0" }}%</div>
         <div class="kpi-change">
-            <span class="change-up">+2.1%</span>
+            <span class="change-up">+{{ customer_growth|default:"0" }}%</span>
             <span class="change-lbl">vs last month</span>
         </div>
     </div>
@@ -464,10 +464,6 @@
             <span style="font-size:.75rem;color:#9ca3af;">Last 12 weeks</span>
         </div>
         <div class="chart-box">
-            <!--
-                data-dates / data-counts: Django passes JSON arrays.
-                If not available they will be empty strings; JS falls back to sample data.
-            -->
             <canvas id="acquisitionChart"
                 data-dates='{{ acquisition_dates|default:"[]"|safe }}'
                 data-counts='{{ acquisition_counts|default:"[]"|safe }}'>
@@ -479,28 +475,18 @@
     <div class="chart-card">
         <div class="chart-head">
             <h3>Customer Segments</h3>
-            <!-- JS populates this after API responds -->
-            <div id="segmentStatus"></div>
-        </div>
-
-        <!-- chart-box height is fixed; Chart.js fills it -->
-        <div class="chart-box" style="height:200px;">
-            <!--
-                Fallback data-* in case API is unavailable.
-                Django should pass JSON strings; defaults are safe fallbacks.
-            -->
-            <canvas id="segmentsChart"
-                data-labels='{{ segment_labels|default:"[\"New\",\"Regular\",\"Loyal\",\"VIP\"]"|safe }}'
-                data-values='{{ segment_values|default:"[25,40,20,15]"|safe }}'
-                data-colors='{{ segment_colors|default:"[\"#2563eb\",\"#10b981\",\"#f59e0b\",\"#8b5cf6\"]"|safe }}'>
-            </canvas>
-        </div>
-
-        <!-- Breakdown list — JS fills via API -->
-        <div id="segmentBreakdown" style="margin-top:.75rem;padding-top:.5rem;border-top:1px solid #f3f4f6;">
-            <div style="text-align:center;padding:.625rem;color:#9ca3af;font-size:.8rem;">
-                <span class="spinner"></span>&nbsp;Loading ML predictions…
+            <div id="segmentStatus">
+                <span class="spinner"></span>
+                <span style="font-size:.72rem;color:#9ca3af;">Loading ML predictions…</span>
             </div>
+        </div>
+
+        <div class="chart-box" style="height:200px;">
+            <canvas id="segmentsChart"></canvas>
+        </div>
+
+        <div id="segmentBreakdown" style="margin-top:.75rem;padding-top:.5rem;border-top:1px solid #f3f4f6;">
+            <!-- Filled by API -->
         </div>
     </div>
 
@@ -516,25 +502,13 @@
                     placeholder="Search name, email, city…">
             <select id="customerSegmentFilter" class="ctrl">
                 <option value="all">All Segments</option>
-                <option value="new">New</option>
-                <option value="regular">Regular</option>
-                <option value="loyal">Loyal</option>
-                <option value="vip">VIP</option>
-                <option value="high-value">High Value</option>
-                <option value="inactive">Inactive</option>
+                <option value="New">New</option>
+                <option value="Regular">Regular</option>
+                <option value="Loyal">Loyal</option>
+                <option value="VIP">VIP</option>
             </select>
-            <select id="customerSort" class="ctrl">
-                <option value="recent">Most Recent</option>
-                <option value="name">Name A–Z</option>
-                <option value="spend">Top Spenders</option>
-                <option value="visits">Most Visits</option>
-                <option value="loyalty">Loyalty Points</option>
-            </select>
-            <button id="addCustomerBtn" class="btn btn-primary">
-                <i class="fas fa-plus"></i> Add
-            </button>
-            <button id="bulkActionBtn" class="btn btn-outline">
-                <i class="fas fa-paper-plane"></i> Campaign
+            <button id="refreshCustomersBtn" class="btn btn-outline">
+                <i class="fas fa-sync-alt"></i> Refresh
             </button>
             <button id="exportCustomersBtn" class="btn btn-outline">
                 <i class="fas fa-download"></i> Export
@@ -552,15 +526,13 @@
                 <th>Total Spend</th>
                 <th>Visits</th>
                 <th>Last Visit</th>
-                <th>Loyalty Pts</th>
                 <th>Status</th>
-                <th>Actions</th>
             </tr>
         </thead>
         <tbody id="customersTableBody">
             {% for customer in recent_customers %}
             <tr>
-                <td><input type="checkbox"></td>
+                <td><input type="checkbox" class="cust-cb" data-id="{{ customer.id }}"></td>
                 <td>
                     <div style="display:flex;align-items:center;gap:.5rem;">
                         <div style="width:2rem;height:2rem;background:#e5e7eb;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
@@ -573,182 +545,357 @@
                     </div>
                 </td>
                 <td style="font-size:.8rem;color:#6b7280;">{{ customer.email }}</td>
-                <td><span class="badge badge-{{ customer.segment }}">{{ customer.segment_display }}</span></td>
+                <td><span class="badge badge-{{ customer.segment|lower }}">{{ customer.segment_display|default:customer.segment }}</span></td>
                 <td><strong>{{ customer.total_spend_formatted }}</strong></td>
                 <td>{{ customer.visit_count }}</td>
                 <td>{{ customer.last_visit }}</td>
-                <td>—</td>
                 <td><span class="badge badge-active">Active</span></td>
-                <td><button class="act-btn act-view"><i class="fas fa-eye"></i></button></td>
             </tr>
             {% empty %}
             <tr id="tableLoadingRow">
-                <td colspan="10" style="text-align:center;padding:3rem;color:#9ca3af;">
+                <td colspan="8" style="text-align:center;padding:3rem;color:#9ca3af;">
                     <i class="fas fa-users" style="font-size:2.5rem;display:block;margin-bottom:.5rem;opacity:.3;"></i>
-                    Loading customer data…
+                    No customer data available
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-
-    <div class="table-footer">
-        <span>Showing <strong id="showingCount">0</strong> of <strong id="totalCount">0</strong> customers</span>
-        <div class="page-controls">
-            <span style="font-size:.8rem;color:#6b7280;">
-                Page <span id="currentPage">1</span> / <span id="totalPages">1</span>
-            </span>
-            <button id="prevPageBtn" class="page-btn">&#8592; Prev</button>
-            <button id="nextPageBtn" class="page-btn">Next &#8594;</button>
-        </div>
-    </div>
 </div>
 
 </div><!-- /#customerPage -->
-
-
-<!-- ═══════════════════════ ADD CUSTOMER MODAL ══════════════ -->
-<div id="addCustomerModal" class="modal-overlay">
-    <div class="modal-box">
-        <div class="modal-hdr">
-            <h3><i class="fas fa-user-plus" style="color:#2563eb;margin-right:.5rem;"></i>Add New Customer</h3>
-            <button class="modal-close" id="closeCustomerModal">&times;</button>
-        </div>
-        <form id="addCustomerForm" novalidate>
-            <div class="frow">
-                <div>
-                    <label class="flbl">Full Name *</label>
-                    <input type="text" id="customerName" class="finput" required placeholder="Arjun Sharma">
-                </div>
-                <div>
-                    <label class="flbl">Gender</label>
-                    <select id="customerGender" class="fselect">
-                        <option value="">Select…</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="other">Other</option>
-                    </select>
-                </div>
-            </div>
-            <div class="frow">
-                <div>
-                    <label class="flbl">Email *</label>
-                    <input type="email" id="customerEmail" class="finput" required placeholder="arjun@email.com">
-                </div>
-                <div>
-                    <label class="flbl">Phone *</label>
-                    <input type="text" id="customerPhone" class="finput" required placeholder="+91 98765 43210">
-                </div>
-            </div>
-            <div class="frow">
-                <div>
-                    <label class="flbl">Age</label>
-                    <input type="number" id="customerAge" class="finput" min="1" max="120" placeholder="28">
-                </div>
-                <div>
-                    <label class="flbl">City</label>
-                    <input type="text" id="customerCity" class="finput" placeholder="Mumbai">
-                </div>
-            </div>
-            <div class="frow">
-                <div>
-                    <label class="flbl">Segment</label>
-                    <select id="customerSegment" class="fselect">
-                        <option value="new">New</option>
-                        <option value="regular" selected>Regular</option>
-                        <option value="loyal">Loyal</option>
-                        <option value="vip">VIP</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="flbl">Source</label>
-                    <select id="customerSource" class="fselect">
-                        <option value="walk-in">Walk-in</option>
-                        <option value="online">Online</option>
-                        <option value="referral">Referral</option>
-                        <option value="campaign">Campaign</option>
-                        <option value="event">Event</option>
-                    </select>
-                </div>
-            </div>
-            <div class="frow1">
-                <label class="flbl">Interests <small style="color:#9ca3af;font-weight:400;">(press Enter)</small></label>
-                <input type="text" id="customerInterests" class="finput" placeholder="Fashion, Electronics…">
-                <div id="interestsContainer"></div>
-            </div>
-            <div class="frow1">
-                <label class="flbl">Communication Preferences</label>
-                <div style="display:flex;flex-wrap:wrap;gap:.875rem;margin-top:.25rem;">
-                    <label style="display:flex;align-items:center;gap:.375rem;font-size:.8125rem;cursor:pointer;"><input type="checkbox" id="prefEmail" checked> Email</label>
-                    <label style="display:flex;align-items:center;gap:.375rem;font-size:.8125rem;cursor:pointer;"><input type="checkbox" id="prefSMS" checked> SMS</label>
-                    <label style="display:flex;align-items:center;gap:.375rem;font-size:.8125rem;cursor:pointer;"><input type="checkbox" id="prefWhatsApp" checked> WhatsApp</label>
-                    <label style="display:flex;align-items:center;gap:.375rem;font-size:.8125rem;cursor:pointer;"><input type="checkbox" id="prefPromotions" checked> Promotions</label>
-                </div>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="fbtn-cancel" id="cancelCustomerBtn">Cancel</button>
-                <button type="submit" class="fbtn-submit" id="addCustomerSubmitBtn">
-                    <i class="fas fa-user-plus"></i> Add Customer
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-<!-- ════════════════════════ CAMPAIGN MODAL ═════════════════ -->
-<div id="campaignModal" class="modal-overlay">
-    <div class="modal-box" style="max-width:460px;">
-        <div class="modal-hdr">
-            <h3><i class="fas fa-paper-plane" style="color:#2563eb;margin-right:.5rem;"></i>Send Campaign</h3>
-            <button class="modal-close" id="closeCampaignModal">&times;</button>
-        </div>
-        <form id="campaignForm" novalidate>
-            <div class="frow1">
-                <label class="flbl">Campaign Type</label>
-                <select id="campaignType" class="fselect">
-                    <option value="email">Email</option>
-                    <option value="sms">SMS</option>
-                    <option value="whatsapp">WhatsApp</option>
-                </select>
-            </div>
-            <div class="frow1">
-                <label class="flbl">Target Audience</label>
-                <select id="campaignAudience" class="fselect">
-                    <option value="selected">Selected Customers</option>
-                    <option value="all">All Filtered Customers</option>
-                </select>
-            </div>
-            <div class="frow1">
-                <label class="flbl">Subject</label>
-                <input type="text" id="campaignSubject" class="finput" placeholder="Exclusive offer just for you!">
-            </div>
-            <div class="frow1">
-                <label class="flbl">Message</label>
-                <textarea id="campaignMessage" class="ftextarea" rows="4" placeholder="Dear customer, …"></textarea>
-            </div>
-            <div class="form-actions">
-                <button type="button" class="fbtn-cancel" id="cancelCampaignBtn">Cancel</button>
-                <button type="submit" class="fbtn-submit">
-                    <i class="fas fa-paper-plane"></i> Send Campaign
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
-
-
-<!-- ══════════════════ CUSTOMER DETAIL MODAL ════════════════ -->
-<div id="customerDetailModal" class="modal-overlay">
-    <div class="modal-box" style="max-width:600px;">
-        <div id="customerDetailContent"></div>
-    </div>
-</div>
 
 {% endblock %}
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/luxon@3/build/global/luxon.min.js"></script>
-<script src="{% static 'javascripts/customers.js' %}"></script>
+ <script>
+      // ============================================================
+    // CUSTOMER MANAGEMENT - REAL DATA FROM APIS ONLY
+    // ============================================================
+    
+    'use strict';
+
+    // Chart instances
+    var acquisitionChart = null;
+    var segmentsChart = null;
+
+    // ── Boot ──────────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+        try {
+            initAcquisitionChart();
+            fetchSegmentDistribution();
+        } catch (err) {
+            console.error('Boot error:', err);
+        }
+    });
+
+    // =============================================================
+    // ACQUISITION CHART - From Django Context
+    // =============================================================
+    function initAcquisitionChart() {
+        var el = document.getElementById('acquisitionChart');
+        if (!el) return;
+
+        var labels = safeJSON(el.dataset.dates, []);
+        var data = safeJSON(el.dataset.counts, []);
+
+        if (!labels.length || !data.length) {
+            document.querySelector('.chart-card:first-child .chart-box').innerHTML = 
+                '<div style="height:100%;display:flex;align-items:center;justify-content:center;color:#9ca3af;">No acquisition data available</div>';
+            return;
+        }
+
+        acquisitionChart = new Chart(el, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'New Customers',
+                    data: data,
+                    borderColor: '#2563eb',
+                    backgroundColor: 'rgba(37,99,235,0.07)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.4,
+                    pointBackgroundColor: '#2563eb',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true, grid: { color: '#f3f4f6' } }
+                }
+            }
+        });
+    }
+
+    // =============================================================
+    // SEGMENT DISTRIBUTION API - GET /api/customers/segment-distribution/
+    // =============================================================
+    function fetchSegmentDistribution() {
+        var statusEl = document.getElementById('segmentStatus');
+        var breakdownEl = document.getElementById('segmentBreakdown');
+
+        fetch('/api/customers/segment-distribution/', {
+            method: 'GET',
+            
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest' 
+            }
+        })
+        
+        .then(function (res) {
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return res.json();
+        })
+        .then(function (data) {
+            if (!data.success || !data.segments) {
+                throw new Error(data.error || 'API returned failure');
+            }
+
+            var segments = data.segments;
+            var labels = segments.labels || [];
+            var values = segments.values || [];
+            var colors = segments.colors || [];
+            var percentages = segments.percentages || {};
+
+            // Update status badge
+            if (statusEl) {
+                var pillClass = data.model_used ? 'model' : 'heuristic';
+                var pillText = data.model_used ? 'ML Model' : 'Heuristic';
+                statusEl.innerHTML = 
+                    '<span class="ml-pill ' + pillClass + '">' + pillText + '</span>' +
+                    '<span style="font-size:.72rem;color:#6b7280;">' + data.total_processed + ' transactions</span>';
+            }
+
+            // Create/Update segment chart
+            initSegmentChart(labels, values, colors);
+
+            // Render breakdown
+            renderBreakdown(labels, values, colors, percentages);
+        })
+        .catch(function (err) {
+            console.error('Segment API error:', err);
+            if (statusEl) {
+                statusEl.innerHTML = '<span class="ml-pill error">API Error</span>';
+            }
+            if (breakdownEl) {
+                breakdownEl.innerHTML = '<div style="text-align:center;padding:.625rem;color:#9ca3af;">Failed to load segment data</div>';
+            }
+        });
+    }
+
+    // ── Segment Doughnut Chart ────────────────────────────────────
+    function initSegmentChart(labels, values, colors) {
+        var ctx = document.getElementById('segmentsChart').getContext('2d');
+        
+        if (segmentsChart) {
+            segmentsChart.destroy();
+        }
+
+        segmentsChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: colors,
+                    borderWidth: 2,
+                    borderColor: '#fff',
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '68%',
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            padding: 14,
+                            usePointStyle: true,
+                            pointStyle: 'circle',
+                            font: { size: 11 }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function (ctx) {
+                                var total = ctx.dataset.data.reduce(function (a, b) { return a + b; }, 0);
+                                var pct = total > 0 ? ((ctx.raw / total) * 100).toFixed(1) : 0;
+                                return ' ' + ctx.label + ': ' + ctx.raw + ' (' + pct + '%)';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Update sidebar loyal customers count
+        var loyalIndex = labels.indexOf('Loyal');
+        var vipIndex = labels.indexOf('VIP');
+        var loyalCount = loyalIndex >= 0 ? values[loyalIndex] : 0;
+        var vipCount = vipIndex >= 0 ? values[vipIndex] : 0;
+        var loyalEl = document.getElementById('loyalCustomers');
+        if (loyalEl) loyalEl.textContent = loyalCount + vipCount;
+    }
+
+    function renderBreakdown(labels, values, colors, percentages) {
+        var el = document.getElementById('segmentBreakdown');
+        if (!el) return;
+        
+        var total = values.reduce(function (a, b) { return a + b; }, 0);
+        
+        var html = '';
+        for (var i = 0; i < labels.length; i++) {
+            var lbl = labels[i];
+            var val = values[i];
+            var color = colors[i] || '#ccc';
+            
+            var pct = percentages && percentages[lbl] ? percentages[lbl] : 
+                     (total > 0 ? ((val / total) * 100).toFixed(1) : '0.0');
+            
+            html += '<div class="seg-row">' +
+                '<div style="display:flex;align-items:center;">' +
+                    '<span class="seg-dot" style="background:' + color + ';"></span>' +
+                    '<span style="font-weight:600;color:#374151;">' + lbl + '</span>' +
+                '</div>' +
+                '<div style="display:flex;align-items:center;gap:.625rem;">' +
+                    '<span style="font-weight:700;color:#111827;min-width:2rem;text-align:right;">' + val + '</span>' +
+                    '<span style="color:#9ca3af;font-size:.75rem;min-width:3.5rem;text-align:right;">' + pct + '%</span>' +
+                '</div>' +
+            '</div>';
+        }
+        
+        el.innerHTML = html;
+    }
+
+    // =============================================================
+    // TABLE CONTROLS
+    // =============================================================
+    function setupTableControls() {
+        var searchEl = document.getElementById('customerSearch');
+        if (searchEl) {
+            searchEl.addEventListener('input', function(e) {
+                filterTable(e.target.value);
+            });
+        }
+
+        var filterEl = document.getElementById('customerSegmentFilter');
+        if (filterEl) {
+            filterEl.addEventListener('change', function(e) {
+                filterBySegment(e.target.value);
+            });
+        }
+
+        var refreshBtn = document.getElementById('refreshCustomersBtn');
+        if (refreshBtn) {
+            refreshBtn.addEventListener('click', function() {
+                window.location.reload();
+            });
+        }
+
+        var exportBtn = document.getElementById('exportCustomersBtn');
+        if (exportBtn) {
+            exportBtn.addEventListener('click', exportTableToCSV);
+        }
+
+        var selectAll = document.getElementById('selectAllCustomers');
+        if (selectAll) {
+            selectAll.addEventListener('change', function(e) {
+                var checkboxes = document.querySelectorAll('.cust-cb');
+                checkboxes.forEach(function(cb) {
+                    cb.checked = e.target.checked;
+                });
+            });
+        }
+    }
+
+    function filterTable(term) {
+        var rows = document.querySelectorAll('#customersTableBody tr');
+        term = term.toLowerCase();
+        
+        rows.forEach(function(row) {
+            var text = row.textContent.toLowerCase();
+            row.style.display = text.includes(term) ? '' : 'none';
+        });
+    }
+
+    function filterBySegment(segment) {
+        var rows = document.querySelectorAll('#customersTableBody tr');
+        
+        rows.forEach(function(row) {
+            if (segment === 'all') {
+                row.style.display = '';
+                return;
+            }
+            
+            var segmentCell = row.querySelector('.badge');
+            if (segmentCell) {
+                var rowSegment = segmentCell.textContent.trim();
+                row.style.display = rowSegment === segment ? '' : 'none';
+            }
+        });
+    }
+
+    function exportTableToCSV() {
+        var rows = document.querySelectorAll('#customersTableBody tr');
+        var csv = [];
+        
+        // Headers
+        csv.push('Customer,Email,Segment,Total Spend,Visits,Last Visit,Status');
+        
+        rows.forEach(function(row) {
+            if (row.style.display !== 'none') {
+                var cols = row.querySelectorAll('td');
+                if (cols.length >= 7) {
+                    var rowData = [
+                        cols[1].textContent.trim().replace(/,/g, ';'),
+                        cols[2].textContent.trim(),
+                        cols[3].textContent.trim(),
+                        cols[4].textContent.trim(),
+                        cols[5].textContent.trim(),
+                        cols[6].textContent.trim(),
+                        cols[7].textContent.trim()
+                    ];
+                    csv.push(rowData.join(','));
+                }
+            }
+        });
+        
+        var blob = new Blob([csv.join('\n')], { type: 'text/csv' });
+        var url = window.URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'customers_export.csv';
+        a.click();
+        window.URL.revokeObjectURL(url);
+    }
+
+    // =============================================================
+    // UTILITY FUNCTIONS
+    // =============================================================
+    function safeJSON(str, fallback) {
+        if (!str || str === 'None' || str === 'null' || str === '') return fallback;
+        try { 
+            var r = JSON.parse(str); 
+            return Array.isArray(r) && r.length ? r : fallback;
+        } catch (e) { 
+            return fallback; 
+        }
+    }
+
+    // Initialize table controls after DOM is ready
+    setTimeout(setupTableControls, 500);
+   
+ </script>
 {% endblock %}
