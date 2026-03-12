@@ -21,8 +21,8 @@ urlpatterns = [
     path('api/analytics/', views.get_analytics, name='get_analytics'),
     
     #ML model API
-    path('api/customers/predict-segment/',     views.predict_customer_segment,  name='predict_customer_segment'),
-     path('api/customers/segment-distribution/', views.get_segment_distribution,  name='get_segment_distribution')
+    path('api/customers/predict-segment/', views.predict_customer_segment, name='predict_customer_segment'),
+    path('api/customers/segment-distribution/', views.get_segment_distribution, name='get_segment_distribution')
     
     
 ]
